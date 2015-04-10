@@ -115,3 +115,8 @@ vi customize.sh
   fi
 
 ```
+
+
+### Install Desktop Workstation
+
+[Instructions](https://github.com/rdbwebster/vcadevops/blob/master/Install.md)
