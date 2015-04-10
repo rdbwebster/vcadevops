@@ -80,13 +80,20 @@ Applications builds and deployment are handled by a centralized Jenkins server o
 
 Ubuntu Server (vAPP)   
 
-Internal: 192.18.109.3 and 192.168.109.4
+    Internal: 192.18.109.3 and 192.168.109.4
+    External: 23.92.225.171
 
-External: 23.92.225.171
+    SSH Access:    ssh root@d23.92.225.171
+    use password: devops123
 
-ssh Access:    ssh root@d23.92.225.171
-use password: devops123
 
+GitHub Account for Chef Cookbooks
+    GitHub:  vcadevops
+    Passwd:  vca4devops
+
+Gmail Account needed for Github
+    Email:   vcadevops@gmail.com
+    Passwd:  vca4devops
 
 
 
