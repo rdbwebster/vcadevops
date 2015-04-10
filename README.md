@@ -1,7 +1,3 @@
-# vcadevops
-
-
-
 
 ## Devops with vCloud Air
 
@@ -72,7 +68,7 @@ Configuration management will be managed by a centralized Chef Server running on
 Applications builds and deployment are handled by a centralized Jenkins server on vCloud Air.
 
 
-Live Demo Environment
+### Live Demo Environment
 
 [Chef Server](https://devops.vcloudair.io/login)      devops / devops123
 
