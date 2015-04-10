@@ -35,11 +35,11 @@ $ export IP=vca vm -a ubu | grep ubu | cut -d '|' -f5
 
 
 // Configure a DNAT rule for ssh and http
-vca nat add --type DNAT  --original-ip 23.92.225.229 --original-port 22 --translated-ip 192.168.109.2 --translated-port 22 --protocol any
-vca nat add --type DNAT  --original-ip 23.92.225.229 --original-port 80 --translated-ip 192.168.109.2 --translated-port 80 --protocol any
+vca nat add --type DNAT  --original-ip 23.92.225.229 --original-port 22 --translated-ip $IP --translated-port 22 --protocol any
+vca nat add --type DNAT  --original-ip 23.92.225.229 --original-port 80 --translated-ip $IP --translated-port 80 --protocol any
 
 // test ssh
-ssh -v -i ./ubuntu.pem ubuntu@23.92.225.229 -p 33
+ssh -v -i ./ubuntu.pem ubuntu@23.92.225.229 -p 22
 
 ```
 
@@ -47,10 +47,10 @@ ssh -v -i ./ubuntu.pem ubuntu@23.92.225.229 -p 33
 
 ```
 // Bootstrap the node
-$ knife solo prepare ubuntu@23.92.225.229 -p 33 -V --identity-file ../ubuntu_rsa 
+$ knife solo prepare ubuntu@23.92.225.229 -p 22 -V --identity-file ../ubuntu_rsa 
 
 // Configure using cookbooks
-$ knife solo cook ubuntu@23.92.225.229 -p 33 -V --identity-file ../ubuntu_rsa 
+$ knife solo cook ubuntu@23.92.225.229 -p 22 -V --identity-file ../ubuntu_rsa 
 ```
 
 
