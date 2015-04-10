@@ -102,7 +102,12 @@ Gmail Account needed for Github
 
 ### Install Desktop Workstation
 
+Insructions to setup a developer workstation that can create and provision VMs on vCloud Air
+
 [Instructions](https://github.com/rdbwebster/vcadevops/blob/master/Install.md)
+
+
+
 
 
 
