@@ -88,12 +88,21 @@ Ubuntu Server (vAPP)
 
 
 GitHub Account for Chef Cookbooks
+
     GitHub:  vcadevops
     Passwd:  vca4devops
 
 Gmail Account needed for Github
+
     Email:   vcadevops@gmail.com
     Passwd:  vca4devops
+
+
+
+
+### Install Desktop Workstation
+
+[Instructions](https://github.com/rdbwebster/vcadevops/blob/master/Install.md)
 
 
 
@@ -103,4 +112,5 @@ Gmail Account needed for Github
 vCloud air Virtual Data Centers are configured with a finite number of public IP addresses.  A public IP address is not automatically assigned to each VM when it is created.  Customers can configure the number of additional public IP’s, but it is common that there are more virtual machines than there are available Public Addresses.
 
 The shortfall of public addresses can be resolved by configuring the NAT server on the VDC Gateway to route traffic based on port.  For example a single public address may be configured to listen on port 80, 81 and 82 and route requests to three different virtual machines each listening on port 80.  A similar mapping can be configured for ssh, so a single ip will listen on ports 22, 33 and 44, routing each to a unique VM listening on port 22.
+
 
