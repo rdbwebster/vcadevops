@@ -70,7 +70,7 @@ Applications builds and deployment are handled by a centralized Jenkins server o
 
 ### Live Demo Environment
 
-[Chef Server](https://devops.vcloudair.io/login)      devops / devops123
+[Chef Server](https://devops.vcloudair.io/login)      vcadevops / welcome1
 
 
 
