@@ -1,4 +1,4 @@
-== Install Desktop Env
+## Install Desktop Env
 
 
 This document details how to setup a developer workstation operating outside of vCloud Air.
@@ -6,7 +6,7 @@ The workstation would be used to demonstrate the single developer use case,
 it is not required for the team CI demo.
 
 
-==== Mac Setup Steps
+#### Mac Setup Steps
 
 // install chef sdk on mac
 
