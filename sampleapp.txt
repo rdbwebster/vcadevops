@@ -10,6 +10,14 @@ Instructions on building and running the sample app
 3. To run the app:
 - java -jar build/libs/gs-handling-form-submission-0.1.0.jar
 
-4. To test the app:
+4. To manually test the app:
 http://localhost:8080/greeting
+
+5. To test using Selenium:
+
+A. Install Selenium
+- sudo easy_install selenium
+
+B. Run selenium test script
+- python test.py
 
