@@ -1,0 +1,59 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    {% include 'flash.html' %}
+
+<div class="container">
+  <h3>Environment</h3>
+  <p>Click on the icon to open the server in another window.</p>
+  <div class="row">
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcloudair.io/" target="_blank">
+             <img src="/static/img/Chef.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcloudair.io:8100" target="_blank">
+             <img src="/static/img/Jenkins.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="https://github.com/vcadevops" target="_blank">
+             <img src="/static/img/Github.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-3">.col-sm-3</div>
+  </div>
+</div>
+
+<br>
+<br>
+<br>
+<div class="container">
+  <h3>Scenarios</h3>
+  <p>The .table-hover class enables a hover state on table rows:</p>            
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>Title</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class='clickableRow' href='{{ url_for('sb1') }}'>
+        <td>SB1</td>
+        <td>Spring Boot App CI</td>
+        <td>Spring Boot App in Git, Build / Deploy to existing dev server using Jenkins, Gradle, Chef</td>
+      </tr>
+      <tr>
+        <td>JB2</td>
+        <td>Jenkins VM Creation</td>
+        <td>Jenkins Creates a new Ubuntu VM, Provisioned with Java 1.8 using Chef and Chef Supermarket Recipes</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
