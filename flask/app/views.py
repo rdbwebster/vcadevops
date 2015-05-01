@@ -27,3 +27,7 @@ def sb1():
 @app.route('/ck1/', methods=['GET'])
 def ck1():
     return render_template('ck1.html')
+
+@app.route('/cl1/', methods=['GET'])
+def cl1():
+    return render_template('cl1.html')

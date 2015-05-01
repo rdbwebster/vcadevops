@@ -1,0 +1,93 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+        <h2>CL1 Scenario</h2>
+
+
+
+<p>
+
+This scenario uses the vCloud Air CLI to create an Ubuntu VM on vCloud Air.
+The created node is then bootstrapped using Chef.
+
+The same commands can be executed from Jenkins as part of a build / test automation.
+
+</p>
+
+ <div style="border: 1px solid silver; font-size: 10pt; margin: 20px 0px 10px; overflow: auto; width: 97.38%; cursor: text; direction: ltr; max-height: 200px; line-height: 12pt; font-family: 'Courier New',courier,monospace; height: 210px; background-color: #f4f4f4; text-align: left;" id="codeSnippetWrapper"> 
+
+<code>
+// Login as the ubuntu user <br>
+
+
+
+
+$ vca login org1@websterx.com --password '' --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424
+
+<br>
+// Next command needed, and must have identical org and service id, even though UI console shows service-id without 4424
+<br>
+$ vca org use --org M933009684-4424 --service M933009684-4424
+<br>
+$ vca vdc use --vdc M933009684-4424
+
+<br>
+$ vca vapp create -a ubu -V ubuChefNode -c 'Public Catalog' -t 'Ubuntu Server 12.04 LTS (amd64 20150127)' -n M933009684-4424-default-routed -m POOL
+
+<br>
+// next line may fail if vapp already undeployed, if so skip
+$ vca vapp undeploy --vapp ubu
+
+<br>
+// Note following command silently fails if vapp or vm names are incorrect, only clue at command line is no output 'vm starting'
+
+<br>
+$ vca vapp customize --vapp ubu --vm ubuChefNode --file ./add_public_ssh_key.sh
+
+<br>
+// Get the IP of the new instance and clear public keys from previous instances
+<br>
+$ ssh-keygen -R 192.168.109.4
+<br>
+
+<br>
+$ knife bootstrap 192.168.109.4 -x ubuntu --sudo
+
+<br>
+// See that the node is now a registerd client of the Chef Server
+<br>
+$ knife client list
+
+</code>
+</div>
+<div>
+
+
+<p> vca-cli will... </p>
+ <ol type="1">
+
+<li> Connect to vCloud Air </li>
+<li> Create the VM using the vCloud Air API </li>
+<li> Start the VM  </li>
+</ol> 
+
+<br>
+<p> knife-bootstrap will... </p>
+<ol type="1">
+<li> SSH into the VM and install the Chef Client </li>
+<li> Register the new vm with the Chef Server as a new node </li>
+<li> Run the chef client on the VM and perform the configuration indicated by the Chef Server </li>
+</ol> 
+</div>
+
+</code>
+
+
+
+</div>
+{% endblock %}
+

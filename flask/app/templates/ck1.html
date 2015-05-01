@@ -28,8 +28,16 @@ part of a build / test automation.
 // Run the following knife command <br>
 
 <br>
+$ ssh-keygen -R 192.168.109.4
+<br>
+
 $ knife vcair server create -VV   --ssh-password Password1  
 --image "Ubuntu Server 12.04 LTS (amd64 20150127)"   --customization-script ./add_public_ssh_key.sh   --cpus 2   --memory 4096   --node-name klinuxtest   --vcair-net "M933009684-4424-default-routed" 
+
+<br>
+// See that the node is now a registerd client of the Chef Server
+<br>
+$ knife client list
 
 </code>
 </div>
