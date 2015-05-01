@@ -23,3 +23,7 @@ def index():
 @app.route('/sb1/', methods=['GET'])
 def sb1():
     return render_template('sb1.html')
+
+@app.route('/ck1/', methods=['GET'])
+def ck1():
+    return render_template('ck1.html')

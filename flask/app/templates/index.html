@@ -1,3 +1,4 @@
+
 <!-- extend base layout -->
 {% extends "base.html" %}
 
@@ -24,7 +25,7 @@
             </a>
     </div>
     <div class="col-sm-3">
-           <a class="navbar-brand" href="https://github.com/vcadevops:8081" target="_blank">
+           <a class="navbar-brand" href="http://devops.vcloudair.io:8081" target="_blank">
              <img src="/static/img/Artifactory.png" height="90" width="90" />
             </a>
     </div>
@@ -51,10 +52,10 @@
         <td>Spring Boot App CI</td>
         <td>Spring Boot App in Git, Build / Deploy to existing dev server using Jenkins, Gradle, Chef</td>
       </tr>
-      <tr>
-        <td>JB2</td>
-        <td>Jenkins VM Creation</td>
-        <td>Jenkins Creates a new Ubuntu VM, Provisioned with Java 1.8 using Chef and Chef Supermarket Recipes</td>
+      <tr class='clickableRow' href='{{ url_for('ck1') }}'>
+        <td>CK</td>
+        <td>Chef Knife Plugin</td>
+        <td>Create a VM on vCloud Air using the Chef vCloud Air Knife plugin</td>
       </tr>
     </tbody>
   </table>

@@ -1,0 +1,57 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+        <h2>CK Scenario</h2>
+
+
+
+<p>
+
+This scenario uses the Chef vCloud Air plugin to create an Ubuntu VM on vCloud Air.
+The example shows the knife commands, but the same commands can be executed from Jenkins as 
+part of a build / test automation.
+
+</p>
+
+ <div style="border: 1px solid silver; font-size: 10pt; margin: 20px 0px 10px; overflow: auto; width: 97.38%; cursor: text; direction: ltr; max-height: 200px; line-height: 12pt; font-family: 'Courier New',courier,monospace; height: 210px; background-color: #f4f4f4; text-align: left;" id="codeSnippetWrapper"> 
+
+<code>
+// Login as the ubuntu user <br>
+
+// Change the --node-name parameter in the following command <br>
+// to a value not in use by a current VM in the VDC. <br>
+
+// Run the following knife command <br>
+
+<br>
+$ knife vcair server create -VV   --ssh-password Password1  
+--image "Ubuntu Server 12.04 LTS (amd64 20150127)"   --customization-script ./add_public_ssh_key.sh   --cpus 2   --memory 4096   --node-name klinuxtest   --vcair-net "M933009684-4424-default-routed" 
+
+</code>
+</div>
+<div>
+
+
+<p> The plugin will... </p>
+ <ol type="1">
+
+<li> Connect to vCloud Air </li>
+<li> Create the VM using the vCloud Air API </li>
+<li> Start the VM  </li>
+<li> SSH into the VM and install the Chef Client </li>
+<li> Register the new vm with the Chef Server as a new node </li>
+<li> Run the chef client on the VM and perform the configuration indicated by the Chef Server </li>
+</ol> 
+</div>
+
+</code>
+
+
+
+</div>
+{% endblock %}
+
