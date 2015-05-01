@@ -7,8 +7,33 @@
     {% include 'flash.html' %}
         <h2>SB1 Scenario</h2>
 
+<p>
+
+This scenario demonstrates an continuous integration build pipeline using
+GitHub, Jenkins and Chef.
+<br>
+A Spring Boot application is built and deployed whenever a developer modifies
+the code in the GitHub Project
+<br>
 
  <img src="/static/img/SB1.png" height="230" width="590" />
+
+<p> The sequence is as follows... </p>
+ <ol type="1">
+
+<li> The developer checks in a modification to GitHub </li>
+<li> GitHub notifies Jenkins of the change</li>
+<li> Jenkins retrieves the code from Github  </li>
+<li> Jenkins instructs Gradle to build the project </li>
+<li> Jenkins instructs Chef to provision the VM for the application </li>
+<li> Jenkins deploys the new version of the Application </li>
+<li> The developer accesses the new version of the App </li>
+</ol>
+</div>
+
+
+</p>
+
 
 </div>
 {% endblock %}
