@@ -4,3 +4,20 @@
     height: 75px;
     padding-top: 0;
 }
+
+pre code {
+    background-color: transparent;
+    color: inherit;
+    font-size: 100%;
+    padding: 0;
+}
+
+
+.highlight {
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+.highlight pre {
+    margin-bottom: 0;
+}
+

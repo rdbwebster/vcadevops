@@ -17,9 +17,8 @@ part of a build / test automation.
 
 </p>
 
- <div style="border: 1px solid silver; font-size: 10pt; margin: 20px 0px 10px; overflow: auto; width: 97.38%; cursor: text; direction: ltr; max-height: 200px; line-height: 12pt; font-family: 'Courier New',courier,monospace; height: 210px; background-color: #f4f4f4; text-align: left;" id="codeSnippetWrapper"> 
+<div class="highlight"><pre><code class="language-text" data-lang="text">
 
-<code>
 // Login as the ubuntu user <br>
 
 // Change the --node-name parameter in the following command <br>
@@ -27,20 +26,16 @@ part of a build / test automation.
 
 // Run the following knife command <br>
 
-<br>
-$ ssh-keygen -R 192.168.109.4
-<br>
+$ su - ubuntu
 
-$ knife vcair server create -VV   --ssh-password Password1  
---image "Ubuntu Server 12.04 LTS (amd64 20150127)"   --customization-script ./add_public_ssh_key.sh   --cpus 2   --memory 4096   --node-name klinuxtest   --vcair-net "M933009684-4424-default-routed" 
+$ cd chef-repo 
+$ knife vcair server create -VV --ssh-password Password1 --image "Ubuntu Server 12.04 LTS (amd64 20150127)" --customization-script ./add_public_ssh_key.sh --cpus 2 --memory 4096 --node-name klinuxtest --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
 
-<br>
+
 // See that the node is now a registerd client of the Chef Server
-<br>
 $ knife client list
 
-</code>
-</div>
+</code></pre></div>
 <div>
 
 
