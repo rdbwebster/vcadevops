@@ -5,18 +5,21 @@
 {% block content %}
 <div class="container">
     {% include 'flash.html' %}
-        <h2>SB1 Scenario</h2>
+        <h2>SB2 Scenario</h2>
 
 <p>
 
 This scenario demonstrates an continuous integration build pipeline using
-GitHub, Jenkins and Chef.
+GitHub, Jenkins, Chef and testing with Selenium.
 <br>
-A Spring Boot application is built and deployed whenever a developer modifies
-the code in the GitHub Project
+A Spring Boot Form Submission Application is built and deployed whenever a developer modifies
+the code in the GitHub Project.
 <br>
+The App is deployed to a server that is configured by Chef
+<br>
+Automated testing is performed by Seleniume
 
- <img src="/static/img/SB1.png" height="230" width="590" />
+ <img src="/static/img/SB2.png" height="230" width="590" />
 
 <p> The sequence is as follows... </p>
  <ol type="1">
@@ -27,6 +30,7 @@ the code in the GitHub Project
 <li> Jenkins instructs Gradle to build the project </li>
 <li> Jenkins instructs Chef to provision the VM for the application </li>
 <li> Jenkins deploys the new version of the Application </li>
+<li> Jenkins instructs Selenium to perform a test of the  App </li>
 <li> The developer accesses the new version of the App </li>
 </ol>
 </div>

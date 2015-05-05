@@ -20,9 +20,18 @@ def index():
     return render_template('index.html',
                            title='Home' )
 
-@app.route('/sb1/', methods=['GET'])
-def sb1():
-    return render_template('sb1.html')
+@app.route('/env/', methods=['GET'])
+def env():
+    return render_template('env.html')
+
+
+@app.route('/sp1/', methods=['GET'])
+def sp1():
+    return render_template('sp1.html')
+
+@app.route('/sb2/', methods=['GET'])
+def sb2():
+    return render_template('sb2.html')
 
 @app.route('/ck1/', methods=['GET'])
 def ck1():

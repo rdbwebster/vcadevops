@@ -1,0 +1,44 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+        <h2>SP1 Scenario</h2>
+
+<p>
+
+This scenario demonstrates how a developer can self provision a standardized VM Development 
+server that is configured by the corprate Chef Server.
+<br>
+
+A Spring Boot application is built and deployed whenever a developer modifies
+the code in the GitHub Project
+<br>
+
+ <img src="/static/img/sp1.png"/>
+
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">
+
+
+// Run the following knife command <br>
+
+$ knife vcair server create -VV --ssh-password Password1 --image "Ubuntu Server 12.04 LTS (amd64 20150127)" --customization-script ./add_public_ssh_key.sh --cpus 2 --memory 4096 --node-name klinuxtest --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
+
+
+// See that the node is now a registerd client of the Chef Server
+$ knife client list
+
+// Map the http port on the vcloud Air Gateway or the vApp Firewall
+
+
+</code></pre></div>
+<div>
+
+
+
+</div>
+{% endblock %}
+
