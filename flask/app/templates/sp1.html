@@ -9,12 +9,14 @@
 
 <p>
 
-This scenario demonstrates how a developer can self provision a standardized VM Development 
-server that is configured by the corprate Chef Server.
+This scenario demonstrates how a developer can configure an existing VM Server <br>
+to be a corporate standard web server running nginx.
 <br>
 
-A Spring Boot application is built and deployed whenever a developer modifies
-the code in the GitHub Project
+<br>
+The client workstation is configured with the Chef SDK.
+<br>
+The Corporate Chef Server has a web-server role definition.
 <br>
 
  <img src="/static/img/sp1.png"/>
@@ -23,15 +25,22 @@ the code in the GitHub Project
 <div class="highlight"><pre><code class="language-text" data-lang="text">
 
 
-// Run the following knife command <br>
+// Starting with a Vm named klinuxsp running at 192.168.109.8
 
-$ knife vcair server create -VV --ssh-password Password1 --image "Ubuntu Server 12.04 LTS (amd64 20150127)" --customization-script ./add_public_ssh_key.sh --cpus 2 --memory 4096 --node-name klinuxtest --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
-
-
-// See that the node is now a registerd client of the Chef Server
+// list the chef known clients
 $ knife client list
 
-// Map the http port on the vcloud Air Gateway or the vApp Firewall
+// Assign the web_server role to the running VM
+knife exec -E 'nodes.transform("name:klinuxsp") {|n| n.run_list(["role[web_server]"])}'
+
+// create a port mapping to the app 
+$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to 192.168.109.8:80"
+
+// access the webserver with a browser
+http://devops.vcloudair.io:8900/
+
+// ssh to the node
+$ ssh ubuntu@192.168.109.8
 
 
 </code></pre></div>
