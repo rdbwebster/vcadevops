@@ -21,3 +21,8 @@ pre code {
     margin-bottom: 0;
 }
 
+
+.title .button { 
+    float:right;
+    font-size:large
+ }

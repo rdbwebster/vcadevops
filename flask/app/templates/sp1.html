@@ -27,7 +27,7 @@ The Corporate Chef Server has a web-server role definition.
 
 // Bootstrap node with chef client and set node role
 
-$ knife bootstrap 192.168.109.8 -x root -P devops123 --sudo --run-list  'role[web_server]'
+$ knife bootstrap 192.168.109.8 -x ubuntu --sudo --run-list  'role[web_server]'
 
 // Get the ip for the chef node
 export NIP=`knife node show klinuxchef | grep IP: | cut -d: -f2 | sed -e 's/^[[:space:]]*//'`
