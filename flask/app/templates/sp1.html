@@ -22,19 +22,35 @@ The Corporate Chef Server has a web-server role definition.
  <img src="/static/img/sp1.png"/>
 
 
+<p> If Starting with a VM  at 192.168.109.8,  No Chef client installed </p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">
 
+// Bootstrap node with chef client and set node role
 
-// Starting with a Vm named klinuxsp running at 192.168.109.8
+$ knife bootstrap 192.168.109.8 -x root -P devops123 --sudo --run-list  'role[web_server]'
 
-// list the chef known clients
-$ knife client list
+// Get the ip for the chef node
+export NIP=`knife node show klinuxchef | grep IP: | cut -d: -f2 | sed -e 's/^[[:space:]]*//'`
 
-// Assign the web_server role to the running VM
+// create a port mapping to the app
+$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${NIP}:80"
+
+// access the webserver with a browser
+http://devops.vcloudair.io:8900/
+
+</div>
+
+<p> If Starting with a VM named klinuxsp,  Chef client already installed </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">
+
+// Tell the Chef Server to Assign the web_server role to the running VM
 knife exec -E 'nodes.transform("name:klinuxsp") {|n| n.run_list(["role[web_server]"])}'
 
+// Get the ip for the chef node
+export NIP=`knife node show klinuxchef | grep IP: | cut -d: -f2 | sed -e 's/^[[:space:]]*//'`
+
 // create a port mapping to the app 
-$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to 192.168.109.8:80"
+$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${NIP}:80"
 
 // access the webserver with a browser
 http://devops.vcloudair.io:8900/
