@@ -7,32 +7,67 @@
     {% include 'flash.html' %}
         <h2>CK Scenario</h2>
 
-<div class="title">
-<span class="button">
-<a href="/">Run the Demo<span class="glyphicon glyphicon-play"></a>
-</span>
-</div>
+
+<div class="col-lg-8">
+
 
 <p>
+<br>
+This scenario demonstrates how a developer can use the Chef Knife utility to create a VM on vCloud Air.
 
-This scenario demonstrates how a developer can create a VM Dev Server on vCloud Air using chef-knife.
+<br>
+<br>
+ Learn more about VMWare & Chef     <br>
+<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+To run the knife command the client workstation must have both the Chef SDK and the knife vcair plugin installed.
+<br>
+<br>
+ <img src="/static/img/chef_knife.png"/>
+
+
 <br>
 
-The client workstation is configured with the Chef SDK.
-<br>
 
-This example shows the knife commands run from a command line,<br>
- but the same commands can be executed from Jenkins as
-part of a build / test automation.
+<div class="center-block">
+ The plugin will... 
+<br>
+<br>
+ <ol type="1">
+
+<li> Connect to vCloud Air </li>
+<li> Create the VM using the vCloud Air API </li>
+<li> Start the VM  </li>
+<li> SSH into the VM and install the Chef Client </li>
+<li> Run the chef client to register the new vm with the Chef Server as a new node </li>
+</ol>
+
+</div>
+
+<br>
+<h3>Commands</h3>
+
+Here are the knife commands necessary to run the scenario.<br>
+The same commands can be executed from Jenkins as part of a build / test automation.
+<br>
+<br>
+<i>Click on </i> 
+<a href="http://devops.vcloudair.io:8100/job/Chef_Knife/" target="_blank">Run the Demo<span class="glyphicon glyphicon-play"></a>
+<i>to check it out. (Login required)</i>
 </p>
 
 
 
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">
+<pre class="pre-scrollable">
 
 // Run the following knife command <br>
-$ knife vcair server create -VV --ssh-password Password1 --image "Ubuntu Server 12.04 LTS (amd64 20150127)" --customization-script ./add_public_ssh_key.sh --cpus 2 --memory 4096 --node-name klinuxsp --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
+$ knife vcair server create -VV --ssh-password Password1 \
+  --image "Ubuntu Server 12.04 LTS (amd64 20150127)" --customization-script ./add_public_ssh_key.sh \
+  --cpus 2 --memory 4096 --node-name klinuxsp --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
 
 // See that the node is now a registered client of the Chef Server
 $ knife client list
@@ -41,25 +76,8 @@ $ knife client list
 // Access the node using the generated ip
 $ ssh ubuntu@192.168.109.8 
 
-</code></pre></div>
-<div>
 
-
-<p> The plugin will... </p>
- <ol type="1">
-
-<li> Connect to vCloud Air </li>
-<li> Create the VM using the vCloud Air API </li>
-<li> Start the VM  </li>
-<li> SSH into the VM and install the Chef Client </li>
-<li> Register the new vm with the Chef Server as a new node </li>
-</ol> 
 </div>
-
-</code>
-
-
-
 </div>
 {% endblock %}
 
