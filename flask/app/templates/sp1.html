@@ -5,25 +5,69 @@
 {% block content %}
 <div class="container">
     {% include 'flash.html' %}
-        <h2>SP1 Scenario</h2>
+        <h2>SP Scenario</h2>
+
+
+<div class="col-lg-8">
+
 
 <p>
-
-This scenario demonstrates how a developer can configure an existing VM Server <br>
-to be a corporate standard web server running nginx.
 <br>
-
+<h4>
+This scenario demonstrates how a developer can configure an existing VM Server
+to be a corporate standard web server running nginx. 
+</h4>
 <br>
-The client workstation is configured with the Chef SDK.
 <br>
-The Corporate Chef Server has a web-server role definition.
+<b> Learn more about VMWare & Chef   </b>  <br>
+<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
 <br>
-
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li>The client workstation is configured with the Chef SDK.</li>
+<li>The Corporate Chef Server has a web-server role definition. </li>
+</ul>
+<br>
+<br>
  <img src="/static/img/sp1.png"/>
 
 
-<p> If Starting with a VM  at 192.168.109.8,  No Chef client installed </p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">
+<br>
+
+
+<div class="center-block">
+ The plugin will... 
+<br>
+<br>
+ <ol type="1">
+
+<li> Connect to vCloud Air </li>
+<li> Create the VM using the vCloud Air API </li>
+<li> Start the VM  </li>
+<li> SSH into the VM and install the Chef Client </li>
+<li> Run the chef client to register the new vm with the Chef Server as a new node </li>
+</ol>
+
+</div>
+
+<br>
+<h3>Commands</h3>
+
+Here are the knife commands necessary to run the scenario.<br>
+The same commands can be executed from Jenkins as part of a build / test automation.
+<br>
+<br>
+<i>Click on </i> 
+<a href="http://devops.vcloudair.io:8100/job/Chef_Knife/" target="_blank">Run the Demo<span class="glyphicon glyphicon-play"></a>
+<i>to check it out. (Login required)</i>
+</p>
+
+
+
+
+<pre class="pre-scrollable">
 
 // Bootstrap node with chef client and set node role
 
@@ -38,11 +82,11 @@ $ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8
 // access the webserver with a browser
 http://devops.vcloudair.io:8900/
 
-</div>
+</pre>
 
-<p> If Starting with a VM named klinuxsp,  Chef client already installed </p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">
+<br>
 
+<pre class="pre-scrollable">
 // Tell the Chef Server to Assign the web_server role to the running VM
 knife exec -E 'nodes.transform("name:klinuxsp") {|n| n.run_list(["role[web_server]"])}'
 
@@ -58,12 +102,9 @@ http://devops.vcloudair.io:8900/
 // ssh to the node
 $ ssh ubuntu@192.168.109.8
 
-
-</code></pre></div>
-<div>
-
-
-
+</pre>
+</br>
+</div>
 </div>
 {% endblock %}
 

@@ -5,40 +5,65 @@
 {% block content %}
 <div class="container">
     {% include 'flash.html' %}
-        <h2>SB2 Scenario</h2>
+        <h2>CK Scenario</h2>
+
+
+<div class="col-lg-8">
+
 
 <p>
-
-This scenario demonstrates an continuous integration build pipeline using
-GitHub, Jenkins, Chef and testing with Selenium.
 <br>
-A Spring Boot Form Submission Application is built and deployed whenever a developer modifies
-the code in the GitHub Project.
+<h4>
+This scenario demonstrates an continuous integration build pipeline using GitHub, Jenkins, Chef and testing with Selenium. 
+
+</h4>
 <br>
-The App is deployed to a server that is configured by Chef
+A Spring Boot Form Submission Application is built and deployed whenever a developer modifies the code in the GitHub Project.<br>
 <br>
-Automated testing is performed by Seleniume
+<br>
+<b> Learn more about VMWare & Chef   </b>  <br>
+<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li> To run the knife command the client workstation must have both the Chef SDK and the knife vcair plugin installed.</li>
+</ul>
+<br>
+<br>
+ <img src="/static/img/SB2.png"/>
 
- <img src="/static/img/SB2.png" height="230" width="590" />
 
-<p> The sequence is as follows... </p>
- <ol type="1">
+<br>
 
-<li> The developer checks in a modification to GitHub </li>
+
+<div class="center-block">
+ The plugin will... 
+<br>
+
+<ol type="1">
+<li> The developer checks in a modification to GitHub</li>
 <li> GitHub notifies Jenkins of the change</li>
-<li> Jenkins retrieves the code from Github  </li>
-<li> Jenkins instructs Gradle to build the project </li>
-<li> Jenkins instructs Chef to provision the VM for the application </li>
-<li> Jenkins deploys the new version of the Application </li>
-<li> Jenkins instructs Selenium to perform a test of the  App </li>
-<li> The developer accesses the new version of the App </li>
+<li> Jenkins retrieves the code from Github</li>
+<li> Jenkins instructs Gradle to build the project</li>
+<li> Jenkins instructs Chef to provision the VM for the application</li>
+<li> Jenkins deploys the new version of the Application</li>
+<li> Jenkins instructs Selenium to perform a test of the App</li>
+<li> The developer accesses the new version of the App</li>
 </ol>
+
 </div>
 
-
+<br>
+<br>
+<i>Click on </i> 
+<a href="http://devops.vcloudair.io:8100/job/Chef_Knife/" target="_blank">Run the Demo<span class="glyphicon glyphicon-play"></a>
+<i>to check it out. (Login required)</i>
 </p>
 
 
+</div>
 </div>
 {% endblock %}
 
