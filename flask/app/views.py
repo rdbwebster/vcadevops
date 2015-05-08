@@ -40,3 +40,7 @@ def ck1():
 @app.route('/cl1/', methods=['GET'])
 def cl1():
     return render_template('cl1.html')
+
+@app.route('/dp1/', methods=['GET'])
+def dp1():
+    return render_template('dp1.html')

@@ -31,7 +31,7 @@ This scenario shows how to deploy a NGINX container onto Photon.
 </ul>
 <br>
 <br>
- <img src="/static/img/chef_knife.png"/>
+ <img src="/static/img/dp1.png"/>
 
 
 <br>
@@ -43,6 +43,7 @@ This scenario shows how to deploy a NGINX container onto Photon.
 <br>
  <ol type="1">
 
+<li> Connect to vCloud Air and lookup the IP for the Photon Server. (optional step)</li>
 <li> SSH into the Photon Server and issue a docker run command </li>
 <li> Add an iptables http port mapping so the app can be accessed through devops.vcloudair.io</li>
 </ol>
@@ -66,10 +67,17 @@ The same commands can be executed from Jenkins as part of a build / test automat
 
 <pre class="pre-scrollable">
 
+vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+
+vca org use --org M933009684-4424 --service M933009684-4424
+
+vca vdc use --vdc M933009684-4424
+
+export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 | sed -e 's/^[[:space:]]*//'`
+
 
 # Trim potential spaces from input parameters
 export HTTP_PORT="$(echo -e "${HTTP_PORT}" | tr -d '[[:space:]]')"
-export SERVER_IP="$(echo -e "${SERVER_IP}" | tr -d '[[:space:]]')"
 
 # install an sample nginx container and start
 sshpass -e ssh -t -v root@${SERVER_IP} "docker run -d -p 80:80 vmwarecna/nginx && docker ps"
@@ -81,6 +89,8 @@ sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m 
 
 # Test with browser using url 
 echo "Test with browser http://devops.vcloudair.io:${HTTP_PORT}"
+
+
 </pre>
 
 </div>

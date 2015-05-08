@@ -14,12 +14,12 @@
 <p>
 <br>
 <h4>
-This scenario shows  how to use the  vCloud Air CLI to create a VM running Photon.
+This scenario shows how to use the vCloud Air CLI to create a VM running Photon and start the Docker Service.
 </h4>
 
 <br>
 <br>
-<b> Learn more about the vCloud Air CLI </b>  <br>
+<span class="learn-more"> Learn more about the vCloud Air CLI </span>  <br>
 <a href="https://github.com/vmware/vca-cli" target="_blank">https://github.com/vmware/vca-cli</a>
 <br>
 <br>
@@ -47,6 +47,7 @@ This scenario shows  how to use the  vCloud Air CLI to create a VM running Photo
 <li> Connect to vCloud Air </li>
 <li> Create the VM using the vCloud Air API </li>
 <li> Start the VM  </li>
+<li> SSH into Photon and start the Docker Service  </li>
 </ol>
 
 </div>
@@ -67,23 +68,26 @@ The same commands can be executed from Jenkins as part of a build / test automat
 
 
 <pre class="pre-scrollable">
-$ export VCA_USER=yourvcauser
-$ export VCA_PASSWORD=yourvcapassword
+vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
 
-$ vca login $VCA_USER --password $VCA_PASSWORD --host vchs.vmware.com \
-                      --type subscription --version 5.6 --org M933009684-4424
-$ vca org use --org M933009684-4424 --service M933009684-4424
-$ vca vdc use --vdc M933009684-4424
+vca org use --org M933009684-4424 --service M933009684-4424
 
-$ vca vapp create -a vcaPhoton -V photonNode -c 'cf-catalog' -t 'Photon' \
-                               -n M933009684-4424-default-routed  -m DHCP
-$ vca vapp power.on --vapp vcaPhoton
+vca vdc use --vdc M933009684-4424
 
-// get the ip of the new node
-$ export IP=`vca vm -a vcaPhoton | grep photonNode | cut -d '|' -f5 | sed -e 's/^[[:space:]]*//'`
+vca vapp create -a $VAPP_NAME -V $VM_NAME -c 'cf-catalog' -t 'Photon'  -n M933009684-4424-default-routed  -m DHCP
 
-// connect with ssh 
-$ ssh root@${IP}
+vca vapp power.on --vapp $VAPP_NAME
+
+sleep 5
+
+# Get the IP of the new node
+
+export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 |  tr -d '[[:space:]]'`
+  
+
+# ssh into Photon and enable and start Docker
+sshpass -e ssh -t -v root@${IP} "systemctl enable docker && systemctl start docker && systemctl status docker"
+
 
 </pre>
 </div>

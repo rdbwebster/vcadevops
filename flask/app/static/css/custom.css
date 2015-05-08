@@ -1,3 +1,4 @@
+/* navbar */
 .navbar-brand,
 .navbar-nav li a {
     line-height: 75px;
@@ -5,13 +6,18 @@
     padding-top: 0;
 }
 
-pre code {
-    background-color: transparent;
-    color: inherit;
-    font-size: 100%;
-    padding: 0;
+.navbar-default {
+    background-color: #66CCFF;
+    border-color: #E7E7E7;
 }
 
+.center-block {  
+      display: block;  
+      margin-right: auto;  
+      margin-left: auto;  
+  width:450px;  
+    padding:10px;  
+    }  
 
 .highlight {
     border-radius: 4px;
@@ -21,8 +27,17 @@ pre code {
     margin-bottom: 0;
 }
 
+/* google fonts */
 
-.title .button { 
-    float:right;
-    font-size:large
- }
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.learn-more {
+    font-family: 'Oswald', sans-serif;
+    font-size: larger;
+    
+}
+
+/* font-family: 'PT Sans Narrow', sans-serif; */
+
