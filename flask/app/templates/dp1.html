@@ -1,0 +1,89 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+        <h2>Docker Photon Scenario</h2>
+
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+This scenario shows how to deploy a NGINX container onto Photon.
+
+</h4>
+<br>
+<br>
+<span class="learn-more"> Learn more about Photon   </span> <br>
+<a href="https://github.com/vmware/photon" target="_blank">https://github.com/vmware/photon</a>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li> This scenario assumes a Photon Server has been deployed to the devops demo environment. <br>(See the other scenarios if needed)</li>
+
+</ul>
+<br>
+<br>
+ <img src="/static/img/chef_knife.png"/>
+
+
+<br>
+
+
+<div class="center-block">
+ The script will... 
+<br>
+<br>
+ <ol type="1">
+
+<li> SSH into the Photon Server and issue a docker run command </li>
+<li> Add an iptables http port mapping so the app can be accessed through devops.vcloudair.io</li>
+</ol>
+
+</div>
+
+<br>
+<h3>Commands</h3>
+
+Here are the shell commands necessary to run the scenario.<br>
+The same commands can be executed from Jenkins as part of a build / test automation.
+<br>
+<br>
+<i>Click on </i> 
+<a href="http://devops.vcloudair.io:8100/job/docker_photon/" target="_blank">Run the Demo<span class="glyphicon glyphicon-play"></a>
+<i>to check it out. (Login required)</i>
+</p>
+
+
+
+
+<pre class="pre-scrollable">
+
+
+# Trim potential spaces from input parameters
+export HTTP_PORT="$(echo -e "${HTTP_PORT}" | tr -d '[[:space:]]')"
+export SERVER_IP="$(echo -e "${SERVER_IP}" | tr -d '[[:space:]]')"
+
+# install an sample nginx container and start
+sshpass -e ssh -t -v root@${SERVER_IP} "docker run -d -p 80:80 vmwarecna/nginx && docker ps"
+
+
+# add route through devops server
+sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80
+
+
+# Test with browser using url 
+echo "Test with browser http://devops.vcloudair.io:${HTTP_PORT}"
+</pre>
+
+</div>
+</div>
+{% endblock %}
+
