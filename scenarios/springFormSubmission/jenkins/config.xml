@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <actions/>
+  <description/>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/spring-guides/gs-handling-form-submission.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>Java 1.7</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.gradle.Gradle plugin="gradle@1.24">
+      <description/>
+      <switches>-Pbuildversion=$BUILD_NUMBER</switches>
+      <tasks>build</tasks>
+      <rootBuildScriptDir>${workspace}/complete</rootBuildScriptDir>
+      <buildFile/>
+      <gradleName>Gradle_2.3</gradleName>
+      <useWrapper>false</useWrapper>
+      <makeExecutable>false</makeExecutable>
+      <fromRootBuildScriptDir>false</fromRootBuildScriptDir>
+      <useWorkspaceAsHome>false</useWorkspaceAsHome>
+    </hudson.plugins.gradle.Gradle>
+    <hudson.tasks.Shell>
+      <command># Call the Chef Client on the dev server to Config the Server
+knife ssh 192.168.109.7 'sudo chef-client' --manual-list --ssh-user ubuntu -i ~/.ssh/ubuntu_rsa --no-host-key-verify
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command># Move the executable
+scp -o StrictHostKeyChecking=no /var/lib/jenkins/jobs/springBootForm/workspace/complete/build/libs/gs-handling-form-submission-0.1.0.jar ubuntu@192.168.109.7:~
+ssh ubuntu@192.168.109.7 chmod +x gs-handling-form-submission-0.1.0.jar 
+
+# Stop the App if a previous version is running
+ssh --no-host-key-verify  ubuntu@192.168.109.7 export JPID=`netstat -plnt | grep 8080 | awk '{print $7}' | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
+
+# Start the App
+ssh --no-host-key-verify  ubuntu@192.168.109.7 "nohup java -jar ~/gs-handling-form-submission-0.1.0.jar &gt; log.out 2&gt; log.err &lt; /dev/null &amp;"
+
+# Test with wget
+wget http://192.168.109.7:8080
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

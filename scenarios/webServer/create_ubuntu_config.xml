@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This job creates a vApp name klinuxw which is needed to support the Scenario demonstrating knife_bootstrap</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>VAPP_NAME</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>VM_NAME</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(Default)</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command># Remove &quot;&quot; from input variables if present
+VAPP_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VAPP_NAME`
+VM_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VM_NAME`
+
+# Create new VM and Unbuntu Server
+vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+
+vca vdc use --vdc M933009684-4424
+
+export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
+
+# if vapp exists skip
+if [ ${#IP} -lt 1 ]
+  then
+
+  vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;Ubuntu Server 12.04 LTS (amd64 20150127)&apos; -n M933009684-4424-default-routed -m DHCP 
+ 
+  vca vapp customize --vapp $VAPP_NAME --vm $VM_NAME --file ~/add_public_ssh_key.sh
+  
+  # get the new vm ip and add it to /etc/hosts
+  for a in 1 2 3 4 5 6 7 8 9; do
+     export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 |  tr -d &apos;[[:space:]]&apos;`
+  
+     echo &quot;Obtain IP attempt $a&quot;
+     if [ ${#IP} -gt 1 ]
+     then
+       echo &quot;New VM at $IP&quot;
+       break
+     else
+       sleep 10
+     fi
+  done
+  
+  if [ ${#IP} -gt 1 ]
+  then
+     echo &quot;${IP}     ${VM_NAME}&quot; | sudo tee --append /etc/hosts
+  fi   
+fi
+
+
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
+      <injectGlobalPasswords>false</injectGlobalPasswords>
+      <maskPasswordParameters>true</maskPasswordParameters>
+      <passwordEntries>
+        <EnvInjectPasswordEntry>
+          <name>VCA_PASSWORD</name>
+          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+        </EnvInjectPasswordEntry>
+      </passwordEntries>
+    </EnvInjectPasswordWrapper>
+  </buildWrappers>
+</project>

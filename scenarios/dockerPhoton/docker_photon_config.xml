@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>VAPP_NAME</name>
+          <description>The name of the Vapp running a Photon VM</description>
+          <defaultValue>photonTestApp</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>VM_NAME</name>
+          <description></description>
+          <defaultValue>photonTestVM</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>HTTP_PORT</name>
+          <description>The port # on devops.vcloud.io where http requests will be sent.</description>
+          <defaultValue>9999</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(Default)</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+
+vca org use --org M933009684-4424 --service M933009684-4424
+
+vca vdc use --vdc M933009684-4424
+
+export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;`
+
+
+# Trim potential spaces from input parameters
+export HTTP_PORT=&quot;$(echo -e &quot;${HTTP_PORT}&quot; | tr -d &apos;[[:space:]]&apos;)&quot;
+
+# install an sample nginx container and start
+sshpass -e ssh -t -v root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps&quot;
+
+
+# add route through devops server
+sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80
+
+
+# Test with browser using url 
+echo &quot;Test with browser http://devops.vcloudair.io:${HTTP_PORT}&quot;
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
+      <injectGlobalPasswords>false</injectGlobalPasswords>
+      <maskPasswordParameters>true</maskPasswordParameters>
+      <passwordEntries>
+        <EnvInjectPasswordEntry>
+          <name>VCA_PASSWORD</name>
+          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+        </EnvInjectPasswordEntry>
+        <EnvInjectPasswordEntry>
+          <name>SSHPASS</name>
+          <value>9F+bQqVw0XLTlVB/+Dt0MN26xISUc9yUv0gDXaq2Z0M=</value>
+        </EnvInjectPasswordEntry>
+      </passwordEntries>
+    </EnvInjectPasswordWrapper>
+  </buildWrappers>
+</project>
