@@ -14,12 +14,12 @@
 <p>
 <br>
 <h4>
-This scenario demonstrates how a developer can configure an existing VM Server
+This scenario demonstrates how a developer can configure an existing Server
 to be a corporate standard web server running nginx. 
 </h4>
 <br>
 <br>
-<b> Learn more about VMWare & Chef   </b>  <br>
+<span class="learn-more"> Learn more about VMWare & Chef </span> <br>
 <a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
 <br>
 <br>
@@ -43,11 +43,9 @@ to be a corporate standard web server running nginx.
 <br>
  <ol type="1">
 
-<li> Connect to vCloud Air </li>
-<li> Create the VM using the vCloud Air API </li>
-<li> Start the VM  </li>
 <li> SSH into the VM and install the Chef Client </li>
-<li> Run the chef client to register the new vm with the Chef Server as a new node </li>
+<li> Assign a run list to the node 
+<li> Run the chef client to register the new vm with the Chef Server and configure the vm based on the assigned runlist </li>
 </ol>
 
 </div>
@@ -84,25 +82,6 @@ http://devops.vcloudair.io:8900/
 
 </pre>
 
-<br>
-
-<pre class="pre-scrollable">
-// Tell the Chef Server to Assign the web_server role to the running VM
-knife exec -E 'nodes.transform("name:klinuxsp") {|n| n.run_list(["role[web_server]"])}'
-
-// Get the ip for the chef node
-export NIP=`knife node show klinuxchef | grep IP: | cut -d: -f2 | sed -e 's/^[[:space:]]*//'`
-
-// create a port mapping to the app 
-$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${NIP}:80"
-
-// access the webserver with a browser
-http://devops.vcloudair.io:8900/
-
-// ssh to the node
-$ ssh ubuntu@192.168.109.8
-
-</pre>
 </br>
 </div>
 </div>

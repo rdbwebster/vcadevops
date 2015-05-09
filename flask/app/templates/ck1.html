@@ -71,11 +71,14 @@ The same commands can be executed from Jenkins as part of a build / test automat
 // Run the following knife command <br>
 $ knife vcair server create -VV --ssh-password Password1 \
   --image "Ubuntu Server 12.04 LTS (amd64 20150127)" --customization-script ./add_public_ssh_key.sh \
-  --cpus 2 --memory 4096 --node-name klinuxsp --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
+  --cpus 2 --memory 4096 --node-name klinux --vcair-net "M933009684-4424-default-routed" --no-host-key-verify
 
-// See that the node is now a registered client of the Chef Server
-$ knife client list
 
+// Tell the Chef Server to Assign a run list to the node
+knife node run_list add klinux 'recipe[SB1]'
+
+// Get the ip of the new node
+$ knife node show klinux
 
 // Access the node using the generated ip
 $ ssh ubuntu@192.168.109.8 

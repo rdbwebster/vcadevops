@@ -1,0 +1,24 @@
+SITE
+  remote: https://supermarket.getchef.com/api/v1
+  specs:
+    chef_handler (1.1.6)
+    java (1.8.0)
+      windows (>= 0.0.0)
+    windows (1.36.6)
+      chef_handler (>= 0.0.0)
+
+PATH
+  remote: site-cookbooks
+  specs:
+    SB1 (0.1.0)
+      java (>= 0.0.0)
+    apt (0.1.0)
+    nginx (0.1.0)
+      apt (>= 0.0.0)
+
+DEPENDENCIES
+  SB1 (>= 0)
+  apt (>= 0)
+  java (= 1.8.0)
+  nginx (>= 0)
+

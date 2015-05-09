@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+#^syntax detection
+
+site 'https://supermarket.getchef.com/api/v1'
+
+# cookbook 'chef-client'
+
+# cookbook 'apache2', '>= 1.0.0'
+
+# cookbook 'rvm',
+#   :git => 'https://github.com/fnichol/chef-rvm'
+
+# cookbook 'postgresql',
+#   :git => 'https://github.com/findsyou/cookbooks',
+#   :ref => 'postgresql-improvements'
+ 
+# Community Cookbooks
+cookbook 'java', '= 1.8.0'
+
+# Our own cookbooks from site-cookbooks
+cookbook "SB1", path: "site-cookbooks" 
+cookbook "apt", path: "site-cookbooks" 
+cookbook "nginx", path: "site-cookbooks" 
+
