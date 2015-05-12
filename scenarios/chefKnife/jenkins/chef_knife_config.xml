@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>NODE_NAME</name>
+          <description>The name of the vapp that will contain the running vm.
+The same name will be registered as the node name with the chef server.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(Default)</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command># Run the following knife command 
+cd ~/chef-repo
+knife vcair server create -VV --ssh-password Password1 --image &quot;Ubuntu Server 12.04 LTS (amd64 20150127)&quot; \
+  --customization-script ./add_public_ssh_key.sh --cpus 2 --memory 4096 \
+  --node-name $NODE_NAME --vcair-net &quot;M933009684-4424-default-routed&quot; --no-host-key-verify
+
+# See that the node is now a registered client of the Chef Server
+knife client list
+
+# Get the IP for the new VM
+export NIP=`knife node show $NODE_NAME | grep IP: | cut -d: -f2 | sed -e &apos;s/^[[:space:]]*//&apos;`
+
+# echo &quot;New VM at ${NIP}&quot;
+
+# Access the node using the generated ip, allocate a tty
+ssh -t ubuntu@devops -i ~/.ssh/ubuntu_rsa  &apos;ssh ubuntu@${NIP}&apos;
+
+exit</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
