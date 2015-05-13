@@ -46,9 +46,21 @@ export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f
 # Trim potential spaces from input parameters
 export HTTP_PORT=&quot;$(echo -e &quot;${HTTP_PORT}&quot; | tr -d &apos;[[:space:]]&apos;)&quot;
 
+# check for existing container deployment
+export name=`sshpass -e ssh -t -v root@${SERVER_IP} &quot;docker ps | grep nginx&quot; `
+export name=`echo $name | awk &apos;{ print $NF }&apos;`
+
+# stop and remove if present
+if [ ${#name} -gt 1 ]
+  then
+  echo found running container named ${name}  
+  
+  sshpass -e ssh -t -v root@${SERVER_IP} docker stop ${name} 
+  sshpass -e ssh -t -v root@${SERVER_IP} docker rm ${name}
+fi
+
 # install an sample nginx container and start
 sshpass -e ssh -t -v root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps&quot;
-
 
 # add route through devops server
 sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80

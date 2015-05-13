@@ -97,7 +97,7 @@ ssh --no-host-key-verify  ubuntu@linuxsb &quot;nohup java -jar ~/gs-handling-for
 
 # create a port mapping to the app
 export SERVER_IP=`grep linuxsb /etc/hosts | cut -d&apos; &apos; -f1`
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 -m conntrack --ctstate NEW -j DNAT --to ${SERVER_IP}:80
+sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 -m conntrack --ctstate NEW -j DNAT --to ${SERVER_IP}:8080
 
 # Test with wget
 wget http://linuxsb:8080/greeting

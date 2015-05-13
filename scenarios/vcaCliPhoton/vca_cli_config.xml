@@ -1,25 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description/>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>VAPP_NAME</name>
-          <description/>
+          <description></description>
           <defaultValue>photonTestApp</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>VM_NAME</name>
-          <description/>
+          <description></description>
           <defaultValue>photonTestVM</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>HTTP_LISTEN_PORT</name>
-          <description>The port on the Gateway that will answer calls to the NGINX server</description>
-          <defaultValue>9999</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -34,56 +29,48 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+      <command>
+# Remove &quot;&quot; from input variables if present
+VAPP_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VAPP_NAME`
+VM_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VM_NAME`
 
-vca org use --org M933009684-4424 --service M933009684-4424
+# Create new VM and Photon Server
+
+vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
 
 vca vdc use --vdc M933009684-4424
 
-vca vapp create -a $VAPP_NAME -V $VM_NAME -c 'cf-catalog' -t 'Photon'  -n M933009684-4424-default-routed  -m DHCP
+export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
-vca vapp power.on --vapp $VAPP_NAME
+# skip if vapp exists 
+if [ ${#IP} -lt 1 ]
+  then
+    vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;cf-catalog&apos; -t &apos;Photon&apos;  -n M933009684-4424-default-routed  -m DHCP
+    vca vapp power.on --vapp $VAPP_NAME
 
-sleep 5
-</command>
-    </hudson.tasks.Shell>
-    <hudson.tasks.Shell>
-      <command># Get the IP of the new node
-
-vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 | sed -e 's/^[[:space:]]*//' &gt; /tmp/ip
-for a in 1 2 3 4 5 6 7 8 9; do
-  export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 | sed -e 's/^[[:space:]]*//'`
-  echo "Obtain IP attempt $a"
+  # get the new vm ip and add it to /etc/hosts
+  for a in 1 2 3 4 5 6 7 8 9; do
+     export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 |  tr -d &apos;[[:space:]]&apos;`
+  
+     echo &quot;Waiting for boot to obtain IP, attempt $a&quot;
+     if [ ${#IP} -gt 1 ]
+     then
+       echo &quot;New VM at $IP&quot;
+       break
+     else
+       sleep 10
+     fi
+  done
+  
   if [ ${#IP} -gt 1 ]
   then
-    echo "New VM at $IP"
-    break
-  else
-    sleep 10
-  fi
-done
-
-
-# enable and start Docker
-sshpass -e ssh -t -v root@${IP} "systemctl enable docker &amp;&amp; systemctl start docker &amp;&amp; systemctl status docker"
-
-# install nginx container and start
-
-sshpass -e ssh -t -v root@${IP} "docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps"
-
-
-
-# Build endpoint, watch for spaces in port input variable
-export HTTP_PORT="$(echo -e "${IP}:${HTTP_LISTEN_PORT}" | tr -d '[[:space:]]')"
-
-# add route
-sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80
-
-
-# Test with browser using url 
-echo "Test with browser http://${IP}:80"
-
-exit</command>
+     echo &quot;${IP}  ${VM_NAME}&quot; | sudo tee --append /etc/hosts
+  fi   
+  
+  # ssh to Proton Server and enable and start Docker
+  sshpass -e ssh -t -v root@${IP} &quot;systemctl enable docker &amp;&amp; systemctl start docker &amp;&amp; systemctl status docker&quot;
+fi
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
