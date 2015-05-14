@@ -10,9 +10,14 @@
 
 <b><br>
 <p  style="font-size: 18px; width:75%">
-This demo shows you how to build devops processes on vCloud Air using the open source versions of popular tools.
+This demo shows you how to build devops toolchains on vCloud Air using the open source versions of popular tools.
 Open source tools are a great way to learn devops techniques and begin a devops initiative in your organization.
 <br>
+
+For team development, configuration management and build scripts are centralized in Team Servers.
+Applications builds and deployment are handled by a centralized Jenkins server on vCloud Air.
+Configuration management of build target servers will be managed by a centralized Chef Server running on vCloud air.
+
 
 </p>
 
@@ -21,26 +26,35 @@ Open source tools are a great way to learn devops techniques and begin a devops 
   <h3>Demo Environment</h3>
   <p>Click on the icon to open the server in another window.</p>
   <div class="row">
-    <div class="col-sm-3">
+    <div class="col-sm-2">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8100" target="_blank">
              <img src="/static/img/Jenkins.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8200/" target="_blank">
             <img src="/static/img/Chef.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
            <a class="navbar-brand" href="https://github.com/vcadevops" target="_blank">
              <img src="/static/img/Github.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8081" target="_blank">
              <img src="/static/img/Artifactory.png" height="90" width="90" />
             </a>
     </div>
+    <div class="col-sm-2">
+           <a class="navbar-brand" href="http://devops.vcloudair.io:4444/wd/hub/static/resource/hub.html" target="_blank">
+             <img src="/static/img/Selenium.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-2">
+           <a class="navbar-brand" href="http://devops.vcloudair.io:8081" target="_blank">
+             <img src="/static/img/Ansible.png" height="90" width="90" />
+            </a>
   </div>
 </div>
 
@@ -62,12 +76,12 @@ Open source tools are a great way to learn devops techniques and begin a devops 
       <tr class='clickableRow' href='{{ url_for('ck1') }}'>
         <td>CK</td>
         <td>Chef Knife Plugin</td>
-        <td>Create a VM on vCloud Air using the Chef vCloud Air Knife plugin</td>
+        <td>Create an Ubuntu Server on vCloud Air using the Chef vCloud Air Knife plugin</td>
       </tr>
       <tr class='clickableRow' href='{{ url_for('cl1') }}'>
         <td>CL1</td>
         <td>vCloud Air CLI Example</td>
-        <td>Create a Photon VM on vCloud Air using vCloud Air CLI</td>
+        <td>Create a Photon Server on vCloud Air using vCloud Air CLI</td>
       </tr>
       <tr class='clickableRow' href='{{ url_for('dp1') }}'>
         <td>DP1</td>
@@ -78,7 +92,7 @@ Open source tools are a great way to learn devops techniques and begin a devops 
       <tr class='clickableRow' href='{{ url_for('sp1') }}'>
         <td>SP1</td>
         <td>Self Provision Corp Std Web Server</td>
-        <td>Use chef to configure a VM to be a standard Web Server</td>
+        <td>Use chef to configure a Server as a standard Web Server</td>
       </tr>
       <tr class='clickableRow' href='{{ url_for('sb2') }}'>
         <td>SB2</td>
