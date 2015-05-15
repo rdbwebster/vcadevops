@@ -14,9 +14,6 @@ This demo shows you how to build devops toolchains on vCloud Air using the open 
 Open source tools are a great way to learn devops techniques and begin a devops initiative in your organization.
 <br>
 
-For team development, configuration management and build scripts are centralized in Team Servers.
-Applications builds and deployment are handled by a centralized Jenkins server on vCloud Air.
-Configuration management of build target servers will be managed by a centralized Chef Server running on vCloud air.
 
 
 </p>
@@ -26,32 +23,34 @@ Configuration management of build target servers will be managed by a centralize
   <h3>Demo Environment</h3>
   <p>Click on the icon to open the server in another window.</p>
   <div class="row">
-    <div class="col-sm-2">
+    <div class="col-sm-3">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8100" target="_blank">
              <img src="/static/img/Jenkins.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8200/" target="_blank">
             <img src="/static/img/Chef.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3">
            <a class="navbar-brand" href="https://github.com/vcadevops" target="_blank">
              <img src="/static/img/Github.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-2">
+</div>
+  <div class="row top-buffer">
+    <div class="col-sm-3">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8081" target="_blank">
              <img src="/static/img/Artifactory.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3">
            <a class="navbar-brand" href="http://devops.vcloudair.io:4444/wd/hub/static/resource/hub.html" target="_blank">
              <img src="/static/img/Selenium.png" height="90" width="90" />
             </a>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-3">
            <a class="navbar-brand" href="http://devops.vcloudair.io:8081" target="_blank">
              <img src="/static/img/Ansible.png" height="90" width="90" />
             </a>
@@ -97,7 +96,7 @@ Configuration management of build target servers will be managed by a centralize
       <tr class='clickableRow' href='{{ url_for('sb2') }}'>
         <td>SB2</td>
         <td>Continuous Integration of Spring Boot Form Project</td>
-        <td>Spring Boot App in Git, Build / Deploy to existing dev server using Jenkins, Gradle, Chef, test with Selenium</td>
+        <td>Spring Boot App in Git, Build / Deploy to existing dev server using Jenkins,<br> Gradle, Chef, test with Selenium</td>
       </tr>
 
     </tbody>

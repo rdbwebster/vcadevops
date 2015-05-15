@@ -41,3 +41,5 @@ h1, h2, h3, h4, h5, h6 {
 
 /* font-family: 'PT Sans Narrow', sans-serif; */
 
+/* spacing for row */
+.top-buffer { margin-top:30px; }
