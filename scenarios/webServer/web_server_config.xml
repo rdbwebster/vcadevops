@@ -57,13 +57,18 @@ vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --
 
 vca org use --org M933009684-4424 --service M933009684-4424
 
-export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;`
+export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
+
+cd /home/ubuntu/vcadevops/chef-repo
+
+# Remove the old node from the chef-server if present
+knife node delete precise-amd64  --yes
 
 # Bootstrap node with chef client and set node role
 knife bootstrap klinuxw -x ubuntu --sudo --run-list  &apos;role[web_server]&apos;
 
-# create a port mapping to the app
-ssh ubuntu@devops &quot;sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${SERVER_IP}:80&quot;
+# create a port mapping to the app 
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8900 ${SERVER_IP} 80
 
 # Test web server at url
 echo &quot;http://devops.vcloud.io:8900&quot;</command>

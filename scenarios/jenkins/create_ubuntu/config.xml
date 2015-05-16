@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job creates an Ubuntu Server for other projects that require a server</description>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -33,13 +33,31 @@
 VAPP_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VAPP_NAME`
 VM_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VM_NAME`
 
-# Create new VM and Unbuntu Server
+if [ ${#VAPP_NAME} -lt 1 ] ||  [ ${#VM_NAME} -lt 1 ]
+then
+ echo Invalid input parameters
+ return -1
+fi
+
+echo VAPP_NAME=${VAPP_NAME} VM_NAME=${VM_NAME}
+
+# Quick check for existing server
+
+if [[ $(ping -c 1 ${VM_NAME}) &amp;&amp; $? -eq 0 ]]; then
+  echo &quot;Found Existing Server ${VM_NAME}!&quot;
+  exit 0
+fi
+
+
+# Login using vca-cli
 vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
 
 vca vdc use --vdc M933009684-4424
 
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
+
+# Create new VM and Unbuntu Server
 # if vapp exists skip
 echo &quot;Check for existing Vapp with same name&quot;
 if [ ${#IP} -lt 1 ]
@@ -56,12 +74,18 @@ if [ ${#IP} -lt 1 ]
   echo &quot;Wait for Boot&quot;
   IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
   
+ fi
+
+id 
+
+ # Set Host Name
+  echo &quot;Set Host Name&quot;
+  /home/ubuntu/vcadevops/scenarios/jenkins/set_host_name.sh $IP precise-amd64 $VM_NAME
+  
   
   # Add host entry 
   echo &quot;Register hostname&quot;
   sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
-fi
-
 
 
 </command>
