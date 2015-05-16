@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>This job creates a ubuntu servers for other projects</description>
+  <description>This job creates an Ubuntu Server for other projects that require a server</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -41,36 +41,25 @@ vca vdc use --vdc M933009684-4424
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
 # if vapp exists skip
+echo &quot;Check for existing Vapp with same name&quot;
 if [ ${#IP} -lt 1 ]
   then
 
+  echo &quot;Create VApp&quot;
   vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;Ubuntu Server 12.04 LTS (amd64 20150127)&apos; -n M933009684-4424-default-routed -m DHCP 
  
+  echo &quot;Customize Vapp&quot;
   vca vapp customize --vapp $VAPP_NAME --vm $VM_NAME --file ~/add_public_ssh_key.sh
   
-  # get the new vm ip and add it to /etc/hosts
-  for a in 1 2 3 4 5 6 7 8 9; do
-     export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 |  tr -d &apos;[[:space:]]&apos;`
   
-     echo &quot;Obtain IP attempt $a&quot;
-     if [ ${#IP} -gt 1 ]
-     then
-       echo &quot;New VM at $IP&quot;
-       break
-     else
-       sleep 10
-     fi
-  done
+  # get the new vm ip 
+  echo &quot;Wait for Boot&quot;
+  IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
   
-  if [ ${#IP} -gt 1 ]
-  then
-     # skip if entry exists
-     export entry=`grep ${VM_NAME} /etc/hosts | cut -d&apos; &apos; -f1`
-     if [ ${entry} -eq 0 ]
-     then
-        echo &quot;${IP}     ${VM_NAME}&quot; | sudo tee --append /etc/hosts
-     fi 
-  fi   
+  
+  # Add host entry 
+  echo &quot;Register hostname&quot;
+  sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
 fi
 
 
