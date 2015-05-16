@@ -3,6 +3,9 @@ if [ "$#" -ne 2 ];
     exit
 fi
 
+# Backup /etc/hosts
+sudo cp /etc/hosts  /etc/hosts.$(date -d "today" +"%Y%m%d%H%M")
+
 # Delete the entry if it exists
 sed  '/'$1'/d' -i  /etc/hosts | sudo tee --append /etc/hosts
 
