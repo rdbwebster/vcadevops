@@ -1,29 +1,17 @@
+
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>The job demonstrates the deployment of a NGINX web server container to a Photon Server.&#xd;
+The photon server will be created if it does not exist (using create_photon)</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>VAPP_NAME</name>
-          <description>The name of the Vapp running a Photon VM</description>
-          <defaultValue>photonTestApp</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>VM_NAME</name>
-          <description></description>
-          <defaultValue>photonTestVM</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>HTTP_PORT</name>
-          <description>The port # on devops.vcloud.io where http requests will be sent.</description>
-          <defaultValue>9999</defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
+  <properties/>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -33,46 +21,83 @@
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.26">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+              <properties>VAPP_NAME=${VAPP_NAME}
+VM_NAME=${VM_NAME}
+</properties>
+            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+          </configs>
+          <projects>create_photon</projects>
+          <condition>ALWAYS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+          <block>
+            <buildStepFailureThreshold>
+              <name>FAILURE</name>
+              <ordinal>2</ordinal>
+              <color>RED</color>
+              <completeBuild>true</completeBuild>
+            </buildStepFailureThreshold>
+            <unstableThreshold>
+              <name>UNSTABLE</name>
+              <ordinal>1</ordinal>
+              <color>YELLOW</color>
+              <completeBuild>true</completeBuild>
+            </unstableThreshold>
+            <failureThreshold>
+              <name>FAILURE</name>
+              <ordinal>2</ordinal>
+              <color>RED</color>
+              <completeBuild>true</completeBuild>
+            </failureThreshold>
+          </block>
+          <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
+        </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.TriggerBuilder>
     <hudson.tasks.Shell>
-      <command>vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
-
-vca org use --org M933009684-4424 --service M933009684-4424
-
-vca vdc use --vdc M933009684-4424
-
-export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;`
-
-
-# Trim potential spaces from input parameters
-export HTTP_PORT=&quot;$(echo -e &quot;${HTTP_PORT}&quot; | tr -d &apos;[[:space:]]&apos;)&quot;
+      <command>echo &quot;=&gt; Login to vCloud Air previously done by &apos;Check for existing server&apos; job&quot;
+echo &quot;=&gt; Get Server IP&quot;
+export SERVER_IP=$(vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;)
 
 # check for existing container deployment
+echo &quot;=&gt; Check for existing container deployment&quot;
 export name=`sshpass -e ssh -t -v root@${SERVER_IP} &quot;docker ps | grep nginx&quot; `
-export name=`echo $name | awk &apos;{ print $NF }&apos;`
+export name=$(echo $name | awk &apos;{ print $NF }&apos;)
 
-# stop and remove if present
+# stop container and remove if present
 if [ ${#name} -gt 1 ]
   then
-  echo found running container named ${name}  
+  echo &quot;=&gt; Removing existing container named ${name} &quot;
   
-  sshpass -e ssh -t -v root@${SERVER_IP} docker stop ${name} 
-  sshpass -e ssh -t -v root@${SERVER_IP} docker rm ${name}
+  sshpass -e ssh -t root@${SERVER_IP} docker stop ${name} 
+  sshpass -e ssh -t root@${SERVER_IP} docker rm ${name}
 fi
 
-# install an sample nginx container and start
-sshpass -e ssh -t -v root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps&quot;
+# install nginx container and start
+echo &quot;=&gt; Deploy Container vmwarecna/nginx&quot;
+sshpass -e ssh -t root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps&quot;
 
-# add route through devops server
-sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80
-
+# create a port mapping to the app 
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 9999 ${SERVER_IP} 80
 
 # Test with browser using url 
-echo &quot;Test with browser http://devops.vcloudair.io:${HTTP_PORT}&quot;
+echo &quot;=&gt; Test with browser http://devops.vcloudair.io:9999&quot;
 </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent>VAPP_NAME=photonTestApp
+VM_NAME=photonTestVM</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
     <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>

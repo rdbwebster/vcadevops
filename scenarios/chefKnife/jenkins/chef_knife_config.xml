@@ -10,7 +10,7 @@
           <name>NODE_NAME</name>
           <description>The name of the vapp that will contain the running vm.
 The same name will be registered as the node name with the chef server.</description>
-          <defaultValue></defaultValue>
+          <defaultValue>klinux</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -26,7 +26,9 @@ The same name will be registered as the node name with the chef server.</descrip
   <builders>
     <hudson.tasks.Shell>
       <command># Run the following knife command 
-cd ~/chef-repo
+# knife.rb specifies ubuntu as user
+cd /home/ubuntu/vcadevops/chef-repo
+
 knife vcair server create -VV --ssh-password Password1 --image &quot;Ubuntu Server 12.04 LTS (amd64 20150127)&quot; \
   --customization-script ./add_public_ssh_key.sh --cpus 2 --memory 4096 \
   --node-name $NODE_NAME --vcair-net &quot;M933009684-4424-default-routed&quot; --no-host-key-verify

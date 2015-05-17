@@ -1,8 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Demonstrates chef provisioning a web_server on an existing server.&#xd;
-A target server will be created if one does not exist.</description>
+  <description>Demonstrates the creation and  provisioning of a web_server based on a chef role named &apos;web_server&apos;.&#xd;
+The web_server role represents an enterprise configuration of a web server using corporate standards.&#xd;
+&#xd;
+This job calls &apos;create_ubuntu&apos; which will connect to vCloud Air using the CLI and create an ubuntu Server to host the web Server.&#xd;
+The server name is &apos;klinuxw&apos;&#xd;
+The chef bootstrap command is used to install the chef client and run the initial configuration.</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
@@ -53,17 +63,20 @@ VM_NAME=klinuxw</properties>
     <hudson.tasks.Shell>
       <command># Lookup the ip of the target node
 # (if necessary the server has been created by an earlier jenkins job)
-vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+# The earlier job connected to vcloud air cli
 
-vca org use --org M933009684-4424 --service M933009684-4424
+export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
 
-export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;`
+cd /home/ubuntu/vcadevops/chef-repo
+
+# Remove the old node from the chef-server if present
+knife node delete precise-amd64  --yes
 
 # Bootstrap node with chef client and set node role
 knife bootstrap klinuxw -x ubuntu --sudo --run-list  &apos;role[web_server]&apos;
 
-# create a port mapping to the app
-ssh ubuntu@devops &quot;sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${SERVER_IP}:80&quot;
+# create a port mapping to the app 
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8900 ${SERVER_IP} 80
 
 # Test web server at url
 echo &quot;http://devops.vcloud.io:8900&quot;</command>

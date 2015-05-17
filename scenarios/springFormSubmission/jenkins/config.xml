@@ -2,6 +2,12 @@
 <project>
   <actions/>
   <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
@@ -45,8 +51,8 @@
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
             <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-              <properties>VAPP_NAME=linuxsb_vapp
-VM_NAME=linuxsb</properties>
+              <properties>VAPP_NAME=$VAPP_NAME
+VM_NAME=$VM_NAME</properties>
             </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
           </configs>
           <projects>create_ubuntu</projects>
@@ -77,33 +83,45 @@ VM_NAME=linuxsb</properties>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
     <hudson.tasks.Shell>
-      <command># Call the Chef Client on the dev server to Config the Server
-cd ~/chef-repo
-knife bootstrap linuxsb -x ubuntu --sudo --run-list  &apos;recipe[SB1]&apos;
-#knife ssh linuxsb &apos;sudo chef-client&apos; --manual-list --ssh-user ubuntu -i ~/.ssh/ubuntu_rsa --no-host-key-verify
+      <command># Lookup the ip of the target node, login completed on create_ubuntu step
 
-</command>
-    </hudson.tasks.Shell>
-    <hudson.tasks.Shell>
-      <command># Move the executable
-scp -o StrictHostKeyChecking=no /var/lib/jenkins/jobs/springBootForm/workspace/complete/build/libs/gs-handling-form-submission-0.1.0.jar ubuntu@linuxsb:~
-ssh ubuntu@linuxsb chmod +x gs-handling-form-submission-0.1.0.jar 
+export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
+
+cd /home/ubuntu/vcadevops/chef-repo
+
+# See if the server (maybe new) is registered with the chef-server
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/check_chef_node.sh ${VM_NAME} ${SERVER_IP}
+
+# Run the chef client to configure the server
+knife ssh ${VM_NAME} &apos;sudo chef-client&apos; --manual-list --ssh-user ubuntu -i ~/.ssh/ubuntu_rsa --no-host-key-verify
+
+# Move the executable
+scp -o StrictHostKeyChecking=no /var/lib/jenkins/jobs/spring_boot_form/workspace/complete/build/libs/gs-handling-form-submission-0.1.0.jar ubuntu@${VM_NAME}:~
+ssh -o &apos;StrictHostKeyChecking=no&apos; ubuntu@${VM_NAME} chmod +x gs-handling-form-submission-0.1.0.jar 
 
 # Stop the App if a previous version is running
-ssh --no-host-key-verify  ubuntu@linuxsb export JPID=`netstat -plnt | grep 8080 | awk &apos;{print $7}&apos; | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
+ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} export JPID=`netstat -plnt | grep 8080 | awk &apos;{print $7}&apos; | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
 
 # Start the App
-ssh --no-host-key-verify  ubuntu@linuxsb &quot;nohup java -jar ~/gs-handling-form-submission-0.1.0.jar &gt; log.out 2&gt; log.err &lt; /dev/null &amp;&quot;
+ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} &quot;nohup java -jar ~/gs-handling-form-submission-0.1.0.jar &gt; log.out 2&gt; log.err &lt; /dev/null &amp;&quot;
 
-# create a port mapping to the app
-export SERVER_IP=`grep linuxsb /etc/hosts | cut -d&apos; &apos; -f1`
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 -m conntrack --ctstate NEW -j DNAT --to ${SERVER_IP}:8080
+# create a port mapping to the app 
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8080 ${SERVER_IP} 8080
 
-# Test with wget
-wget http://linuxsb:8080/greeting
-</command>
+echo &quot;Test with http://devops.vcloudair.io:8080/greeting&quot;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
-  <buildWrappers/>
+  <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent># Set constants for Vapp and VM 
+# Rather than let user set values with parameterized build to avoid too many vms.
+
+VAPP_NAME=linuxsb_vapp
+VM_NAME=linuxsb</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
+  </buildWrappers>
 </project>
