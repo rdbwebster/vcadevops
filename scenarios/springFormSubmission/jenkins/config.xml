@@ -2,23 +2,14 @@
 <project>
   <actions/>
   <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>VAPP_NAME</name>
-          <description></description>
-          <defaultValue>linuxsb_vapp</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>VM_NAME</name>
-          <description></description>
-          <defaultValue>linuxsb</defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
+  <properties/>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
@@ -96,16 +87,13 @@ VM_NAME=$VM_NAME</properties>
 
 export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
 
-# Remove the old node from the chef-server if present
 cd /home/ubuntu/vcadevops/chef-repo
-if [[ $(knife node list | grep ${VM_NAME} | wc -l) -gt 0 ]]
-then
-   knife node delete ${VM_NAME}  --yes
-fi
 
-# Call the Chef Client on the dev server to Config the Server
-knife bootstrap ${SERVER_IP} -x ubuntu --sudo --run-list  &apos;recipe[SB1]&apos;
-#knife ssh ${VM_NAME} &apos;sudo chef-client&apos; --manual-list --ssh-user ubuntu -i ~/.ssh/ubuntu_rsa --no-host-key-verify
+# See if the server (maybe new) is registered with the chef-server
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/check_chef_node.sh ${VM_NAME} ${SERVER_IP}
+
+# Run the chef client to configure the server
+knife ssh ${VM_NAME} &apos;sudo chef-client&apos; --manual-list --ssh-user ubuntu -i ~/.ssh/ubuntu_rsa --no-host-key-verify
 
 # Move the executable
 scp -o StrictHostKeyChecking=no /var/lib/jenkins/jobs/spring_boot_form/workspace/complete/build/libs/gs-handling-form-submission-0.1.0.jar ubuntu@${VM_NAME}:~
@@ -124,5 +112,16 @@ echo &quot;Test with http://devops.vcloudair.io:8080/greeting&quot;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
-  <buildWrappers/>
+  <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent># Set constants for Vapp and VM 
+# Rather than let user set values with parameterized build to avoid too many vms.
+
+VAPP_NAME=linuxsb_vapp
+VM_NAME=linuxsb</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
+  </buildWrappers>
 </project>

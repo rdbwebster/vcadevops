@@ -1,24 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>This job demonstrates how to create a Photon Server using the vCloud Air CLI.&#xd;
+The job creates a server named &apos;photonTestVM&apos; &#xd;
+If the server exists, the creation is skipped.&#xd;
+This job is called by the &apos;docker_photon&apos; job to create a server.&#xd;
+Run the &apos;Reset_Demo&apos; job to delete the existing server, if necessary.&#xd;
+</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>VAPP_NAME</name>
-          <description></description>
-          <defaultValue>photonTestApp</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>VM_NAME</name>
-          <description></description>
-          <defaultValue>photonTestVM</defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
+  <properties/>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -29,12 +25,11 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>
-# Remove &quot;&quot; from input variables if present
+      <command># Remove &quot;&quot; from input variables if present
 VAPP_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VAPP_NAME`
 VM_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VM_NAME`
 
-# Create new VM and Photon Server
+# Login to vCloud Air
 
 vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
 
@@ -42,30 +37,17 @@ vca vdc use --vdc M933009684-4424
 
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
-# skip if vapp exists 
+# Create new Server, skip if Server already exists 
 if [ ${#IP} -lt 1 ]
   then
     vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;cf-catalog&apos; -t &apos;Photon&apos;  -n M933009684-4424-default-routed  -m DHCP
     vca vapp power.on --vapp $VAPP_NAME
 
-  # get the new vm ip and add it to /etc/hosts
-  for a in 1 2 3 4 5 6 7 8 9; do
-     export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 |  tr -d &apos;[[:space:]]&apos;`
+  # get the new vm ip 
+  IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
   
-     echo &quot;Waiting for boot to obtain IP, attempt $a&quot;
-     if [ ${#IP} -gt 1 ]
-     then
-       echo &quot;New VM at $IP&quot;
-       break
-     else
-       sleep 10
-     fi
-  done
-  
-  if [ ${#IP} -gt 1 ]
-  then
-     echo &quot;${IP}  ${VM_NAME}&quot; | sudo tee --append /etc/hosts
-  fi   
+  # Add host entry 
+  sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
   
   # ssh to Proton Server and enable and start Docker
   sshpass -e ssh -t -v root@${IP} &quot;systemctl enable docker &amp;&amp; systemctl start docker &amp;&amp; systemctl status docker&quot;
@@ -75,6 +57,14 @@ fi
   </builders>
   <publishers/>
   <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent>VAPP_NAME=photonTestApp
+VM_NAME=photonTestVM
+</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
     <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>

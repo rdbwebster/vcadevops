@@ -2,6 +2,12 @@
 <project>
   <actions/>
   <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -41,7 +47,7 @@ fi
 
 echo VAPP_NAME=${VAPP_NAME} VM_NAME=${VM_NAME}
 
-# Quick check for existing server
+# Try Quick check for existing server
 
 if [[ $(ping -c 1 ${VM_NAME}) &amp;&amp; $? -eq 0 ]]; then
   echo &quot;Found Existing Server ${VM_NAME}!&quot;
@@ -51,11 +57,9 @@ fi
 
 # Login using vca-cli
 vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
-
 vca vdc use --vdc M933009684-4424
 
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
-
 
 # Create new VM and Unbuntu Server
 # if vapp exists skip
@@ -74,20 +78,18 @@ if [ ${#IP} -lt 1 ]
   echo &quot;Wait for Boot&quot;
   IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
   
- fi
+fi
 
-id 
-
- # Set Host Name
-  echo &quot;Set Host Name&quot;
-  /home/ubuntu/vcadevops/scenarios/jenkins/set_host_name.sh $IP precise-amd64 $VM_NAME
+# Set Host Name
+echo &quot;=&gt; Set Host Name&quot;
+/home/ubuntu/vcadevops/scenarios/jenkins/set_host_name.sh $IP precise-amd64 $VM_NAME
   
   
-  # Add host entry 
-  echo &quot;Register hostname&quot;
-  sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
+# Add host entry 
+echo &quot;=&gt; Register hostname&quot;
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
 
-
+echo &quot;=&gt; New Server ${VM_NAME} created at ${IP}
 </command>
     </hudson.tasks.Shell>
   </builders>

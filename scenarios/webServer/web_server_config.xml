@@ -1,8 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Demonstrates chef provisioning a web_server on an existing server.&#xd;
-A target server will be created if one does not exist.</description>
+  <description>Demonstrates the creation and  provisioning of a web_server based on a chef role named &apos;web_server&apos;.&#xd;
+The web_server role represents an enterprise configuration of a web server using corporate standards.&#xd;
+&#xd;
+This job calls &apos;create_ubuntu&apos; which will connect to vCloud Air using the CLI and create an ubuntu Server to host the web Server.&#xd;
+The server name is &apos;klinuxw&apos;&#xd;
+The chef bootstrap command is used to install the chef client and run the initial configuration.</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
@@ -53,9 +63,7 @@ VM_NAME=klinuxw</properties>
     <hudson.tasks.Shell>
       <command># Lookup the ip of the target node
 # (if necessary the server has been created by an earlier jenkins job)
-vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
-
-vca org use --org M933009684-4424 --service M933009684-4424
+# The earlier job connected to vcloud air cli
 
 export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
 
