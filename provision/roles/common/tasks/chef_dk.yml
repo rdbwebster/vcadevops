@@ -1,0 +1,17 @@
+---
+
+- name: check for chefdk download
+  stat: path=./chefdk_0.4.0-1_amd64.deb
+  register: chefdk_downloaded
+
+#- name:  get chef sdk if not present
+#  command: wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.4.0-1_amd64.deb
+#  creates=./chefdk_0.4.0-1_amd64.deb
+ 
+- name:  get chef sdk if not present
+  command: wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.4.0-1_amd64.deb
+  when: chefdk_downloaded.stat.exists == False
+
+- name: install chef dk
+  shell: dpkg -i chefdk_0.4.0-1_amd64.deb
+

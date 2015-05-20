@@ -1,0 +1,9 @@
+---
+
+- name: Copy across new bash_profile file 
+  template: src=ubuntu_bash_profile.j2 dest=/home/ubuntu/.bash_profile owner=ubuntu group=ubuntu mode=0664
+
+- name: Add ubuntu  to sudoers  
+  lineinfile: dest=/etc/sudoers.d/myOverrides  state=present create=yes regexp='^# ubuntu'
+              line='# ubuntu needs to call chef bootstrap without tty prompt\nubuntu  ALL=(ALL) NOPASSWD:ALL'
+              validate='visudo -cf %s'

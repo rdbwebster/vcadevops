@@ -1,0 +1,21 @@
+---
+
+- name: accept forwards
+  lineinfile: dest=/etc/default/ufw regexp='^DEFAULT_FORWARD_POLICY' line='DEFAULT_FORWARD_POLICY="ACCEPT"'
+
+- name: enable forwarding by uncommenting line
+  lineinfile: "dest=/etc/ufw/sysctl.conf regexp='^#net.ipv4.ip_forward=1' line='net.ipv4.ip_forward=1'"
+
+- name: Add snat rule in nat section to before.rules
+  lineinfile: dest=/etc/ufw/before.rules 
+              regexp='^# NAT table rules'
+              line="# NAT table rules\n\n*nat\n\n:POSTROUTING ACCEPT [0:0]\n\n-A POSTROUTING -o eth0 -j SNAT --to  {{ devops_ip }}\nCOMMIT"
+
+- name: set default to allow all incoming
+  shell: ufw default allow incoming
+
+- name: enable ufw
+  shell: yes '' | sudo ufw enable
+
+
+

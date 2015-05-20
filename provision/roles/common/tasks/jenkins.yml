@@ -1,0 +1,32 @@
+---
+
+- name: Add Jenkins to apt source list
+  shell: wget  -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key > /tmp/key
+  shell: apt-key add  /tmp/key
+  shell: echo "deb http://pkg.jenkins-ci.org/debian binary/" >> /etc/apt/sources.list
+
+- name: install Jenkins CI Server
+  apt: name=jenkins update_cache=yes force=yes
+
+- name: config
+  lineinfile:
+    dest: /etc/default/jenkins
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^HTTP_PORT', line: 'HTTP_PORT=8100' }
+    - { regexp: '^#JAVA_ARGS="-Xmx256m"', line: 'JAVA_ARGS="-Xmx256m"' }
+
+- name: restart jenkins service
+  service: name=jenkins state=restarted
+
+- name: get jenkins cli
+  shell: wget {{ jenkins_url  }}/jnlpJars/jenkins-cli.jar
+
+- name: install required jenkins plugins
+  shell: java -jar jenkins-cli.jar -s {{ jenkins url }} install-plugin envinject github gradle 
+
+- name: safe restart jenkins
+  shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} safe-restart
+
+
