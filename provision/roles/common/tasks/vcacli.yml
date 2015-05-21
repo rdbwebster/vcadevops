@@ -1,0 +1,29 @@
+---
+
+- name: build-essential
+  apt: name=build-essential update_cache=yes
+
+- name: libssl-dev 
+  apt: name=libssl-dev update_cache=yes
+
+- name: libffi-dev 
+  apt: name=libffi-dev update_cache=yes
+
+- name: libxml2-dev 
+  apt: name=libxml2-dev update_cache=yes
+
+- name: libxslt-dev 
+  apt: name=libxslt-dev update_cache=yes
+
+- name: python-dev 
+  apt: name=python-dev update_cache=yes
+
+#- name: python-pip 
+#  apt: name=python-pip update_cache=yes
+
+- name: Install pip with easy-install to avoid 'cannot import name IncompleteRead'
+  shell: easy_install -U pip 
+
+- name: Install vca-cli
+  shell: pip install vca-cli==10rc8
+

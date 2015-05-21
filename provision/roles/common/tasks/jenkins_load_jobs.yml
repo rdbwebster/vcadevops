@@ -1,0 +1,24 @@
+---
+
+- name: Load Jenkins job create_photon
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job create_photon < /home/ubuntu/vcadevops/scenarios/createPhoton/create_photon_config.xml
+
+- name: Load Jenkins jobs create_ubuntu
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job create_ubuntu < /home/ubuntu/vcadevops/scenarios/createUbuntu/config.xml
+
+- name: Load Jenkins job docker_photon
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job docker_photon  < /home/ubuntu/vcadevops/scenarios/dockerPhoton/docker_photon_config.xml
+
+- name: Load Jenkins job spring_boot_form
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job spring_boot_form  < /home/ubuntu/vcadevops/scenarios/springFormSubmission/jenkins/config.xml
+
+- name: Load Jenkins job web_servers
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job web_server  < /home/ubuntu/vcadevops/scenarios/webServer/web_server_config.xml
+
+- name: Load Jenkins Chef_Knife
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job Chef_Knife  < /home/ubuntu/vcadevops/scenarios/chefKnife/jenkins/chef_knife_config.xml
+
+- name: Load Jenkins job reset_demo
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job reset_demo  < /home/ubuntu/vcadevops/scenarios/resetDemo/jenkins/resetDemo_config.xml
+
+

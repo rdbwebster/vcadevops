@@ -1,0 +1,10 @@
+---
+
+- name: Copy across new bash_profile file 
+  template: src=jenkins_bash_profile.j2 dest=/var/lib/jenkins/.bash_profile owner=jenkins group=jenkins mode=0664
+
+- name: Add jenkins to sudoers
+  lineinfile: dest=/etc/sudoers.d/myOverrides  state=present create=yes regexp='^# jenkins'
+              line='# jenkins needs to call iptables\njenkins ALL=(ALL) NOPASSWD:ALL' 
+              validate='visudo -cf %s'
+

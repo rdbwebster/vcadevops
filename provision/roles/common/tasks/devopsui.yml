@@ -1,0 +1,10 @@
+---
+
+- name: pip install flask
+  shell: pip install Flask
+
+- name: Copy across upstart script
+  template: src=devopsui.j2 dest=/etc/init/devopsui.conf owner=ubuntu group=ubuntu  mode=0644
+
+- name: Start devopsui flask service
+  service: name=devopsui state=started

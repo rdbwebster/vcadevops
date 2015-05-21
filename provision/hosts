@@ -1,0 +1,12 @@
+
+#[devopsServer]
+#localhost:2222 ansible_ssh_user=vagrant sudo=yes
+#23.92.225.229:22   ansible_ssh_user=ubuntu sudo=yes
+
+devops ansible_ssh_port=22 ansible_ssh_host=23.92.225.229
+
+chef   ansible_ssh_port=33 ansible_ssh_host=23.92.225.229
+
+#[chefServer]
+#23.92.225.229:33   ansible_ssh_user=buntu sudo=yes
+

@@ -1,0 +1,31 @@
+---
+- hosts: devops
+  remote_user: ubuntu
+  sudo: yes
+  vars:
+    host_name: devops
+    fqdn: devops.vcloudair.io
+    devops_ip: 192.168.109.3
+
+    # use local network address for chef workstation setup
+    chef_ip: "{{ lookup('env','chef_server_ip') }}"
+    chef_port: 2222
+
+    devops_ip: "{{ lookup('env','devops_server_ip') }}"
+    # must use internal address due to no NAT hairpin support
+    # cannot call out through gateway and back in on devops.vcloudair.io
+    jenkins_url: http://{{ devops_ip }}:8100
+  tasks:
+    - include: roles/common/tasks/hostname.yml
+    - include: roles/common/tasks/ssh.yml
+    - include: roles/common/tasks/java7.yml
+    - include: roles/common/tasks/jenkins.yml
+    - include: roles/common/tasks/chef_dk.yml
+    - include: roles/common/tasks/chef_repo.yml
+    - include: roles/common/tasks/vcacli.yml
+    - include: roles/common/tasks/devopsui.yml
+    - include: roles/common/tasks/jenkins_plugins.yml
+    - include: roles/common/tasks/jenkins_load_jobs.yml
+    - include: roles/common/tasks/config_user_ubuntu.yml
+    - include: roles/common/tasks/config_user_jenkins.yml
+    - include: roles/common/tasks/iptables.yml

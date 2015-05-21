@@ -1,0 +1,21 @@
+---
+
+- name: install Git
+  apt: name=git-core
+
+- name: Checkout project from github
+  git: repo=https://github.com/rdbwebster/vcadevops.git
+       dest=/home/ubuntu/vcadevops
+       accept_hostkey=yes
+  sudo: yes
+  sudo_user: ubuntu
+
+
+#- name: Copy chef server certifiates
+
+   shell: scp -P 22 ubuntu@{{ chef_ip }}:/home/ubuntu/.ssh/chef-validator.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-validator.pem
+   shell: scp -P 22 ubuntu@{{ chef_ip }}:/home/ubuntu/.ssh/chef-ubuntu.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-ubuntu.pem
+   shell: "cd ~/vcadevops/chef-repo; knife ssl fetch"
+
+
+

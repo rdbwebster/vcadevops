@@ -1,0 +1,14 @@
+---
+- hosts: chef
+  remote_user: ubuntu
+  sudo: yes
+  vars:
+    # fqdn must match for chef cert
+    fqdn: chef.vcloudair.io
+    host_name: chef
+  tasks:
+    - include: roles/common/tasks/hostname.yml
+    - include: roles/common/tasks/ssh.yml
+    - include: roles/common/tasks/java7.yml
+    - include: roles/common/tasks/chefServer.yml
+

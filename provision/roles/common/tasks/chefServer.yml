@@ -1,0 +1,48 @@
+---
+
+- name: debug variables
+  debug: msg=" variable fqdn = {{ fqdn }}"
+
+- name: Get and install Chef Server
+  shell: wget https://web-dl.packagecloud.io/chef/stable/packages/ubuntu/precise/chef-server-core_12.0.7-1_amd64.deb
+
+- name: install Chef Server
+  apt: deb=./chef-server-core_12.0.7-1_amd64.deb
+
+- name: config server
+  lineinfile:
+    dest: /etc/opscode/chef-server.rb
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^api_fqdn', line: 'api_fqdn "{{ fqdn }}"' }
+    - { regexp: "^nginx", line: "nginx['non_ssl_port'] = 8200" }
+
+- name: reconfigure Chef Server
+  shell: chef-server-ctl reconfigure
+
+# on retry user may already exist
+# su - opscode
+# chef-server-ctl user-list | grep ubuntu
+
+- name: Create user
+  shell: chef-server-ctl user-create ubuntu Devops Developer vcadevops@gmail.com devops123 --filename /home/ubuntu/.ssh/chef-ubuntu.pem
+  ignore_errors: yes
+
+- name: Create org
+  shell: chef-server-ctl org-create chef Chef Software, Inc. --association_user ubuntu --filename /home/ubuntu/.ssh/chef-validator.pem 
+  ignore_errors: yes
+
+- name: set key permissions
+  file: path=/home/ubuntu/.ssh/chef-ubuntu.pem    owner=ubuntu group=ubuntu mode=0600
+  file: path=/home/ubuntu/.ssh/chef-validator.pem owner=ubuntu group=ubuntu mode=0600
+
+- name: Add on Chef Manage UI and Reconfigure UI
+  shell: chef-server-ctl install opscode-manage
+
+- name: Reconfigure with new UI
+  shell: chef-server-ctl reconfigure
+
+- name: Final Server Reconfigure
+  shell: opscode-manage-ctl reconfigure
+

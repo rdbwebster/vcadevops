@@ -1,0 +1,10 @@
+---
+
+- name: modify /etc/hostname
+  lineinfile: dest="/etc/hostname" regexp="^precise-amd64" line="{{ host_name }}"
+
+- name: modify /etc/hosts
+  lineinfile: dest="/etc/hosts" regexp='^127.0.1.1' line='127.0.1.1  {{ host_name }}  {{ fqdn }}'
+
+- name: change hostname until restart
+  shell: hostname "{{ host_name }}"
