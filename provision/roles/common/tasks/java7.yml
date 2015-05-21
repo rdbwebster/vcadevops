@@ -1,7 +1,7 @@
 ---
 
 - name: install Java 7 openjdk
-  apt: name=openjdk-7-jdk update_cache=yes
+  apt: name=openjdk-7-jdk update_cache=no
 
 - name: Set JAVA HOME and PATHh values
   lineinfile:

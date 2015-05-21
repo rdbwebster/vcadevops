@@ -39,11 +39,13 @@ export UBUNTU_PRIVATE_KEY=~/.ssh/ubuntu_rsa
 
 // Run the create server script
 
-// Note
-// This script creates the vapps and add NAT rules using vca-cli but there are issues.
+// Note!!
+// The create_server script creates the vapps and add NAT rules using vca-cli but there are issues.
 // The NAT rule configuration fails, so the rules must be added through the vcloud air console.
-// The server created for ChefServer is too small, after creation, stop and reconfigure through the vcloud air 
-// console for 2 cpu, and 4 GB Ram
+// The server created for ChefServer is too small, after creation, 
+// stop and reconfigure both VM's through the vcloud air 
+// console 
+// Set both servers to 2 cpu, 4 GB Ram, 16 GB Disk
 
 ./create_server.sh
 

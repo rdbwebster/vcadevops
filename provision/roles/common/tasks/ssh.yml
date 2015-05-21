@@ -9,6 +9,6 @@
     - { regexp: '^ClientAliveCountMax', line: 'ClientAliveCountMax 3' }
 
 - name: Install sshpass
-  apt: name=sshpass update_cache=yes
+  apt: name=sshpass update_cache=no
 
 

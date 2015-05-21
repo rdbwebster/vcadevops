@@ -3,6 +3,7 @@
   remote_user: ubuntu
   sudo: yes
   vars:
+    # fqdn must match for chef cert
     fqdn: chef.vcloudair.io
     host_name: chef
   tasks:

@@ -1,7 +1,7 @@
 ---
 
 - name: debug variables
-  debug: msg=" variable devops_fqdn = {{ devops_fqdn }}"
+  debug: msg=" variable fqdn = {{ fqdn }}"
 
 - name: Get and install Chef Server
   shell: wget https://web-dl.packagecloud.io/chef/stable/packages/ubuntu/precise/chef-server-core_12.0.7-1_amd64.deb
@@ -15,8 +15,8 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   with_items:
-    - { regexp: '^api_fqdn', line: 'api_fqdn={{ devops_fqdn }}' }
-    - { regexp: "^nginx['non_ssl_port']", line: "nginx['non_ssl_port'] = 8200" }
+    - { regexp: '^api_fqdn', line: 'api_fqdn "{{ fqdn }}"' }
+    - { regexp: "^nginx", line: "nginx['non_ssl_port'] = 8200" }
 
 - name: reconfigure Chef Server
   shell: chef-server-ctl reconfigure
