@@ -7,7 +7,7 @@ current_dir = File.dirname(__FILE__)
   user = "ubuntu"
   node_name                user
  # client_key               "#{ENV['HOME']}/.chef/#{user}.pem"
-  client_key               "/home/ubuntu/vcadevops/chef-repo/.chef/ubuntu.pem"
+  client_key               "/home/ubuntu/vcadevops/chef-repo/.chef/chef-ubuntu.pem"
  # client_key               "#{current_dir}/ubuntu.pem"
  # validation_client_name   "#{ENV['ORGNAME']}-validator"
   validation_client_name   "chef-validator"
@@ -15,7 +15,8 @@ current_dir = File.dirname(__FILE__)
   validation_key           "/home/ubuntu/vcadevops/chef-repo/.chef/chef-validator.pem"
  # validation_key           "#{current_dir}/chef-validator.pem"
  # chef_server_url          "https://api.opscode.com/organizations/#{ENV['ORGNAME']}"
-  chef_server_url          "https://devops.vcloudair.io/organizations/chef"
+  chef_server_url          "https://chef.vcloudair.io/organizations/chef"
+#  chef_server_url          "https:/devops.localdomain/organizations/chef"
   syntax_check_cache_path  "#{ENV['HOME']}/.chef/syntax_check_cache"
  # cookbook_path            ["#{current_dir}/../cookbooks"]
   cookbook_path            ["/home/ubuntu/vcadevops/chef-repo/cookbooks"]
