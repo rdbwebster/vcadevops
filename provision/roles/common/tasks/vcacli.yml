@@ -1,22 +1,22 @@
 ---
 
 - name: build-essential
-  apt: name=build-essential update_cache=yes
+  apt: name=build-essential update_cache=no
 
 - name: libssl-dev 
-  apt: name=libssl-dev update_cache=yes
+  apt: name=libssl-dev update_cache=no
 
 - name: libffi-dev 
-  apt: name=libffi-dev update_cache=yes
+  apt: name=libffi-dev update_cache=no
 
 - name: libxml2-dev 
-  apt: name=libxml2-dev update_cache=yes
+  apt: name=libxml2-dev update_cache=no
 
 - name: libxslt-dev 
-  apt: name=libxslt-dev update_cache=yes
+  apt: name=libxslt-dev update_cache=no
 
 - name: python-dev 
-  apt: name=python-dev update_cache=yes
+  apt: name=python-dev update_cache=no
 
 #- name: python-pip 
 #  apt: name=python-pip update_cache=yes
