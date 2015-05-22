@@ -1,0 +1,13 @@
+---
+
+- name:  add apt source for nodejs
+  shell: curl -sL https://deb.nodesource.com/setup | sudo bash -
+
+- name: install nodejs and dependencies
+  apt: pkg={{item}} state=installed
+  with_items:
+  - nodejs
+  - build-essential
+
+
+
