@@ -1,0 +1,36 @@
+---
+
+# Default Username: root
+# Default Password: 5iveL!fe 
+
+- name: install postfix, pre seed answers for installer
+  command: "{{ item }} chdir=/tmp"
+  with_items:
+  - debconf-set-selections <<< "postfix postfix/mailname string vcadevops@gmail.com"
+  - debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+  - apt-get install -y postfix
+
+- name: gitlab dependencies
+  apt: pkg={{item}} state=installed
+  with_items:
+  - curl
+  - openssh-server
+  - ca-certificates
+
+
+- name:  add apt source for  gitlab
+  shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
+
+- name: install gitlab
+  apt: name=gitlab-ce update_cache=yes
+  register: git1
+- debug: var=git1.stdout_lines
+
+- name: modify listen port 
+  lineinfile: dest="/etc/gitlab/gitlab.rb"
+              regexp='^external_url' line="external_url 'http://{{ host_name }}:8300'"
+
+- name: reconfigure
+  shell: gitlab-ctl reconfigure
+
+
