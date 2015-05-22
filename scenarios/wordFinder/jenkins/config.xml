@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(Default)</jdk>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.26">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+              <properties>VAPP_NAME=${VAPP_NAME}
+VM_NAME=${VM_NAME}</properties>
+            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+          </configs>
+          <projects>create_ubuntu</projects>
+          <condition>ALWAYS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+          <block>
+            <buildStepFailureThreshold>
+              <name>FAILURE</name>
+              <ordinal>2</ordinal>
+              <color>RED</color>
+              <completeBuild>true</completeBuild>
+            </buildStepFailureThreshold>
+            <unstableThreshold>
+              <name>UNSTABLE</name>
+              <ordinal>1</ordinal>
+              <color>YELLOW</color>
+              <completeBuild>true</completeBuild>
+            </unstableThreshold>
+            <failureThreshold>
+              <name>FAILURE</name>
+              <ordinal>2</ordinal>
+              <color>RED</color>
+              <completeBuild>true</completeBuild>
+            </failureThreshold>
+          </block>
+          <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
+        </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.TriggerBuilder>
+    <hudson.tasks.Shell>
+      <command># Lookup the ip of the target node, login completed on create_ubuntu step
+
+export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
+
+# Get the app source from GitLab
+sudo rm -rf  word-finder
+git clone http://devops:8300/root/word-finder.git
+
+# Build / Syntax check the app
+
+cd word-finder
+sudo npm install
+
+# Provision targer server with Ansible, install nodejs and setup app as service
+
+export ANSIBLE_HOST_KEY_CHECKING=False
+
+pushd ~ubuntu/vcadevops/scenarios/wordFinder/ansible
+      ansible-playbook -i inventory.py playbook.yml
+popd
+
+pwd 
+
+# Move the executable
+scp -o StrictHostKeyChecking=no -r /var/lib/jenkins/jobs/word_finder/workspace/word-finder ubuntu@${VM_NAME}:~
+
+
+# Stop the App if a previous version is running
+ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} export JPID=`netstat -plnt | grep 3000 | awk &apos;{print $7}&apos; | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
+
+
+# Start the App
+ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} &quot;cd word-finder; nohup nodejs /home/ubuntu/word-finder/server.js &gt; /tmp/word-finder.out 2&gt;&amp;1 &lt; /dev/null &amp;&quot;
+
+
+# create a port mapping to the app 
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 3000 ${SERVER_IP} 3000
+
+# Run Selenium test
+echo &quot;&lt;= Run Selenium Test&quot;
+#python /home/ubuntu/vcadevops/scenarios/springFormSubmission/selenium/formtest.py
+
+
+echo &quot;Test with http://devops.vcair.us:3000/&quot;
+
+
+
+
+
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent>VAPP_NAME=linuxa_vapp
+VM_NAME=linuxa</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
+    <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
+      <injectGlobalPasswords>false</injectGlobalPasswords>
+      <maskPasswordParameters>true</maskPasswordParameters>
+      <passwordEntries>
+        <EnvInjectPasswordEntry>
+          <name>VCA_PASSWORD</name>
+          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+        </EnvInjectPasswordEntry>
+      </passwordEntries>
+    </EnvInjectPasswordWrapper>
+  </buildWrappers>
+</project>

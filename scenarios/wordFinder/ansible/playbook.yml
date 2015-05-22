@@ -1,0 +1,21 @@
+---
+- hosts: linuxa
+  vars:
+  remote_user: ubuntu
+  tasks:
+
+  - name: Check if nodejs is installed
+    command: dpkg-query -W nodejs
+    register: pkg_check
+
+  - name:  add apt source for nodejs
+    shell: curl -sL https://deb.nodesource.com/setup | sudo bash -
+    when: pkg_check.rc == 1
+
+  - name: install nodejs and dependencies
+    apt: pkg={{item}} state=installed
+    with_items:
+    - nodejs
+    - build-essential
+    when: pkg_check.rc == 1
+
