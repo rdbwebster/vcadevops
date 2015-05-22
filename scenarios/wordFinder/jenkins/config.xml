@@ -57,6 +57,7 @@ export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos
 # Get the app source from GitLab
 sudo rm -rf  word-finder
 git clone http://devops:8300/root/word-finder.git
+sudo rm -rf /home/ubuntu/word-finder/.git
 
 # Build / Syntax check the app
 
@@ -90,7 +91,14 @@ sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 3000 ${SERVER_I
 
 # Run Selenium test
 echo &quot;&lt;= Run Selenium Test&quot;
-#python /home/ubuntu/vcadevops/scenarios/springFormSubmission/selenium/formtest.py
+python /home/ubuntu/vcadevops/scenarios/wordFinder/selenium/formtest.py
+
+if [  $? -eq 0 ] 
+then
+  echo &quot;TEST PASSED&quot;
+else
+  echo &quot;TEST FAILED&quot;
+fi
 
 
 echo &quot;Test with http://devops.vcair.us:3000/&quot;
