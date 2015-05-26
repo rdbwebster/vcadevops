@@ -15,7 +15,8 @@ current_dir = File.dirname(__FILE__)
   validation_key           "/home/ubuntu/vcadevops/chef-repo/.chef/chef-validator.pem"
  # validation_key           "#{current_dir}/chef-validator.pem"
  # chef_server_url          "https://api.opscode.com/organizations/#{ENV['ORGNAME']}"
-  chef_server_url          "https://chef.vcloudair.io/organizations/chef"
+ # api connection on port 443
+  chef_server_url          "https://chef.vcair.us/organizations/chef"
 #  chef_server_url          "https:/devops.localdomain/organizations/chef"
   syntax_check_cache_path  "#{ENV['HOME']}/.chef/syntax_check_cache"
  # cookbook_path            ["#{current_dir}/../cookbooks"]
