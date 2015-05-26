@@ -1,10 +1,29 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<project>
-  <actions/>
+
+ns/>
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties/>
-  <scm class="hudson.scm.NullSCM"/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>http://devops:8300/root/word-finder.git</url>
+        <credentialsId>058a9d12-b397-4e5b-a470-e25bf78fcfe0</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <browser class="hudson.plugins.git.browser.GitLab">
+      <url>http://devops.vcair.us:8300/root/word-finder</url>
+      <version>7.11</version>
+    </browser>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -52,42 +71,41 @@ VM_NAME=${VM_NAME}</properties>
     <hudson.tasks.Shell>
       <command># Lookup the ip of the target node, login completed on create_ubuntu step
 
-export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
+#export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
 
 # Get the app source from GitLab
-sudo rm -rf  word-finder
-git clone http://devops:8300/root/word-finder.git
-sudo rm -rf /home/ubuntu/word-finder/.git
+#sudo rm -rf  word-finder
+#git clone http://devops:8300/root/word-finder.git
+#sudo rm -rf /home/ubuntu/word-finder/.git
 
 # Build / Syntax check the app
 
-cd word-finder
-sudo npm install
+#cd word-finder
+sudo npm -g install
 
 # Provision targer server with Ansible, install nodejs and setup app as service
 
-export ANSIBLE_HOST_KEY_CHECKING=False
+#export ANSIBLE_HOST_KEY_CHECKING=False
 
-pushd ~ubuntu/vcadevops/scenarios/wordFinder/ansible
-      ansible-playbook -i inventory.py playbook.yml
-popd
+#pushd ~ubuntu/vcadevops/scenarios/wordFinder/ansible
+#      ansible-playbook -i inventory.py playbook.yml
+#popd
 
-pwd 
+#pwd 
 
 # Move the executable
-scp -o StrictHostKeyChecking=no -r /var/lib/jenkins/jobs/word_finder/workspace/word-finder ubuntu@${VM_NAME}:~
+#scp -o StrictHostKeyChecking=no -r /var/lib/jenkins/jobs/word_finder/workspace/word-finder ubuntu@${VM_NAME}:~
 
 
 # Stop the App if a previous version is running
-ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} export JPID=`netstat -plnt | grep 3000 | awk &apos;{print $7}&apos; | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
-
+#ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} export JPID=`netstat -plnt | grep 3000 | awk &apos;{print $7}&apos; | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
+sudo service word-finder restart
 
 # Start the App
-ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} &quot;cd word-finder; nohup nodejs /home/ubuntu/word-finder/server.js &gt; /tmp/word-finder.out 2&gt;&amp;1 &lt; /dev/null &amp;&quot;
-
+#ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} &quot;cd word-finder; nohup nodejs /home/ubuntu/word-finder/server.js &gt; /tmp/word-finder.out 2&gt;&amp;1 &lt; /dev/null &amp;&quot;
 
 # create a port mapping to the app 
-sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 3000 ${SERVER_IP} 3000
+#sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 3000 ${SERVER_IP} 3000
 
 # Run Selenium test
 echo &quot;&lt;= Run Selenium Test&quot;
@@ -116,7 +134,11 @@ echo &quot;Test with http://devops.vcair.us:3000/&quot;
     <EnvInjectBuildWrapper plugin="envinject@1.91.2">
       <info>
         <propertiesContent>VAPP_NAME=linuxa_vapp
-VM_NAME=linuxa</propertiesContent>
+VM_NAME=linuxa
+
+
+
+</propertiesContent>
         <loadFilesFromMaster>false</loadFilesFromMaster>
       </info>
     </EnvInjectBuildWrapper>

@@ -24,6 +24,7 @@
     - include: roles/common/tasks/chef_repo.yml
     - include: roles/common/tasks/vcacli.yml
     - include: roles/common/tasks/devopsui.yml
+    - include: roles/common/tasks/ansible.yml
     - include: roles/common/tasks/jenkins_plugins.yml
     - include: roles/common/tasks/jenkins_load_jobs.yml
     - include: roles/common/tasks/config_user_ubuntu.yml

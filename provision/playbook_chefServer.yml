@@ -4,7 +4,8 @@
   sudo: yes
   vars:
     # fqdn must match for chef cert
-    fqdn: chef.vcloudair.io
+    #fqdn: chef.vcloudair.io
+    fqdn: chef.vcair.us
     host_name: chef
   tasks:
     - include: roles/common/tasks/hostname.yml

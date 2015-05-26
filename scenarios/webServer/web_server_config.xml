@@ -70,7 +70,10 @@ export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -
 cd /home/ubuntu/vcadevops/chef-repo
 
 # Remove the old node from the chef-server if present
-knife node delete precise-amd64  --yes
+if [ $(knife node list | grep precise-amd64 | wc -l) -eq 1 ]
+then
+  knife node delete precise-amd64  --yes
+fi
 
 # Bootstrap node with chef client and set node role
 knife bootstrap klinuxw -x ubuntu --sudo --run-list  &apos;role[web_server]&apos;
@@ -79,7 +82,7 @@ knife bootstrap klinuxw -x ubuntu --sudo --run-list  &apos;role[web_server]&apos
 sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8900 ${SERVER_IP} 80
 
 # Test web server at url
-echo &quot;http://devops.vcloud.io:8900&quot;</command>
+echo &quot;http://devops.vcair.us:8900&quot;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
