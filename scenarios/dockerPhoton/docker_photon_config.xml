@@ -1,4 +1,3 @@
-
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
@@ -85,7 +84,7 @@ sshpass -e ssh -t root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx
 sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 9999 ${SERVER_IP} 80
 
 # Test with browser using url 
-echo &quot;=&gt; Test with browser http://devops.vcloudair.io:9999&quot;
+echo &quot;=&gt; Test with browser http://devops.vcair.us:9999&quot;
 </command>
     </hudson.tasks.Shell>
   </builders>
