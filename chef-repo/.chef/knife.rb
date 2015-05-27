@@ -7,6 +7,7 @@ current_dir = File.dirname(__FILE__)
   user = "ubuntu"
   node_name                user
  # client_key               "#{ENV['HOME']}/.chef/#{user}.pem"
+ # Set so jenkins and ubuntu use same client key
   client_key               "/home/ubuntu/vcadevops/chef-repo/.chef/chef-ubuntu.pem"
  # client_key               "#{current_dir}/ubuntu.pem"
  # validation_client_name   "#{ENV['ORGNAME']}-validator"
