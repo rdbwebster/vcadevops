@@ -1,0 +1,51 @@
+
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+Installing vca-cli
+
+</h4>
+<p>
+
+<br>
+
+
+<br>
+<b>Mac Installation</b>
+<br>
+<a href="https://github.com/vmware/vca-cli" target="_blank">Follow the vca-cli install docs</a>
+<br>
+<br>
+<b>Ubuntu Installation</b>
+<p>(For calling from Jenkins Job</p>
+
+<pre class="pre-scrollable">
+
+// Login as ubuntu
+$ su - ubuntu
+
+$ sudo apt-get install -y build-essential libssl-dev libffi-dev libxml2-dev libxslt-dev python-dev python-pip
+
+$ sudo pip install vca-cli
+
+</pre>
+
+
+
+<br>
+
+</div>
+</div>
+{% endblock %}
+

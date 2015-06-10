@@ -1,6 +1,8 @@
 from flask import render_template, flash, redirect, session, url_for, request
 from datetime import datetime
 from app import app
+from flaskext.markdown import Markdown
+Markdown(app)
 
 
 @app.errorhandler(404)
@@ -44,3 +46,24 @@ def cl1():
 @app.route('/dp1/', methods=['GET'])
 def dp1():
     return render_template('dp1.html')
+
+@app.route('/docs/', methods=['GET'])
+def docs():
+    return render_template('docs.html', **locals())
+
+@app.route('/docs/install_jenkins', methods=['GET'])
+def install_jenkins():
+    return render_template('docs/install_jenkins.html', **locals())
+
+@app.route('/docs/create_ubuntu', methods=['GET'])
+def create_ubuntu():
+    return render_template('docs/create_ubuntu.html', **locals())
+
+@app.route('/docs/setup_ssh', methods=['GET'])
+def setup_ssh():
+    return render_template('docs/setup_ssh.html', **locals())
+
+@app.route('/docs/install_vca_cli', methods=['GET'])
+def installing_vca_cli():
+    return render_template('docs/install_vca_cli.html', **locals())
+

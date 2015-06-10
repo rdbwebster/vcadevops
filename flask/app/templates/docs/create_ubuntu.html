@@ -1,0 +1,63 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container">
+
+<h3>Create an Ubuntu Server on vCloud Air</h3>
+       
+</br>
+<h4>Create a ssh key and customization file</h4>
+</br>
+       
+<p>We will want to use ssh to access our new server without requiring a password. </br>
+To do this you will need a key pair for the ubuntu user and a customization script to set the key on the new server.  <br>
+If you don't have these things, see this article  <a  href="http://vcair.us/docs/setup_ssh"_blank"> ssh setup on vCloud Air </a> 
+
+</p>
+</br>
+</br>
+
+
+
+
+<h4> Create a new Ubuntu Server using vca-cli </h4>
+</br>
+
+ You will need to get a few pieces of information from the vCloud Air Portal to get started.
+   
+ 
+<pre class="pre-scrollable">
+    // If you have a Subscription vCloud Air Account login like this
+    
+    $ vca login youremail@gmail.com --password 'yourpswd' --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424 --save-password
+
+    $ vca org use --org M933009684-4424 --service M933009684-4424
+    $ vca vdc use --vdc M933009684-4424
+
+    // if you have an on demand vCloud Air Account login like this
+
+    $ vca login youremail@gmail.com --password 'yourpswd' --instance 61209cc8-c4ea-467d-bc07-d3fa74929ae4
+
+    $ vca vdc use --vdc 'VDC1'
+
+    // Next after login Create a new Ubuntu Server with 4 cpu and 4 GB RAM
+
+    $ vca vapp create -a devopsVapp -V devops -c 'Public Catalog' -t 'Ubuntu Server 12.04 LTS (amd64 20150127)' -n M933009684-4424-default-routed -m POOL --cpu 4 --ram 4096
+
+    // Customize the server using the customize.sh file you created in the ssh setup article
+    $ vca vapp customize --vapp devopsVapp --vm devops --file ~/customize.sh
+
+</pre>
+
+</br>
+</br>
+<br>
+
+<h4>Configure vCloud Air Network Gateway</h4>
+
+
+</div>
+{% endblock %}

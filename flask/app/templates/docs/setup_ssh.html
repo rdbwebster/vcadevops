@@ -1,0 +1,246 @@
+
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+
+<div class="col-lg-9">
+
+
+<p>
+<br>
+<h3>
+SSH Setup 
+
+</h3>
+<br>
+<p>This section covers several topics:
+
+<ol>
+<li>How to configure ssh login without a password for newly created Servers on vCloud Air.</li>
+<li>How to define SSH Aliases on your local workstation to make login simpler.</li>
+<li>Ways to forward SSH and HTTP for servers on vCloud Air.</li>
+</ol>
+</p>
+<br>
+<hr>
+
+
+<h4>Customize new vCloud Air Servers to allow ssh login without a password </h4>
+ 
+First create a new key pair for the desired user.<br>
+In our example we will use the ubuntu user since it already exists on Ubuntu Servers.
+<br>
+
+<br>
+<pre class="pre-scrollable">
+    $ ssh-keygen -t rsa -f ./ubuntu_rsa
+</pre>
+
+<p>
+This creates two files ubuntu_rsa.pub containing the public key and an ubuntu_rsa containing the private key.<br>
+
+</br>
+Cut and past the following script and save it on your workstation.</br>
+Name the file customize.sh </br>
+(Other names are fine too, but you will need to substitute your choice of names in the later examples)
+<p>
+
+<pre class="pre-scrollable">
+     #!/bin/bash
+      if [ x$1=x"precustomization" ];
+      then
+        echo performing precustomization tasks on `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"`
+        echo performing precustomization tasks on `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"` >> /root/customization.log
+      fi
+      if [ x$1=x"postcustomization" ];
+      then
+        echo performing postcustomization tasks at `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"`
+        mkdir -p /home/ubuntu/.ssh
+
+        echo 'PUT_KEY_HERE ubuntu@localhost' >> /home/ubuntu/.ssh/authorized_keys
+
+        chown ubuntu.ubuntu /home/ubuntu/.ssh
+        chown ubuntu.ubuntu /home/ubuntu/.ssh/authorized_keys
+        chmod go-rwx /home/ubuntu/.ssh
+        chmod go-rwx /home/ubuntu/.ssh/authorized_keys
+
+        printf "nameserver 8.8.8.8 \n" >> /etc/resolvconf/resolv.conf.d/base
+
+
+        echo performing postcustomization tasks at `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"` >> /root/customization.log
+      fi      
+
+</pre>
+
+<p>
+
+Using your favorite editor, Add the contents of ubuntu_rsa file to the following customize.sh file <br>
+Replace the PUT_KEY_HERE value with the Entire file contents, let the text wrap, </br>
+
+</br>
+When complete the line should be something like this </br>
+Note: The someone@somewhere is just a comment, so the value you have will be fine. </br>
+</br>
+<pre class="pre-scrollable">
+echo 'ssh-rsa ATONOFCRAZYCHARACTERS someone@somewhere' >> /home/ubuntu/.ssh/authorized_keys
+</pre>
+</p>
+
+<p>
+One final step, <br>
+ copy the ubuntu_rsa file to your workstation ~/.ssh/config
+<pre class="pre-scrollable">
+ $ cp ubuntu_rsa ~/.ssh/
+</pre>
+
+<br>
+With this setup, you can ssh to a newly created server using this command, and login without a password.
+<br>
+
+
+<pre class="pre-scrollable">
+ssh ubuntu@myserver -i ~/.ssh/ubuntu_rsa 
+</pre>
+<br>
+
+To make an easier simpler setup see the section on 'ssh aliases' in the SSH Tricks section below.
+
+
+<br>
+<br>
+<hr>
+<h3> SSH Tricks </h3>
+<br>
+
+
+
+<br>
+<h4>Define SSH Aliases on your local workstation</h4>
+<br>
+
+Its super handly to setup an alias for your server and set the default ssh key if you won't be logging in using your own id.
+<br>
+
+<pre class="pre-scrollable">
+vi ~/.ssh/config
+
+Host *
+ServerAliveInterval 30
+
+Host myserver
+  Hostname 23.92.226.191
+# next 2 lines for connecting to myserver directly
+# enables this command form:   ssh ubuntu@myserver
+  User ubuntu
+  IdentityFile ~/.ssh/ubuntu_rsa
+</pre>
+
+<br>
+<hr>
+
+
+
+<h3>Too few public IP's ?</h3>
+
+Having fewer public Ip's than Servers is a possible scenario on vCloud Air.<br>
+This section presents a number of solutions for forwarding ssh and http through a single public ip <br>
+
+The approach selected will depend on whether the you haves admin access to the vCloud Air Gateway appliance.
+<br>
+<br>
+<h4>Routing http with the vCloud Air Gateway </h4>
+
+If the vCloud Air gateway configuration can be modified, <br>
+new DNAT rules can be added to route http requests based on their port to other servers on the private network.<br>
+These changes can be performed through the vCloud Air Console or using vca-cli
+<br>
+
+<pre class="pre-scrollable">
+
+vca nat add --type DNAT  --original-ip 23.92.225.229 --original-port 80 --translated-ip $IP --translated-port 80 --protocol any
+
+</pre>
+
+</br></br>
+<h4>Forwarding ssh with the vCloud Air Gateway</h4>
+
+If the vCloud Air Gateway configuration can be modified then new DNAT rules can be added to route ssh requests <br>
+from the gateway to other servers on the internal network.  For example
+
+<pre class="pre-scrollable">
+
+vca nat add --type DNAT  --original-ip 23.92.225.229 --original-port 44 --translated-ip 192.168.109.101 --translated-port 22 --protocol any
+</pre>
+
+<br>
+
+<h4><u>Alternative:</u> Routing http with the IPTables </h4>
+
+If the gateway cannot be modifed, then using IPTables on a server on the inside network is an alternative approach.<br>
+The devops server hosting this demo is using this method.<br> 
+<br>
+
+All browser requests from the internet are made to devops.vcair.us which is configured with a single NAT rule to forward all requests
+to a single Ubuntu server.  The IPTables firewall on the Ubuntu server is configured to forward requests for certain ports
+to other servers / port combinations on the internal network.<br>
+<br>
+IPTable commands can be issued dynamically in a shell (for example using Jenkins when an artifact is deployed)
+
+<br>
+For example, This following command will route a request to devops.vcair.us:8080 to a server on the internal network at 192.168.109.7:8080 <br>
+
+<pre class="pre-scrollable">
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 -m conntrack --ctstate NEW -j DNAT --to 192.168.109.7:8080
+</pre>
+<br>
+
+
+<h4> <u>Alternative:</u> Forwarding ssh Using an ssh gateway</h4>
+  
+If configuration of the vCloud Air Gateway is not possible, then a ssh proxy can be configured.<br>
+
+The sshd server on a single Ubuntu Server can act as a ssh gateway so that remote clients can connect to the VMs.
+This is possible since the same ubuntu user and its key are used to connect to all servers on the privat network.<br>
+The Ubuntu server has the ubuntu public key located in ~ubuntu/.ssh/authorized_keys 
+The Ubuntu server acts as a ssh proxy.
+
+In the client .ssh/config file
+<br>
+
+<pre class="pre-scrollable">
+Host devops
+  Hostname 23.92.225.171
+# next 2 lines for connecting to devops directly
+# enables this command form -> ssh ubuntu@devops
+  User ubuntu
+  IdentityFile ~/.ssh/ubuntu_rsa
+
+# For ssh access to any host on private network behind vca gateway 
+# For example vCloud Air Gatway config DNAT rule 23.92.225.171->192.168.109.3
+#
+# Proxied by ssh on 192.168.109.3 
+# enables this command form: ssh ubuntu@192.168.109.4
+Host 192.168.109.*
+  User ubuntu
+  IdentityFile ~/.ssh/ubuntu_rsa
+  ProxyCommand ssh devops -l ubuntu  -i ~/.ssh/ubuntu_rsa  nc -q0 %h %p
+
+</pre>
+
+Then for example, the following command will connect to 192.168.109.4, through the devops server behind 23.92.225.171
+<br>
+
+ssh 192.168.109.4
+<br>
+
+
+</pre>
+
+<br>
+</div>
+{% endblock %}
+

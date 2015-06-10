@@ -1,0 +1,47 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container">
+
+<h3>Installing Jenkins on vCloud Air</h3>
+       
+</br>
+</br>
+       
+<h4>Create an Ubuntu Server on vCloud Air using vca-cli </h4>
+
+If you don't aleady have an Ubuntu Server follow these steps to create one.<br>
+<a  href="http://vcair.us/docs/create_ubuntu">Create an Ubuntu Server using vca-cli </a> 
+
+<br>
+<br>
+      
+<h4> Login to the Server using user ubuntu </h4>
+
+</br>
+</br>
+</br>
+<h4> Install Jenkins 1.609 </h4>
+
+<pre class="pre-scrollable">
+    //Running as user root or use 'sudo' before each command
+
+    # wget  -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | apt-key add -
+    # echo "deb http://pkg.jenkins-ci.org/debian binary/" >> /etc/apt/sources.list
+    # apt-get update
+    # apt-get install jenkins
+
+</pre>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+
+
+</div>
+{% endblock %}
