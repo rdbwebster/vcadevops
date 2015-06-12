@@ -1,0 +1,37 @@
+---
+
+- name: debug variables
+  debug: msg=" variable fqdn = {{ fqdn }}"
+
+- name: Get Puppet Server
+  shell: wget https://apt.puppetlabs.com/puppetlabs-release-precise.deb
+
+- name: install Puppet Server
+  apt: deb=./puppetlabs-release-precise.deb
+
+- name: install Puppet agent
+  apt: name=puppetmaster-passenger 
+
+- name: config server
+  lineinfile:
+   dest: /etc/puppet/puppet.conf
+   regexp: "{{ item.regexp }}"
+   insertafter="[main]"
+   line: "{{ item.line }}"
+   with_items:
+   - { regexp: '^dns_alt_names', line: 'dns_alt_names = puppet,puppet.vcair.us' }
+
+
+
+- name: Start one to create certificates
+  shell: sudo puppet master --verbose --no-daemonize
+
+# - name: Create org
+#  shell: chef-server-ctl org-create chef Chef Software, Inc. --association_user ubuntu --filename /home/ubuntu/.ssh/chef-validator.pem 
+#  ignore_errors: yes
+
+# - name: set key permissions
+#  file: path=/home/ubuntu/.ssh/chef-ubuntu.pem    owner=ubuntu group=ubuntu mode=0600
+#  file: path=/home/ubuntu/.ssh/chef-validator.pem owner=ubuntu group=ubuntu mode=0600
+
+
