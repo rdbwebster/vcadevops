@@ -123,8 +123,9 @@ echo &quot;Test with http://devops.vcloudair.io:8080/greeting&quot;</command>
         <propertiesContent># Set constants for Vapp and VM 
 # Rather than let user set values with parameterized build to avoid too many vms.
 
-VAPP_NAME=linuxsb_vapp
-VM_NAME=linuxsb</propertiesContent>
+VAPP_NAME=vApp4
+VM_NAME=s4ubu_c
+</propertiesContent>
         <loadFilesFromMaster>false</loadFilesFromMaster>
       </info>
     </EnvInjectBuildWrapper>

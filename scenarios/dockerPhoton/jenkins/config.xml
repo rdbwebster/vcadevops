@@ -1,12 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Demonstrates the creation and  provisioning of a web_server based on a chef role named &apos;web_server&apos;.&#xd;
-The web_server role represents an enterprise configuration of a web server using corporate standards.&#xd;
-&#xd;
-This job calls &apos;create_ubuntu&apos; which will connect to vCloud Air using the CLI and create an ubuntu Server to host the web Server.&#xd;
-The server name is &apos;klinuxw&apos;&#xd;
-The chef bootstrap command is used to install the chef client and run the initial configuration.</description>
+  <description>The job demonstrates the deployment of a NGINX web server container to a Photon Server.&#xd;
+The photon server will be created if it does not exist (using create_photon)</description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>-1</daysToKeep>
     <numToKeep>5</numToKeep>
@@ -29,11 +25,12 @@ The chef bootstrap command is used to install the chef client and run the initia
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
             <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-              <properties>VAPP_NAME=klinuxw_vapp
-VM_NAME=klinuxw</properties>
+              <properties>VAPP_NAME=${VAPP_NAME}
+VM_NAME=${VM_NAME}
+</properties>
             </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
           </configs>
-          <projects>create_ubuntu</projects>
+          <projects>create_photon</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
@@ -61,32 +58,45 @@ VM_NAME=klinuxw</properties>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
     <hudson.tasks.Shell>
-      <command># Lookup the ip of the target node
-# (if necessary the server has been created by an earlier jenkins job)
-# The earlier job connected to vcloud air cli
+      <command>echo &quot;=&gt; Login to vCloud Air previously done by &apos;Check for existing server&apos; job&quot;
+echo &quot;=&gt; Get Server IP&quot;
+export SERVER_IP=$(vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;)
 
-export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
+# check for existing container deployment
+echo &quot;=&gt; Check for existing container deployment&quot;
+export name=`sshpass -e ssh -t -v root@${SERVER_IP} &quot;docker ps | grep nginx&quot; `
+export name=$(echo $name | awk &apos;{ print $NF }&apos;)
 
-cd /home/ubuntu/vcadevops/chef-repo
-
-# Remove the old node from the chef-server if present
-if [ $(knife node list | grep precise-amd64 | wc -l) -eq 1 ]
-then
-  knife node delete precise-amd64  --yes
+# stop container and remove if present
+if [ ${#name} -gt 1 ]
+  then
+  echo &quot;=&gt; Removing existing container named ${name} &quot;
+  
+  sshpass -e ssh -t root@${SERVER_IP} docker stop ${name} 
+  sshpass -e ssh -t root@${SERVER_IP} docker rm ${name}
 fi
 
-# Bootstrap node with chef client and set node role
-knife bootstrap klinuxw -x ubuntu --sudo --run-list  &apos;role[web_server]&apos;
+# install nginx container and start
+echo &quot;=&gt; Deploy Container vmwarecna/nginx&quot;
+sshpass -e ssh -t root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps&quot;
 
 # create a port mapping to the app 
-sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8900 ${SERVER_IP} 80
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 9999 ${SERVER_IP} 80
 
-# Test web server at url
-echo &quot;http://devops.vcair.us:8900&quot;</command>
+# Test with browser using url 
+echo &quot;=&gt; Test with browser http://devops.vcair.us:9999&quot;
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent>VAPP_NAME=vApp1
+VM_NAME=s1pho</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
     <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>
@@ -94,6 +104,10 @@ echo &quot;http://devops.vcair.us:8900&quot;</command>
         <EnvInjectPasswordEntry>
           <name>VCA_PASSWORD</name>
           <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+        </EnvInjectPasswordEntry>
+        <EnvInjectPasswordEntry>
+          <name>SSHPASS</name>
+          <value>9F+bQqVw0XLTlVB/+Dt0MN26xISUc9yUv0gDXaq2Z0M=</value>
         </EnvInjectPasswordEntry>
       </passwordEntries>
     </EnvInjectPasswordWrapper>

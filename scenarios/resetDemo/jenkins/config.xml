@@ -18,14 +18,15 @@
 
 vca vdc use --vdc M933009684-4424
 
-# Project photon vapp created by create_photon
-vca vapp delete -a photonTestApp
+vca vapp delete -a vApp1
 
-# Project web_server vapp created by create_ubuntu
-vca vapp delete -a klinuxw_vapp
+vca vapp delete -a vApp2
 
-# Project spring_boot_form vapp created by create_ubuntu
-vca vapp delete -a linuxsb_vapp
+vca vapp delete -a vApp3
+
+vca vapp delete -a vApp4
+
+vca vapp delete -a vApp5
 
 echo &quot;=&gt; Removed demo Test Servers&quot;</command>
     </hudson.tasks.Shell>

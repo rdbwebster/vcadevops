@@ -1,7 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>This job demonstrates how to create a Photon Server using the vCloud Air CLI.&#xd;
+The job creates a server named &apos;photonTestVM&apos; &#xd;
+If the server exists, the creation is skipped.&#xd;
+This job is used by other jobs to create a photon server.&#xd;
+Run the &apos;Reset_Demo&apos; job to delete the existing server, if necessary.&#xd;
+</description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>-1</daysToKeep>
     <numToKeep>5</numToKeep>
@@ -9,22 +14,7 @@
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>VAPP_NAME</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>VM_NAME</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
+  <properties/>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -39,66 +29,50 @@
 VAPP_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VAPP_NAME`
 VM_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VM_NAME`
 
-if [ ${#VAPP_NAME} -lt 1 ] ||  [ ${#VM_NAME} -lt 1 ]
-then
- echo Invalid input parameters
- return -1
-fi
+# Login to vCloud Air
 
-echo VAPP_NAME=${VAPP_NAME} VM_NAME=${VM_NAME}
-
-# Try Quick check for existing server
-
-if [[ $(ping -c 1 ${VM_NAME}) &amp;&amp; $? -eq 0 ]]; then
-  echo &quot;Found Existing Server ${VM_NAME}!&quot;
-  exit 0
-fi
-
-
-# Login using vca-cli
 vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+
 vca vdc use --vdc M933009684-4424
 
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
-# Create new VM and Unbuntu Server
-# if vapp exists skip
-echo &quot;Check for existing Vapp with same name&quot;
+# Create new Server, skip if Server already exists 
 if [ ${#IP} -lt 1 ]
   then
+    vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;cf-catalog&apos; -t &apos;Photon&apos;  -n M933009684-4424-default-routed  -m DHCP
+    vca vapp power.on --vapp $VAPP_NAME
 
-  echo &quot;Create VApp&quot;
-  vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;Ubuntu Server 12.04 LTS (amd64 20150127)&apos; -n M933009684-4424-default-routed -m DHCP 
- 
-  echo &quot;Customize Vapp&quot;
-  vca vapp customize --vapp $VAPP_NAME --vm $VM_NAME --file ~/add_public_ssh_key.sh
-  
-  
   # get the new vm ip 
-  echo &quot;Wait for Boot&quot;
   IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
   
+  # Add host entry 
+  sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
+  
+  # ssh to Proton Server and enable and start Docker
+  sshpass -e ssh -t -v root@${IP} &quot;systemctl enable docker &amp;&amp; systemctl start docker &amp;&amp; systemctl status docker&quot;
 fi
-
-# Set Host Name
-echo &quot;=&gt; Set Host Name&quot;
-/home/ubuntu/vcadevops/scenarios/jenkins/set_host_name.sh $IP precise-amd64 $VM_NAME
-  
-  
-# Add host entry 
-echo &quot;=&gt; Register hostname&quot;
-sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
-
-echo &quot;=&gt; New Server ${VM_NAME} created at ${IP}
 </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+      <info>
+        <propertiesContent>VAPP_NAME=vApp1
+VM_NAME=s1pho
+</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
     <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>
       <passwordEntries>
+        <EnvInjectPasswordEntry>
+          <name>SSHPASS</name>
+          <value>9F+bQqVw0XLTlVB/+Dt0MN26xISUc9yUv0gDXaq2Z0M=</value>
+        </EnvInjectPasswordEntry>
         <EnvInjectPasswordEntry>
           <name>VCA_PASSWORD</name>
           <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
