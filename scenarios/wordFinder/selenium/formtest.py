@@ -14,8 +14,7 @@ display.start()
 # you will not see the browser.
 browser = webdriver.Firefox()
 # Cannot test from inside against devops.vcloudair.io not gateway support for hairpin nat (out and back in again)
-browser.get('http://linuxa:3000/')
-
+browser.get('http://s2ubu:3000/') 
 print browser.title
 el = browser.find_element_by_name('pattern')
 el.send_keys('he__o')

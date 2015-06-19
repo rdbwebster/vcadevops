@@ -1,7 +1,9 @@
 ---
-- hosts: linuxa
+- hosts: s2ubu
   vars:
   remote_user: ubuntu
+  sudo: True
+  sudo_user: root
   tasks:
 
   - name: Check if nodejs is installed
@@ -11,11 +13,13 @@
   - name:  add apt source for nodejs
     shell: curl -sL https://deb.nodesource.com/setup | sudo bash -
     when: pkg_check.rc == 1
-
+  
   - name: install nodejs and dependencies
     apt: pkg={{item}} state=installed
     with_items:
     - nodejs
     - build-essential
     when: pkg_check.rc == 1
-
+   
+  - name: copy service definition
+    copy: src=/home/ubuntu/vcadevops/scenarios/wordFinder/ansible/word-finder.conf dest=/etc/init/word-finder.conf owner=root group=root mode=644 
