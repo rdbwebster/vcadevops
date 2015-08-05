@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>vCloud Air Devops</title>
+    {% endif %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+
+    <script type=text/javascript>
+        jQuery(document).ready(function($) {
+        $(".clickableRow").click(function() {
+              window.document.location = $(this).attr("href");
+        });
+    });
+</script>
+  </head>
+  <body>
+<!-- extend base layout -->
+
+
+{% block content %}
+<div class="container">
+    {% include 'flash.html' %}
+        <h2>CI Lab - Mac Instructions</h2>
+
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+In this lab you will create a Continuous Integration 
+</h4>
+<br>
+<br>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li>Your Mac is running a Jenkins Server.</li>
+<li>You have Git installed on your Mac. </li>
+</ul>
+<br>
+<br>
+
+
+<br>
+
+
+<div>
+<h3> Lab Overview Steps </h3>
+<br>
+<br>
+ <ol type="1">
+
+<li> Clone (create) a local source code repository on your laptop
+<li> Setup a post-commit hook so Git will call Jenkins when code changes are made.
+<li> Add the Git Plugin to Jenkins
+<li> Create a new Jenkins Project that will build the source code
+<li> Modify the code and commit the change
+<li> Watch Jenkins checkout and deploy the new code
+<li> Test the application with a browser
+
+</ol>
+
+</div>
+
+</p>
+<br>
+<h3>Step 1</h3>
+
+-  Clone (create) a local source code repository on your laptop <br>
+<br>
+<br>
+
+<pre class="pre-scrollable">
+
+$ cd /tmp
+$ git clone https://github.com/Dissimulate/Tearable-Cloth.git
+
+</pre>
+
+<br>
+<h3>Step 2</h3>
+-  Setup a post-commit hook so Git will call Jenkins when code changes are made.
+<br>
+<br>
+<pre class="pre-scrollable">
+
+$ cd Tearable-Cloth
+$ cp .git/hooks/post-update.sample  .git/hooks/post-commit
+$ echo "curl http://localhost:8080/job/Sample/build?delay=0sec" >> post-commit
+
+</pre>
+<br>
+<br>
+
+<h3>Step 3</h3>
+-  Add the Git plugin
+<br>
+<br>
+<img src="/static/img/jenkins_git_plugin.png"/>
+<br>
+-  Click the 'Install without Restart' button
+</br>
+
+<h3>Step 4</h3>
+-  Create a new Jenkins Project
+<br>
+-  In Jenkins click on the 'New Item' link on the upper left corner. <br>
+-  Enter a Item Name of "Tearable_Cloth"
+-  Check the 'Freestyle project' radio button. Jenkins click on the 'New Item' link on the upper left corner. <br>
+-  Click the OK Button
+<br>
+<br>
+
+<img src="/static/img/jenkins_new_project.png"/>
+
+<br>
+<br>
+-  Scroll down to the 'Source Code Management' Section
+-  Check the 'Git' radio button
+-  Enter the following repository url
+<pre class="pre-scrollable">
+file:////tmp/Tearable-Cloth
+</pre>
+<img src="/static/img/jenkins_git_config.png"/>
+<br>
+<br>
+<br>
+<br>
+-  Scroll down in the project to the 'Build' section and choose 'Execute shell' from the dropdown.
+<br>
+<br>
+<img src="/static/img/jenkins_shell_step.png"/>
+<br>
+<br>
+<pre class="pre-scrollable">
+
+# vCloud Air IP
+SERVER=23.92.222.222
+
+# vCloud Air Username
+USER=bob
+
+# vCloud Air Password
+PASS=password
+
+# Move the executable
+rsync -avzhe "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --exclude=".*" /var/lib/jenkins/jobs/word_finder/workspace/ $USER@PASS:/home/ubuntu/workspace
+
+</pre>
+
+- Click the 'Save' Button
+<br>
+<br>
+<h3>Step 5</h3>
+
+<pre class="pre-scrollable">
+
+$ git add index.html
+$ git commit -m "new change"
+
+</pre>
+
+<br>
+<h3>Step 6</h3>
+</p>
+ 
+</div>
+</div>
+{% endblock %}
+
+</body>
+</html>
