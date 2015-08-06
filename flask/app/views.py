@@ -67,3 +67,7 @@ def setup_ssh():
 def installing_vca_cli():
     return render_template('docs/install_vca_cli.html', **locals())
 
+@app.route('/lab/mac', methods=['GET'])
+def lab_mac():
+    return render_template('lab/mac.html', **locals())
+

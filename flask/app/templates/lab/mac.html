@@ -39,20 +39,17 @@
 
 <p>
 <br>
-<h4>
-In this lab you will create a Continuous Integration 
-</h4>
-<br>
-<br>
-<br>
+In this lab you will create a Continuous Integration process using Jenkins.<br>
+You will install the source code for an application into a git repository on your laptop and configure Jenkins to build and deploy the application whenever the source code is modified.
+</p>
 <br>
 <br>
 <h3>Prerequisites</h3>
 <ul>
 <li>Your Mac is running a Jenkins Server.</li>
 <li>You have Git installed on your Mac. </li>
+<li>Your instructor has provided a username, password <br>and public ip where you will deploy your application. </li>
 </ul>
-<br>
 <br>
 
 
@@ -62,26 +59,106 @@ In this lab you will create a Continuous Integration
 <div>
 <h3> Lab Overview Steps </h3>
 <br>
-<br>
  <ol type="1">
 
-<li> Clone (create) a local source code repository on your laptop
-<li> Setup a post-commit hook so Git will call Jenkins when code changes are made.
-<li> Add the Git Plugin to Jenkins
-<li> Create a new Jenkins Project that will build the source code
+<li> Add the Git and SCP Plugins to Jenkins
+<li> Define an scp site in Jenkins global config
+<li> Create a new Jenkins Project to do the build 
+<li> Clone (create) a source code repository on your laptop
+<li> Setup a post-commit hook so Git will call Jenkins
 <li> Modify the code and commit the change
 <li> Watch Jenkins checkout and deploy the new code
-<li> Test the application with a browser
+<li> View the application with a browser
 
 </ol>
 
 </div>
 
 </p>
-<br>
-<h3>Step 1</h3>
 
--  Clone (create) a local source code repository on your laptop <br>
+<br>
+<h3>Step 1: &nbsp;   Add the Git and SCP Plugins to Jenkins</h3>
+<br>
+ <ol type="a">
+ <li>  Open the Jenkins console in a browser <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></li>
+ <li>  Click on the '<b>Manage Jenkins</b>' link in the upper left corner </li>
+ <li>  Click on the '<b>Manage Plugins</b>' link in the center of the page </li>
+ <li>  Click on the '<b>Available</b>' tab in the center of the page </li>
+ <li>  Scroll down and select the '<b>Git Plugin</b>' in the list as shown below </li>
+<br>
+<img style="border:1px solid black" src="/static/img/jenkins_git_plugin.png"/>
+<br>
+<br>
+ <li>  Scroll down and select the '<b>Hudson SCP publisher plugin</b>' in the list as shown below </li>
+ <li>  Click on the '<b>Install without Restart</b>' button' as shown below </li>
+<br>
+<img style="border:1px solid black" src="/static/img/jenkins_scp_plugin.png"/>
+<br>
+<br>
+ <li>  Once the plugins are installed, <br>Click the '<b>Restart Jenkins when installation is complete and no jobs are running</b>'  button </li>
+</ol>
+<br>
+</br>
+
+<h3>Step 3: &nbsp;  Create a new Jenkins Project to do the build</h3>
+<br>
+ <ol type="a">
+<li>  In Jenkins click on the '<b>New Item</b>' link in the upper left corner. </li>
+<li>  Enter the value "<b>Tearable_Cloth</b>" in the '<b>Item name</b>' field</li>
+<li>  Check the '<b>Freestyle project</b>' radio button</li>
+<li>  Click the <b>OK</b>  Button</li>
+<br>
+<br>
+
+<img style="border:1px solid black" src="/static/img/jenkins_new_project.png"/>
+
+<br>
+<br>
+<li>  Scroll down to the '<b>Source Code Management</b>' Section </li>
+<li>  Check the '<b>Git</b>' radio button </li>
+<li>  Enter the following repository url </li>
+<br>
+<pre class="pre-scrollable">
+file:////tmp/Tearable-Cloth
+</pre>
+<a href="/static/img/jenkins_git_config.png" target="_blank">
+<img style="border:1px solid black" src="/static/img/jenkins_git_config.png" height="270" width="360"/>
+</a>
+<br>
+<br>
+<br>
+<br>
+<li>  Scroll down in the project to the '<b>Post-build Actions</b>' section. </li>
+<br>
+<img style="border:1px solid black" src="/static/img/jenkins_post_build_dropdown.png"/>
+
+<br>
+<br>
+<li>  Click on the dropdown field and select the '<b>Publish artifacts to SCP Repository</b>' entry. </li>
+<br>
+<img style="border:1px solid black" src="/static/img/jenkins_publish_artifact_menu.png"/>
+<br>
+<br>
+<li>  In the <b>Publish artifacts to SCP Repository</b> step, select the remote site from the <b>SCP site</b> dropdown</li>
+<li>  Enter two asterisks in the Source input field '<b>**</b>'</li>
+<li>  Enter <b>your student name provided by the instructor </b> in the '<b>Destination</b>' field</li>
+<li>  Click the '<b>Save</b>' button at the bottom of the page to save your project</li>
+<br>
+<a href="/static/img/jenkins_scp_step.png" target="_blank">
+<img style="border:1px solid black" src="/static/img/jenkins_scp_step.png"/>
+</a>
+<br>
+<br>
+</ol>
+<br>
+<br>
+<h3>Step 4: &nbsp; Clone (create) a source code repository on your laptop</h3>
+<br>
+
+<ol type="a">
+<li> Open a terminal window on your laptop  </li>
+<li> Enter the following commands to create a local git repository containing the sample application. </li>
+</ol>
 <br>
 <br>
 
@@ -93,92 +170,54 @@ $ git clone https://github.com/Dissimulate/Tearable-Cloth.git
 </pre>
 
 <br>
-<h3>Step 2</h3>
--  Setup a post-commit hook so Git will call Jenkins when code changes are made.
+<h3>Step 5: &nbsp; Setup a post-commit hook so Git will call Jenkins</h3>
+<br>
+<ol type="a">
+<li>  Enter the following commands in the terminal window to create a post-commit hook. <br>
+  With this command in place, Git will call Jenkins whenever code changes are comitted to the repository.</li>
+</ol>
 <br>
 <br>
 <pre class="pre-scrollable">
 
 $ cd Tearable-Cloth
-$ cp .git/hooks/post-update.sample  .git/hooks/post-commit
-$ echo "curl http://localhost:8080/job/Sample/build?delay=0sec" >> post-commit
+$ echo '#!/bin/sh' > .git/hooks/post-commit
+$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" >> .git/hooks/post-commit
 
 </pre>
 <br>
 <br>
+<h3>Step 6: &nbsp;  Modify the code and commit the change</h3>
+<br>
+<ol type="a">
 
-<h3>Step 3</h3>
--  Add the Git plugin
-<br>
-<br>
-<img src="/static/img/jenkins_git_plugin.png"/>
-<br>
--  Click the 'Install without Restart' button
-</br>
-
-<h3>Step 4</h3>
--  Create a new Jenkins Project
-<br>
--  In Jenkins click on the 'New Item' link on the upper left corner. <br>
--  Enter a Item Name of "Tearable_Cloth"
--  Check the 'Freestyle project' radio button. Jenkins click on the 'New Item' link on the upper left corner. <br>
--  Click the OK Button
-<br>
-<br>
-
-<img src="/static/img/jenkins_new_project.png"/>
-
-<br>
-<br>
--  Scroll down to the 'Source Code Management' Section
--  Check the 'Git' radio button
--  Enter the following repository url
-<pre class="pre-scrollable">
-file:////tmp/Tearable-Cloth
-</pre>
-<img src="/static/img/jenkins_git_config.png"/>
-<br>
-<br>
-<br>
-<br>
--  Scroll down in the project to the 'Build' section and choose 'Execute shell' from the dropdown.
-<br>
-<br>
-<img src="/static/img/jenkins_shell_step.png"/>
-<br>
-<br>
+<li>  Enter the following commands in the terminal window to modify the source code. <br>The changes will slightly modify the web page. <br>
+</li>
+</ol>
 <pre class="pre-scrollable">
 
-# vCloud Air IP
-SERVER=23.92.222.222
-
-# vCloud Air Username
-USER=bob
-
-# vCloud Air Password
-PASS=password
-
-# Move the executable
-rsync -avzhe "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --exclude=".*" /var/lib/jenkins/jobs/word_finder/workspace/ $USER@PASS:/home/ubuntu/workspace
-
-</pre>
-
-- Click the 'Save' Button
-<br>
-<br>
-<h3>Step 5</h3>
-
-<pre class="pre-scrollable">
-
-$ git add index.html
+$ sed -i.bak 's/F2F2F2/A2F2F2/g' style.css
+$ git add style.html
 $ git commit -m "new change"
 
 </pre>
 
 <br>
-<h3>Step 6</h3>
-</p>
+<h3>Step 7: &nbsp; Watch Jenkins checkout and deploy the new code</h3>
+<ol type="a">
+
+<li>  Open your browser and return to the Jenkins project window.<br>Within a few seconds you should see a new job execution.</li>
+<li>  Click on the '<b>Console Output</b> link on the left to view the job steps while they execute.</li>
+</ol>
+<br>
+<img style="border:1px solid black" src="/static/img/jenkins_console_output.png"/>
  
+<br>
+
+<h3>Step 8: &nbsp; View the application with a browser</h3>
+<br>
+<img style="border:1px solid black" src="/static/img/tearable_cloth.png"/>
+
 </div>
 </div>
 {% endblock %}
