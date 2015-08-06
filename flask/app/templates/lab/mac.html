@@ -40,7 +40,9 @@
 <p>
 <br>
 In this lab you will create a Continuous Integration process using Jenkins.<br>
-You will install the source code for an application into a git repository on your laptop and configure Jenkins to build and deploy the application whenever the source code is modified.
+You will install the source code for an application into a git repository on your laptop <br>
+and configure your local Jenkins server to automatically build and deploy the application <br>
+to a remote server whenever the source code is modified.
 </p>
 <br>
 <br>
@@ -60,10 +62,9 @@ You will install the source code for an application into a git repository on you
 <h3> Lab Overview Steps </h3>
 <br>
  <ol type="1">
-
 <li> Add the Git and SCP Plugins to Jenkins
-<li> Define an scp site in Jenkins global config
-<li> Create a new Jenkins Project to do the build 
+<li> Configure a remote server endpoint in Jenkins
+<li> Create a new Jenkins Project to do the build / deploy
 <li> Clone (create) a source code repository on your laptop
 <li> Setup a post-commit hook so Git will call Jenkins
 <li> Modify the code and commit the change
@@ -100,7 +101,25 @@ You will install the source code for an application into a git repository on you
 <br>
 </br>
 
-<h3>Step 3: &nbsp;  Create a new Jenkins Project to do the build</h3>
+<h3>Step 2: &nbsp;  Configure a remote server endpoint in Jenkins </h3>
+<br>
+
+ <ol type="a">
+<li>  In Jenkins console click on the '<b>Manage Jenkins</b>' link in the upper left corner. </li>
+<li>  Click on the <b>Configure System</b>' link in the middle of the page.</li>
+<li>  Scroll down to the <b>SCP repository hosts</b> section. (Shown below)</li>
+<li>  In the <b>Hostname</b> field enter the server name or IP provided by your instructor.</li>
+<li>  In the <b>Port</b> field enter the value '<b>22</b>'</li>
+<li>  In the <b>User Name</b> field enter your student username provided by the instructor.</li>
+<li>  In the <b>Password/Passphrase</b> field enter your student password provided by the instructor.</li>
+<li>  Click on the <b>Save</b> button on the bottom of the page to save the settings.</li>
+</ol>
+<br>
+<img style="border:1px solid black" src="/static/img/jenkins_scp_site.png"/>
+<br>
+<br>
+
+<h3>Step 3: &nbsp;  Create a new Jenkins Project to do the build / deploy</h3>
 <br>
  <ol type="a">
 <li>  In Jenkins click on the '<b>New Item</b>' link in the upper left corner. </li>
@@ -114,7 +133,7 @@ You will install the source code for an application into a git repository on you
 
 <br>
 <br>
-<li>  Scroll down to the '<b>Source Code Management</b>' Section </li>
+<li>  Scroll down to the '<b>Source Code Management</b>' Section (shown below) </li>
 <li>  Check the '<b>Git</b>' radio button </li>
 <li>  Enter the following repository url </li>
 <br>
@@ -124,7 +143,6 @@ file:////tmp/Tearable-Cloth
 <a href="/static/img/jenkins_git_config.png" target="_blank">
 <img style="border:1px solid black" src="/static/img/jenkins_git_config.png" height="270" width="360"/>
 </a>
-<br>
 <br>
 <br>
 <br>
@@ -139,7 +157,8 @@ file:////tmp/Tearable-Cloth
 <img style="border:1px solid black" src="/static/img/jenkins_publish_artifact_menu.png"/>
 <br>
 <br>
-<li>  In the <b>Publish artifacts to SCP Repository</b> step, select the remote site from the <b>SCP site</b> dropdown</li>
+<li>  In the <b>Publish artifacts to SCP Repository</b> section,<br>
+click on the <b>SCP site</b> dropdown box select the remote site from the <b>SCP site</b> dropdown</li>
 <li>  Enter two asterisks in the Source input field '<b>**</b>'</li>
 <li>  Enter <b>your student name provided by the instructor </b> in the '<b>Destination</b>' field</li>
 <li>  Click the '<b>Save</b>' button at the bottom of the page to save your project</li>
@@ -180,7 +199,7 @@ $ git clone https://github.com/Dissimulate/Tearable-Cloth.git
 <br>
 <pre class="pre-scrollable">
 
-$ cd Tearable-Cloth
+$ cd /tmp/Tearable-Cloth
 $ echo '#!/bin/sh' > .git/hooks/post-commit
 $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" >> .git/hooks/post-commit
 
@@ -191,7 +210,7 @@ $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" 
 <br>
 <ol type="a">
 
-<li>  Enter the following commands in the terminal window to modify the source code. <br>The changes will slightly modify the web page. <br>
+<li>  Enter the following commands in the terminal window to modify the source code. <br>The changes will modify the background color of the Apps main page. <br>
 </li>
 </ol>
 <pre class="pre-scrollable">
@@ -204,9 +223,10 @@ $ git commit -m "new change"
 
 <br>
 <h3>Step 7: &nbsp; Watch Jenkins checkout and deploy the new code</h3>
+<br>
 <ol type="a">
 
-<li>  Open your browser and return to the Jenkins project window.<br>Within a few seconds you should see a new job execution.</li>
+<li>  Open your browser and return to the Jenkins project window.<br>Within a few seconds you should see a new job execution start.</li>
 <li>  Click on the '<b>Console Output</b> link on the left to view the job steps while they execute.</li>
 </ol>
 <br>
@@ -215,6 +235,12 @@ $ git commit -m "new change"
 <br>
 
 <h3>Step 8: &nbsp; View the application with a browser</h3>
+<br>
+<ol type="a">
+
+<li>  Open your browser to http://<b>serverIdFromInstructor:90/yourStudentID</b>/index.html<br></li>
+      For example   http://vcair.us:90/student0/index.html
+</ol>
 <br>
 <img style="border:1px solid black" src="/static/img/tearable_cloth.png"/>
 
