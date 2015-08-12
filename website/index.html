@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script type=text/javascript>
+        jQuery(document).ready(function($) {
+        $(".clickableRow").click(function() {
+              window.document.location = $(this).attr("href");
+        });
+    });
+    </script>
+
+    <script> 
+      $(function(){
+         $("#header").load("base.html"); 
+      });
+    </script> 
+
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<div class="container">
+  <h2><b>Use Open Source DevOps tools with VMware vCloud Air.</b></h2>
+
+<b><br>
+<p  style="font-size: 15px; width:75%">
+This demo shows you how to use open source devops tools on vCloud Air.<br>
+Open source tools are a great way to learn devops techniques and begin a devops initiative in your organization.
+<br>
+
+
+
+</p>
+
+<br>
+<br>
+  <h3>Demo Environment</h3>
+  <p>Click on the icon to open the server in another window.</p>
+  <div class="row">
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcair.us:8100" target="_blank">
+             <img src="/static/img/Jenkins.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://chef.vcair.us:8200/" target="_blank">
+            <img src="/static/img/Chef.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcair.us:8300/explore/projects/" target="_blank">
+             <img src="/static/img/gitlab.png" height="90" width="180" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+    </div>
+</div>
+  <div class="row top-buffer">
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcair.us:4444/wd/hub/static/resource/hub.html" target="_blank">
+             <img src="/static/img/Selenium.png" height="70" width="70" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcair.us:8081" target="_blank">
+             <img src="/static/img/Artifactory.png" height="90" width="90" />
+            </a>
+    </div>
+    <div class="col-sm-3">
+           <a class="navbar-brand" href="http://devops.vcair.us" target="_blank">
+             <img src="/static/img/Ansible.png" height="90" width="90" />
+            </a>
+  </div>
+    <div class="col-sm-2">
+    </div>
+</div>
+
+<br>
+<br>
+<br>
+<div class="container col-lg-9">
+  <h3>Scenarios</h3>
+  <p>The following scenaios demonstrate different DevOps tasks and Integration workflows.<br>
+   Each scenario includes a client side example and a Jenkins example.<br><br>
+Click on a Scenario below to view the details.<br><br>
+</p>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th bgcolor="#66CCFF">Scenario</th>
+        <th bgcolor="#66CCFF">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class='clickableRow' href='/cl1.html'>
+        <td>Photon Server Example</td>
+        <td>Create a Photon Server on vCloud Air using vCloud Air CLI</td>
+      </tr>
+      <tr class='clickableRow' href='/dp1.html'>
+        <td>Docker / Photon Example</td>
+        <td>Deploy a docker container on a Photon Server</td>
+      </tr>
+
+      <tr class='clickableRow' href='/sp1.html'>
+        <td>Self Provision Corp Std Web Server</td>
+        <td>Use chef to configure a Server as a standard Web Server</td>
+      </tr>
+      <tr class='clickableRow' href='/sb2.html'>
+        <td>Continuous Integration of Spring Boot Form Project</td>
+        <td>Spring Boot App in Git, Build / Deploy to existing dev server using Jenkins, Gradle, Chef, test with Selenium</td>
+      </tr>
+      <tr class='clickableRow' href='ck1.html}'>
+        <td>Chef Knife Plugin</td>
+        <td>Create an Ubuntu Server on vCloud Air using the Chef vCloud Air Knife plugin</td>
+      </tr>
+
+    </tbody>
+  </table>
+<br>
+<br>
+</div>
+</html>

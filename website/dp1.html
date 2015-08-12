@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script> 
+      $(function(){
+         $("#header").load("base.html"); 
+      });
+    </script> 
+
+</head>
+
+<body>
+
+<div id="header"></div>
+<div class="container">
+        <h2>Docker Photon Scenario</h2>
+
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+This scenario shows how to deploy a NGINX container onto Photon.
+
+</h4>
+<br>
+<br>
+<span class="learn-more"> Learn more about Photon   </span> <br>
+<a href="https://github.com/vmware/photon" target="_blank">https://github.com/vmware/photon</a>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li> This scenario assumes a Photon Server has been deployed to the devops demo environment. <br>(See the other scenarios if needed)</li>
+
+</ul>
+<br>
+<br>
+ <img src="/static/img/dp1.png"/>
+
+
+<br>
+
+
+<div class="center-block">
+ The script will... 
+<br>
+<br>
+ <ol type="1">
+
+<li> Connect to vCloud Air and lookup the IP for the Photon Server. (optional step)</li>
+<li> SSH into the Photon Server and issue a docker run command </li>
+<li> Add an iptables http port mapping so the app can be accessed through devops.vcloudair.io</li>
+</ol>
+
+</div>
+
+<br>
+<h3>Commands</h3>
+
+Here are the shell commands necessary to run the scenario.<br>
+The same commands can be executed from Jenkins as part of a build / test automation.
+<br>
+<br>
+Click on
+<a href="http://devops.vcloudair.io:8100/job/docker_photon/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
+<i>to try it. (Login required)</i>
+</p>
+
+
+
+
+<pre class="pre-scrollable">
+
+vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+
+vca org use --org M933009684-4424 --service M933009684-4424
+
+vca vdc use --vdc M933009684-4424
+
+export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 | sed -e 's/^[[:space:]]*//'`
+
+
+# Trim potential spaces from input parameters
+export HTTP_PORT="$(echo -e "${HTTP_PORT}" | tr -d '[[:space:]]')"
+
+# install an sample nginx container and start
+sshpass -e ssh -t -v root@${SERVER_IP} "docker run -d -p 80:80 vmwarecna/nginx && docker ps"
+
+
+# add route through devops server
+sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80
+
+
+# Test with browser using url 
+echo "Test with browser http://devops.vcloudair.io:${HTTP_PORT}"
+
+
+</pre>
+
+</div>
+</div>
+
+</body>
+</html>

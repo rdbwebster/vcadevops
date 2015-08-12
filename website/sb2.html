@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script> 
+      $(function(){
+         $("#header").load("base.html"); 
+      });
+    </script> 
+
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<div class="container">
+        <h2>Spring Boot CI Scenario</h2>
+
+<div class="col-lg-8">
+
+<p>
+<br>
+<h4>
+This scenario demonstrates an continuous integration build pipeline using GitHub, Jenkins, Chef and testing with Selenium. 
+
+</h4>
+<br>
+A Spring Boot Form Submission Application is built and deployed whenever a developer modifies the code in the GitHub Project.<br>
+<br>
+<br>
+<b> Learn more about VMWare & Chef   </b>  <br>
+<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li> To run the knife command the client workstation must have both the Chef SDK and the knife vcair plugin installed.</li>
+</ul>
+<br>
+<br>
+ <img src="/static/img/SB2.png"/>
+
+
+<br>
+
+
+<div class="center-block">
+ The plugin will... 
+<br>
+
+<ol type="1">
+<li> The developer checks in a modification to GitHub</li>
+<li> GitHub notifies Jenkins of the change</li>
+<li> Jenkins retrieves the code from Github</li>
+<li> Jenkins instructs Gradle to build the project</li>
+<li> Jenkins instructs Chef to provision the VM for the application</li>
+<li> Jenkins deploys the new version of the Application</li>
+<li> Jenkins instructs Selenium to perform a test of the App</li>
+<li> The developer accesses the new version of the App</li>
+</ol>
+
+</div>
+
+<br>
+<br>
+Click on
+<a href="http://devops.vcloudair.io:8100/job/Chef_Knife/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
+<i>to try it. (Login required)</i>
+</p>
+
+
+</div>
+</div>
+
+</body>
+</html>
