@@ -48,15 +48,11 @@ to a remote server whenever the source code is modified.
 <br>
 <h3>Prerequisites</h3>
 <ul>
-<li>Your Mac is running a Jenkins Server.</li>
-<li>You have Git installed on your Mac. </li>
+<li>You have a Jenkins server running on your Mac or Windows PC.</li>
+<li>You have Git installed on your Mac or Windows PC. </li>
 <li>Your instructor has provided a username, password <br>and public ip where you will deploy your application. </li>
 </ul>
 <br>
-
-
-<br>
-
 
 <div>
 <h3> Lab Overview Steps </h3>
@@ -179,13 +175,22 @@ click on the <b>SCP site</b> dropdown box select the remote site from the <b>SCP
 </ol>
 <br>
 <br>
-
+<h5>OSX</h5>
 <pre class="pre-scrollable">
 
 $ cd /tmp
 $ git clone https://github.com/Dissimulate/Tearable-Cloth.git
 
 </pre>
+
+<h5>Windows</h5>
+<pre class="pre-scrollable">
+
+C:> cd \temp
+C:> git clone https://github.com/Dissimulate/Tearable-Cloth.git
+
+</pre>
+
 
 <br>
 <h3>Step 5: &nbsp; Setup a post-commit hook so Git will call Jenkins</h3>
@@ -196,6 +201,7 @@ $ git clone https://github.com/Dissimulate/Tearable-Cloth.git
 </ol>
 <br>
 <br>
+<h5>OSX</h5>
 <pre class="pre-scrollable">
 
 $ cd /tmp/Tearable-Cloth
@@ -203,22 +209,46 @@ $ echo '#!/bin/sh' > .git/hooks/post-commit
 $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" >> .git/hooks/post-commit
 
 </pre>
+<h5>Windows</h5>
+<pre class="pre-scrollable">
+
+$ cd \temp\Tearable-Cloth
+$ echo '#!/bin/sh' > .git\hooks\post-commit
+$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" >> .git\hooks\post-commit
+</pre>
 <br>
 <br>
 <h3>Step 6: &nbsp;  Modify the code and commit the change</h3>
 <br>
 <ol type="a">
 
-<li>  Enter the following commands in the terminal window to modify the source code. <br>The changes will modify the background color of the Apps main page. <br>
+<li>  Use your favorite text editor to edit the style.css source code file. <br>
+Change the value for the background color for the main page by changing the <b>background: </b> value <br>
+from #F2F2F2; to #A2A2A2; as shown below.  Then save the contents of the file.<br>
+<br>
+body {<br>
+    background: #A2A2A2;<br>
+}<br>
+<br>
 </li>
 </ol>
+<h5>OSX</h5>
 <pre class="pre-scrollable">
 
-$ sed -i.bak 's/F2F2F2/A2F2F2/g' style.css
+$ nano  style.css
 $ git add style.html
 $ git commit -m "new change"
 
 </pre>
+<h5>Windows</h5>
+<pre class="pre-scrollable">
+
+$ notepad style.css
+$ git add style.html
+$ git commit -m "new change"
+
+</pre>
+
 
 <br>
 <h3>Step 7: &nbsp; Watch Jenkins checkout and deploy the new code</h3>
@@ -247,5 +277,7 @@ $ git commit -m "new change"
 </div>
 {% endblock %}
 
+<br>
+<br>
 </body>
 </html>
