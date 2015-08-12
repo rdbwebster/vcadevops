@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+  </head>
+  <body>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link
+href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
+      rel="stylesheet" type="text/css">
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+        $(".clickableRow").click(function() {
+              window.document.location = $(this).attr("href");
+        });
+    });
+    </script>
+    <div class="container"> <img
+        src="../../static/img/VMWorld_Banner.png">
+      <h2>Jenkins Lab (DevOps Track) </h2>
+      <div class="col-lg-8">
+        <p> <br>
+          In this lab you will create a Continuous Integration process
+          using Jenkins.<br>
+          You will install the source code for an application into a git
+          repository on your laptop <br>
+          and configure your local Jenkins server to automatically build
+          and deploy the application <br>
+          to a remote server whenever the source code is modified. </p>
+        <br>
+        <h3>Prerequisites</h3>
+        <ul>
+          <li>You have a Jenkins server running on your Mac or Windows
+            PC.</li>
+          <li>You have Git installed on your Mac or Windows PC. </li>
+          <li>Your instructor has provided a username, password <br>
+            and public ip where you will deploy your application. </li>
+        </ul>
+        <br>
+        <div>
+          <h3> Lab Overview Steps </h3>
+          <ol type="1">
+            <li> Add the Git and SCP Plugins to Jenkins </li>
+            <li> Configure a remote server endpoint in Jenkins </li>
+            <li> Create a new Jenkins Project to do the build / deploy </li>
+            <li> Clone (create) a source code repository on your laptop
+            </li>
+            <li> Setup a post-commit hook so Git will call Jenkins </li>
+            <li> Modify the code and commit the change </li>
+            <li> Watch Jenkins checkout and deploy the new code </li>
+            <li> View the application with a browser </li>
+          </ol>
+        </div>
+        <br>
+        <h3>Step 1: &nbsp; Add the Git and SCP Plugins to Jenkins</h3>
+        <br>
+        <ol type="a">
+          <li> Open the Jenkins console in a browser <a
+              href="http://localhost:8080" target="_blank">http://localhost:8080</a></li>
+          <li> Click on the '<b>Manage Jenkins</b>' link in the upper
+            left corner </li>
+          <li> Click on the '<b>Manage Plugins</b>' link in the center
+            of the page </li>
+          <li> Click on the '<b>Available</b>' tab in the center of the
+            page </li>
+          <li> Scroll down and select the '<b>Git Plugin</b>' in the
+            list as shown below </li>
+          <br>
+          <img style="border:1px solid black"
+            src="../../static/img/jenkins_git_plugin.png"> <br>
+          <br>
+          <li> Scroll down and select the '<b>Hudson SCP publisher
+              plugin</b>' in the list as shown below </li>
+          <li> Click on the '<b>Install without Restart</b>' button' as
+            shown below </li>
+          <br>
+          <img alt="Install without restart" style="border:1px solid
+            black" src="../../static/img/jenkins_scp_plugin.png"
+            height="220" width="800"> <br>
+          <br>
+          <li> Once the plugins are installed, <br>
+            Click the '<b>Restart Jenkins when installation is complete
+              and no jobs are running</b>' button </li>
+        </ol>
+        <br>
+        <br>
+        <h3>Step 2: &nbsp; Configure a remote server endpoint in Jenkins
+        </h3>
+        <br>
+        <ol type="a">
+          <li> In Jenkins console click on the '<b>Manage Jenkins</b>'
+            link in the upper left corner. </li>
+          <li> Click on the <b>Configure System</b>' link in the middle
+            of the page.</li>
+          <li> Scroll down to the <b>SCP repository hosts</b> section.
+            (Shown below)</li>
+          <li> In the <b>Hostname</b> field enter the server name or IP
+            provided by your instructor.</li>
+          <li> In the <b>Port</b> field enter the value '<b>22</b>'</li>
+          <li> In the <b>User Name</b> field enter your student
+            username provided by the instructor.</li>
+          <li> In the <b>Password/Passphrase</b> field enter your
+            student password provided by the instructor.</li>
+          <li> Click on the <b>Save</b> button on the bottom of the
+            page to save the settings.</li>
+        </ol>
+        <br>
+        <img alt="click the save button" style="border:1px solid black"
+          src="../../static/img/jenkins_scp_site.png" height="256"
+          width="800"> <br>
+        <br>
+        <h3>Step 3: &nbsp; Create a new Jenkins Project to do the build
+          / deploy</h3>
+        <br>
+        <ol type="a">
+          <li> In Jenkins click on the '<b>New Item</b>' link in the
+            upper left corner. </li>
+          <li> Enter the value "<b>Tearable_Cloth</b>" in the '<b>Item
+              name</b>' field</li>
+          <li> Check the '<b>Freestyle project</b>' radio button</li>
+          <li> Click the <b>OK</b> Button</li>
+          <br>
+          <br>
+          <img alt="Click the ok button" style="border:1px solid black"
+            src="../../static/img/jenkins_new_project.png" height="424"
+            width="640"> <br>
+          <br>
+          <li> Scroll down to the '<b>Source Code Management</b>'
+            Section (shown below) </li>
+          <li> Check the '<b>Git</b>' radio button </li>
+          <li> Enter the following repository url </li>
+          <br>
+          <pre class="pre-scrollable">file:////tmp/Tearable-Cloth
+</pre>
+          <a href="/static/img/jenkins_git_config.png" target="_blank">
+            <img alt="enter file url" style="border:1px solid black"
+              src="../../static/img/jenkins_git_config.png" height="270"
+              border="0" width="360"> </a> <br>
+          <br>
+          <br>
+          <li> Scroll down in the project to the '<b>Post-build Actions</b>'
+            section. </li>
+          <br>
+          <img alt="post build actions" style="border:1px solid black"
+            src="../../static/img/jenkins_post_build_dropdown.png"
+            height="108" width="320"> <br>
+          <br>
+          <li> Click on the dropdown field and select the '<b>Publish
+              artifacts to SCP Repository</b>' entry. </li>
+          <br>
+          <img alt="Publish to scp repository" style="border:1px solid
+            black"
+            src="../../static/img/jenkins_publish_artifact_menu.png"
+            height="240" width="316"> <br>
+          <br>
+          <li> In the <b>Publish artifacts to SCP Repository</b>
+            section,<br>
+            click on the <b>SCP site</b> dropdown box select the remote
+            site from the <b>SCP site</b> dropdown</li>
+          <li> Enter two asterisks in the Source input field '<b>**</b>'</li>
+          <li> Enter <b>your student name provided by the instructor </b>
+            in the '<b>Destination</b>' field</li>
+          <li> Click the '<b>Save</b>' button at the bottom of the page
+            to save your project</li>
+          <br>
+          <a href="/static/img/jenkins_scp_step.png" target="_blank"> <img
+              alt="Click Save" style="border:1px solid black"
+              src="../../static/img/jenkins_scp_step.png" height="467"
+              border="0" width="640"> </a> <br>
+          <br>
+        </ol>
+        <br>
+        <br>
+        <h3>Step 4: &nbsp; Clone (create) a source code repository on
+          your laptop</h3>
+        <br>
+        <ol type="a">
+          <li> Open a terminal window on your laptop </li>
+          <li> Enter the following commands to create a local git
+            repository containing the sample application. </li>
+        </ol>
+        <br>
+        <br>
+        <h5>OSX</h5>
+        <pre class="pre-scrollable">$ cd /tmp
+$ git clone https://github.com/Dissimulate/Tearable-Cloth.git
+
+</pre>
+        <h5>Windows</h5>
+        <pre class="pre-scrollable">C:&gt; cd \temp
+C:&gt; git clone https://github.com/Dissimulate/Tearable-Cloth.git
+
+</pre>
+        <br>
+        <h3>Step 5: &nbsp; Setup a post-commit hook so Git will call
+          Jenkins</h3>
+        <br>
+        <ol type="a">
+          <li> Enter the following commands in the terminal window to
+            create a post-commit hook. <br>
+            With this command in place, Git will call Jenkins whenever
+            code changes are comitted to the repository.</li>
+        </ol>
+        <br>
+        <br>
+        <h5>OSX</h5>
+        <pre class="pre-scrollable">$ cd /tmp/Tearable-Cloth
+$ echo '#!/bin/sh' &gt; .git/hooks/post-commit
+$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" &gt;&gt; .git/hooks/post-commit
+
+</pre>
+        <h5>Windows</h5>
+        <pre class="pre-scrollable">$ cd \temp\Tearable-Cloth
+$ echo '#!/bin/sh' &gt; .git\hooks\post-commit
+$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" &gt;&gt; .git\hooks\post-commit
+</pre>
+        <br>
+        <br>
+        <h3>Step 6: &nbsp; Modify the code and commit the change</h3>
+        <br>
+        <ol type="a">
+          <li> Use your favorite text editor to edit the style.css
+            source code file. <br>
+            Change the value for the background color for the main page
+            by changing the <b>background: </b> value <br>
+            from #F2F2F2; to #A2A2A2; as shown below. Then save the
+            contents of the file.<br>
+            <br>
+            body {<br>
+            background: #A2A2A2;<br>
+            }<br>
+            <br>
+          </li>
+        </ol>
+        <h5>OSX</h5>
+        <pre class="pre-scrollable">$ nano  style.css
+$ git add style.html
+$ git commit -m "new change"
+
+</pre>
+        <h5>Windows</h5>
+        <pre class="pre-scrollable">$ notepad style.css
+$ git add style.html
+$ git commit -m "new change"
+
+</pre>
+        <br>
+        <h3>Step 7: &nbsp; Watch Jenkins checkout and deploy the new
+          code</h3>
+        <br>
+        <ol type="a">
+          <li> Open your browser and return to the Jenkins project
+            window.<br>
+            Within a few seconds you should see a new job execution
+            start.</li>
+          <li> Click on the '<b>Console Output</b> link on the left to
+            view the job steps while they execute.</li>
+        </ol>
+        <br>
+        <img alt="Console Output Window" style="border:1px solid black"
+          src="../../static/img/jenkins_console_output.png" height="297"
+          width="800"> <br>
+        <h3>Step 8: &nbsp; View the application with a browser</h3>
+        <br>
+        <ol type="a">
+          <li> Open your browser to http://<b>serverIdFromInstructor:90/yourStudentID</b>/index.html<br>
+          </li>
+          For example http://vcair.us:90/student0/index.html
+        </ol>
+        <br>
+        <img alt="Tearable Cloth App" style="border:1px solid black"
+          src="../../static/img/tearable_cloth.png" height="250"
+          width="640"> </div>
+    </div>
+    <br>
+    <br>
+  </body>
+</html>
