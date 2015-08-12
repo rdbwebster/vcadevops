@@ -47,6 +47,10 @@ def cl1():
 def dp1():
     return render_template('dp1.html')
 
+@app.route('/ans/', methods=['GET'])
+def dp1():
+    return render_template('ans.html')
+
 @app.route('/docs/', methods=['GET'])
 def docs():
     return render_template('docs.html', **locals())
