@@ -54,6 +54,10 @@ server {
                 try_files $uri $uri/ /index.html;
         }
 
+        location /docs/ {
+                try_files $uri $uri/ /index.html;
+        }
+
 
 // next add sym link to enable the devopsui site
 sudo ln -s /etc/nginx/sites-available/devopsui  /etc/nginx/sites-enabled/devopsui
