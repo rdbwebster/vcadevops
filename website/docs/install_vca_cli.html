@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script> 
+      $(function(){
+         $("#header").load("base.html"); 
+      });
+    </script> 
+
+</head>
+
+<body>
+
+<div id="header"></div>
+<div class="container">
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+Installing vca-cli
+
+</h4>
+<p>
+
+<br>
+
+
+<br>
+<b>Mac Installation</b>
+<br>
+<a href="https://github.com/vmware/vca-cli" target="_blank">Follow the vca-cli install docs</a>
+<br>
+<br>
+<b>Ubuntu Installation</b>
+<p>(For calling from Jenkins Job</p>
+
+<pre class="pre-scrollable">
+
+// Login as ubuntu
+$ su - ubuntu
+
+$ sudo apt-get install -y build-essential libssl-dev libffi-dev libxml2-dev libxslt-dev python-dev python-pip
+
+$ sudo pip install vca-cli
+
+</pre>
+
+
+
+<br>
+
+</div>
+</div>
+
+</body>
+</html>

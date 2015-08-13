@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script> 
+      $(function(){
+         $("#header").load("base.html"); 
+      });
+    </script> 
+
+</head>
+
+<body>
+
+<div id="header"></div>
+<div class="container">
+
+<h3>Create an Ubuntu Server on vCloud Air</h3>
+       
+</br>
+<h4>Create a ssh key and customization file</h4>
+</br>
+       
+<p>We will want to use ssh to access our new server without requiring a password. </br>
+To do this you will need a key pair for the ubuntu user and a customization script to set the key on the new server.  <br>
+If you don't have these things, see this article  <a  href="http://vcair.us/docs/setup_ssh"_blank"> ssh setup on vCloud Air </a> 
+
+</p>
+</br>
+</br>
+
+
+
+
+<h4> Create a new Ubuntu Server using vca-cli </h4>
+</br>
+
+<p>
+ You will need to get a few pieces of information from the vCloud Air Portal to get started.
+ <ol>
+ <li>Your vcloud Air account user id and password</li>
+ <li>For onDemand Accounts: Your instance identifier. You can get this when you first login.</li>
+ <li>For Subscription Accounts: Your org organization / Service identifier.</li>
+ <ol>
+   
+</p>
+ 
+<pre class="pre-scrollable">
+
+    // First just login
+
+    $ vca login user@domain.com --password ********
+
+    // Next If you have a Subscription vCloud Air Account set your org and service like this
+    $ vca org use --org M933009684-9999 --service M933009684-9999
+
+    // Or if you have an on demand vCloud Air Account and you dont know your instance id run this
+    $ vca instance
+
+    // and then use of of the org ids
+    $ vca login youremail@gmail.com --password 'yourpswd' --instance 124cc8-c4ff-468d-bc08-d3fa74929ae4
+
+
+    // Now Create a new Ubuntu Server with 4 cpu and 4 GB RAM
+
+    $ vca vapp create -a devopsVapp -V devops -c 'Public Catalog' -t 'Ubuntu Server 12.04 LTS (amd64 20150127)' -n M933009684-4424-default-routed -m POOL --cpu 4 --ram 4096
+
+    // Customize the server using the customize.sh file you created in the ssh setup article
+    $ vca vapp customize --vapp devopsVapp --vm devops --file ~/customize.sh
+
+    // Check when the server has booted
+    // Repeat this next command periodically until an internal IP entry is set for the server
+    $ vca vm
+</pre>
+
+</br>
+</br>
+<br>
+
+<h4>Configure vCloud Air Network Gateway</h4>
+
+<p>For OnDemand accounts. you have the option of clicking the 'Connect to Internet' button for the instance in the vCloud Air Portal.
+</p>
+
+<p>For Subscription or onDemand you can configure the vCloud Air network Gateway using vca-cli.<br>
+Add a nat rule to the gateway to may your public ip to the internal ip used by the server.
+</p>
+
+<pre class="pre-scrollable">
+$ vca nat add --type DNAT  --original-ip 23.92.225.123 --original-port any --translated-ip 192.168.109.2 --translated-port any --protocol any
+</pre>
+
+
+</div>
+</body>
+</html>
