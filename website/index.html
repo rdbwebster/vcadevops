@@ -1,134 +1,167 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet"
+href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <link href="./static/css/custom.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <link
+href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
+      rel="stylesheet" type="text/css">
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-
-    <script type=text/javascript>
+    <script type="text/javascript">
         jQuery(document).ready(function($) {
         $(".clickableRow").click(function() {
               window.document.location = $(this).attr("href");
         });
     });
     </script>
-
     <script> 
       $(function(){
-         $("#header").load("base.html"); 
+         $("#header").load("./base.html"); 
       });
-    </script> 
+    </script>
+    <title></title>
+  </head>
+  <body>
 
-</head>
+<!-- Navbar from base.html, before container-fixed so full width-->
+    <div id="header"></div>
 
-<body>
+<div class="container-fixed">
 
-<div id="header"></div>
-
-<div class="container">
-  <h2><b>Use Open Source DevOps tools with VMware vCloud Air.</b></h2>
-
-<b><br>
-<p  style="font-size: 15px; width:75%">
-This demo shows you how to use open source devops tools on vCloud Air.<br>
-Open source tools are a great way to learn devops techniques and begin a devops initiative in your organization.
+    
+ <div class="text-center">
 <br>
-
-
-
-</p>
-
-<br>
-<br>
-  <h3>Demo Environment</h3>
-  <p>Click on the icon to open the server in another window.</p>
-  <div class="row">
-    <div class="col-sm-3">
-           <a class="navbar-brand" href="http://devops.vcair.us:8100" target="_blank">
-             <img src="./static/img/Jenkins.png" height="90" width="90" />
-            </a>
-    </div>
-    <div class="col-sm-3">
-           <a class="navbar-brand" href="http://chef.vcair.us:8200/" target="_blank">
-            <img src="./static/img/Chef.png" height="90" width="90" />
-            </a>
-    </div>
-    <div class="col-sm-3">
-           <a class="navbar-brand" href="http://devops.vcair.us:8300/explore/projects/" target="_blank">
-             <img src="./static/img/gitlab.png" height="90" width="180" />
-            </a>
-    </div>
-    <div class="col-sm-3">
-    </div>
+ <h2><b>Use Open Source DevOps tools with VMware vCloud Air.</b></h2>
 </div>
-  <div class="row top-buffer">
-    <div class="col-sm-3">
-           <a class="navbar-brand" href="http://devops.vcair.us:4444/wd/hub/static/resource/hub.html" target="_blank">
-             <img src="./static/img/Selenium.png" height="70" width="70" />
-            </a>
+<br><br>
+
+
+    <div class="text-center">
+     
+<h3> The Demo Environment</h3>
+
+        <p class="lead">This is a live sandbox demonstrating open source
+          DevOps tools interacting with vCloud Air.</p>
+         <p> You need a login to run the demos, but all servers are configured so anyone can view previous executions.</p>
+  
+    <div class="row top-buffer">
+                <div class="col-xs-2" lightgrey> <a class="navbar-brand"
+                    href="http://devops.vcair.us:8100" target="_blank">
+                    <img src="./static/img/Jenkins.png" height="90"
+                      width="90"> </a> </div>
+                <div class="col-xs-2"> <a class="navbar-brand"
+                    href="http://chef.vcair.us:8200/" target="_blank"> <img
+                      src="./static/img/Chef.png" height="90" width="90">
+                  </a> </div>
+                <div class="col-xs-2"> <a class="navbar-brand"
+                    href="http://devops.vcair.us:8300/explore/projects/"
+                    target="_blank"> <img src="./static/img/gitlab.png"
+                      height="90" width="180"> </a> </div>
+                <div class="col-xs-1"> </div>
+                <div class="col-xs-2"> <a class="navbar-brand"
+                    href="http://devops.vcair.us:4444/wd/hub/static/resource/hub.html"
+                    target="_blank"> <img
+                      src="./static/img/Selenium.png" height="70"
+                      width="70"> </a> </div>
+                <div class="col-xs-2"> <a class="navbar-brand"
+                    href="http://devops.vcair.us:8081" target="_blank">
+                    <img src="./static/img/Artifactory.png" height="90"
+                      width="90"> </a> </div>
     </div>
-    <div class="col-sm-3">
-           <a class="navbar-brand" href="http://devops.vcair.us:8081" target="_blank">
-             <img src="./static/img/Artifactory.png" height="90" width="90" />
-            </a>
-    </div>
-    <div class="col-sm-3">
-           <a class="navbar-brand" href="http://devops.vcair.us" target="_blank">
-             <img src="./static/img/Ansible.png" height="90" width="90" />
-            </a>
-  </div>
-    <div class="col-sm-2">
-    </div>
+    <br><br>
+     
 </div>
 
-<br>
-<br>
-<br>
-<div class="container col-lg-9">
-  <h3>Scenarios</h3>
-  <p>The following scenaios demonstrate different DevOps tasks and Integration workflows.<br>
-   Each scenario includes a client side example and a Jenkins example.<br><br>
-Click on a Scenario below to view the details.<br><br>
-</p>
 
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th bgcolor="#66CCFF">Scenario</th>
-        <th bgcolor="#66CCFF">Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class='clickableRow' href='/cl1.html'>
-        <td>Photon Server Example</td>
-        <td>Create a Photon Server on vCloud Air using vCloud Air CLI</td>
-      </tr>
-      <tr class='clickableRow' href='/dp1.html'>
-        <td>Docker / Photon Example</td>
-        <td>Deploy a docker container on a Photon Server</td>
-      </tr>
+ 
+<!--
+    <div class="row">
+        <div class="col-lg-6 col-sm-6"><div class="well"><p>6 cols, 6 small cols</p></div></div>
+        <div class="col-lg-6 col-sm-6"><div class="well"><p>6 cols, 6 small cols</p></div></div>
+    </div>
+-->
 
-      <tr class='clickableRow' href='/sp1.html'>
-        <td>Self Provision Corp Std Web Server</td>
-        <td>Use chef to configure a Server as a standard Web Server</td>
-      </tr>
-      <tr class='clickableRow' href='/sb2.html'>
-        <td>Continuous Integration of Spring Boot Form Project</td>
-        <td>Spring Boot App in Git, Build / Deploy to existing dev server using Jenkins, Gradle, Chef, test with Selenium</td>
-      </tr>
-      <tr class='clickableRow' href='ck1.html'>
-        <td>Chef Knife Plugin</td>
-        <td>Create an Ubuntu Server on vCloud Air using the Chef vCloud Air Knife plugin</td>
-      </tr>
-
-    </tbody>
-  </table>
 <br>
 <br>
+  	<hr>
+
+
+    <div class="row">
+        <div class="col-lg-6">
+            <h4><u>Infrastructure Automation Examples</u></h4>
+            <p>These scenarios use automation tools to create Virtual
+              Machines on vCloud Air
+            </p>
+            <table class="table table-hover">
+              <thead> <tr>
+                 <th bgcolor="#E0EEE0">Scenario</th> 
+                 <th bgcolor="#E0EEE0">Description</th> 
+                </tr>
+              </thead> <tbody>
+                <tr class="clickableRow" href="/cl1.html">
+                  <td>Photon Server Example</td>
+                  <td>Create a Photon Server on vCloud Air using vCloud
+                    Air CLI</td>
+                </tr>
+                <tr class="clickableRow" href="/dp1.html">
+                  <td>Docker / Photon Example</td>
+                  <td>Deploy a docker container on a Photon Server</td>
+                </tr>
+                <tr class="clickableRow" href="/sp1.html">
+                  <td>Self Provision Corp Std Web Server</td>
+                  <td>Use chef to configure a Server as a standard Web
+                    Server</td>
+                </tr>
+                <tr class="clickableRow" href="ck1.html">
+                  <td>Chef Knife Plugin</td>
+                  <td>Create an Ubuntu Server on vCloud Air using the
+                    Chef vCloud Air Knife plugin</td>
+                </tr>
+              </tbody>
+            </table>
 </div>
+</div>
+
+<br><br>
+    <div class="row">
+        <div class="col-lg-6">
+            <h4><u>Continuous Integration Examples</u></h4>
+            <p>These scenarios use Jenkins running on vCloud Air to
+                implement continuous build / test.</p>
+            <table class="table table-hover">
+              <thead><tr>
+                  <th bgcolor="#E0EEE0">Scenario<br>
+                  </th>
+                  <th bgcolor="#E0EEE0">Description</th>
+                </tr>
+              </thead> <tbody>
+                <tr class="clickableRow" href="file:///sb2.html">
+                  <td>Continuous Integration of Spring Boot Form Project</td>
+                  <td>A CI example using Jenkins, Grade, Chef and
+                    Selenium ot deploy and test a Spring Boot App
+                    managed in Git. <br>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top">Jenkins and vca-cli<br>
+                  </td>
+                  <td valign="top">A CI example using Jenkins and
+                    vca-cli to deploy a NodeJS Word-Finder Application.
+                    <br>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+</div>
+</div>
+        </b> </b> </div>
+</div> <!-- /container -->
+  </body>
 </html>

@@ -1,16 +1,23 @@
 /* navbar */
 .navbar-brand,
 .navbar-nav li a {
-    line-height: 75px;
-    height: 75px;
-    padding-top: 0;
+    padding-top: 6px;
 }
 
+
 .navbar-default {
-    background-color: #66CCFF;
+    background-color: #E0EEE0;
     border-color: #E7E7E7;
 }
 
+
+.thumbnail {
+    display:block;
+    margin-right: auto;  
+    margin-left: auto;  
+}
+
+/*
 .center-block {  
       display: block;  
       margin-right: auto;  
@@ -18,14 +25,40 @@
   width:450px;  
     padding:10px;  
     }  
+*/
+
+.clickable-row {
+background-color:#76A0D3;
+}
 
 .highlight {
-    border-radius: 4px;
-    margin-bottom: 1rem;
+     border-radius: 4px;
+     margin-bottom: 1rem;
 }
 .highlight pre {
-    margin-bottom: 0;
+     margin-bottom: 0;
 }
+
+/* Navbar right */
+/* http://stackoverflow.com/questions/15118310/bootstrap-navbar-align-want-align-to-the-right */
+
+.navbar .nav.pull-right {
+     float: right;
+     margin-right: 98px; /*set margin this way in your custom styesheet*/
+  }
+
+/* Bootstrap 3 grid is fluid only, custom fixed-container below */
+/* http://www.bootply.com/71142 */
+
+/* Custom container */
+.container-fixed {
+  margin: 0 auto;
+  max-width: 960px;
+}
+.container-fixed > hr {
+  margin: 30px 0;
+}
+
 
 /* google fonts */
 
@@ -39,10 +72,8 @@ h1, h2, h3, h4, h5, h6 {
     
 }
 
-
 /* spacing for row */
 .top-buffer { margin-top:30px; }
-
 
 a.big-link {
     font-size: 18px;
