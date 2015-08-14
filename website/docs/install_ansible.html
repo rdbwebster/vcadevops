@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link
+href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
+      rel="stylesheet" type="text/css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script> 
+      $(function(){
+         $("#header").load("../base.html"); 
+      });
+    </script>
+    <title></title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-lg-8">
+        <p> <br>
+        </p>
+        <h3> Installing ansible with the vcloud air module on a mac </h3>
+        <p> <br>
+          Ansible with the vCloud Air modules should be installed on the
+          mac in a python virtual environment.<br>
+          Why?<br>
+          Because the vcloud Air module has a dependency on the pyvcloud
+          python module.<br>
+        </p>
+        <p> The Ansible vCloud Air module may not always depend on the
+          latest version of pyvcloud.<br>
+          Installing in a virtual environment will enable you to keep
+          all the python modules isolated so they don't<br>
+          interfere with other python apps. One example would be
+          vca-cli, the vCloud Air command line interpreter <br>
+          which also depends on the pyvcloud module.<br>
+          <br>
+          By using a virtual env you can multiple separate installs that
+          won't interfere with one another.<br>
+        </p>
+        <p>If you are not familiar with Python Virtual Environments,
+          read a great introduction <a
+href="http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/">here</a><br>
+        </p>
+        <p><br>
+          Let's get started....<br>
+          <br>
+        </p>
+        <p><b>1) Install the python virtualenv module </b><br>
+        </p>
+        <pre class="pre-scrollable"> // see if virtualenv is already installed on your mac, in this case it is<br> $ pip show virtualenv<br>   ---<br>   Name: virtualenv<br>   Version: 12.0.7<br>   Location: /Library/Python/2.7/site-packages<br>   Requires: <br><br><br> // if virtualenv is not installed, install it<br> $ sudo pip install virtualenv<br>
+</pre>
+        <p><br>
+        </p>
+        <p><b>2) Create a new project folder </b><b><b>for this ansible
+              install </b>and create a python virtual environment </b><br>
+        </p>
+        <pre class="pre-scrollable"><br> // make a new folder for this ansible install<br> $ mkdir ansible_vca<br> $ cd ansible_vca<br>&nbsp;<br> // make a new virtualenv for python<br> $ virtualenv python_env <br><br> // activate the environment<br> $ source ./python_env/bin/activate<br><br> // Notice that the command line prompt changes to indicate<br> // the virtual environment is in use.<br> (python_env) $<br>
+
+</pre>
+        <p><b><br>
+            3) Install Ansible and pyvcloud in the virtual
+            environment&nbsp;</b> </p>
+        <pre class="pre-scrollable">// Note for all pip commands, do not use sudo or the module will not be installed in the virutal env<br><br>// Some warnings may appear during the ansible install, they can be ignored<br>$ pip install ansible<br><br>// check its installed<br>$ ansible --version<br>  ansible 1.9.2<br>  configured module search path = None<br><br>// install pyvcloud<br>// Some warnings may appear during the ansible install, they can be ignored<br>$ pip install pyvcloud==13rc7<br><br>// confirm the package is installed<br>$ pip show pyvcloud<br></pre>
+        <br>
+        The vCloud Air ansible modules are described in the vmware
+        section of the following doc:<br>
+        <a
+          href="http://docs.ansible.com/ansible/list_of_cloud_modules.html">http://docs.ansible.com/ansible/list_of_cloud_modules.html</a><br>
+        <br>
+        The code for the modules can be found on github<br>
+        <a
+href="https://github.com/ansible/ansible-modules-extras/tree/devel/cloud/vmware">https://github.com/ansible/ansible-modules-extras/tree/devel/cloud/vmware</a><br>
+        <br>
+        We will manually install the vCloud Air modules to avoid
+        installing all the modules in the extras repository.<br>
+        <br>
+        <b>4) Create local ansible.cfg and host files</b><br>
+        <br>
+        <pre class="pre-scrollable"><br>// create a local hosts file and add the following line, then save the file<br><br>$ nano hosts<br>localhost ansible_connect=local ansible_python_interpreter="./python_env/bin/python"<br><br>// create a local ansible.cfg file and add the following lines, then save the file<br>$ nano ansible.cfg<br>[defaults]<br>library=    ./python_env/lib/python2.7/site-packages:./lib/python2.7/site-packages/ansible/modules/extras/cloud/vmware/<br>inventory = ./hosts<br>log_path =  ./playbook.log<br>
+</pre>
+        <b><br>
+          5) Install the vCloud Air Ansible modules </b><br>
+        <br>
+        <pre class="pre-scrollable"><br>// Note: We are placing these in the virtualenv path<br><br>$ mkdir python_env/lib/python2.7/site-packages/ansible/modules/extras/cloud/vmware<br><br>$ wget <meta http-equiv="content-type" content="text/html; charset=UTF-8"><code>-P </code>python_env/lib/python2.7/site-packages/ansible/modules/extras/cloud/vmware https://raw.githubusercontent.com/ansible/ansible-modules-extras/devel/cloud/vmware/vca_vapp.py<br><br>$ wget <code>-P </code>python_env/lib/python2.7/site-packages/ansible/modules/extras/cloud/vmware https://raw.githubusercontent.com/ansible/ansible-modules-extras/devel/cloud/vmware/vca_fw.py<br><br>$ wget <code>-P </code>python_env/lib/python2.7/site-packages/ansible/modules/extras/cloud/vmware https://raw.githubusercontent.com/ansible/ansible-modules-extras/devel/cloud/vmware/vca_nat.py<br><br>// confirm at least one of the vCloud Air modules can be found<br>$ ansible-doc  vca_fw  <br>  VCA_FW<br>  Adds or removes firewall rules from a gateway in a vca environment<br>  ...<br>&nbsp;</pre>
+        <br>
+        <b>5) Create a new playbook and test against a Subscription VDC<br>
+          <br>
+          <pre class="pre-scrollable"><br>// use nano to create a test file, add the following lines and save the file<br>$ nano my_vapp.yml<br><br>- hosts: localhost<br>  connection: local<br>  tasks:<br>   - vca_vapp:<br>       admin_password: 'Password!123'<br>       operation: poweron<br>       state: present<br>       service_id: 'M933009684-4424'<br>       vdc_name: 'M933009684-4424'<br>       org: 'M933009684-4424'<br>       service_type: 'vchs'<br>       vm_name: scooby<br>       vm_cpus: 2<br>       catalog_name: "Public Catalog"<br>       template_name: "Ubuntu Server 12.04 LTS (amd64 20150127)"<br>       vm_memory: 2048<br>       network_name: "M933009684-4424-default-routed"<br><br>       register: myNewVApp<br>   - debug: var=myNewVApp<br><br>// After saving the above file, we will set our vCloud Air<br>// credentials as environment variables to keep them from prying eyes.<br><br>$ export VCA_USER='myusername'<br>$ export VCA_PASS='mypassword'<br><br>// Run the playbook<br><br>$ ansible-playbook my_vapp.yml<br><br></pre>
+          <br>
+          <br>
+          <u>Troubleshooting</u><u>:</u><br>
+          <br>
+          Issue 1-&gt; ImportError: No module named xmltodict<br>
+        </b><br>
+        &nbsp;&nbsp; Ansible cannot find the xmltodict module.<br>
+        &nbsp;&nbsp; Either it's not installed or ansible is not using
+        the python interpreter in the virtual environment.<br>
+        &nbsp;&nbsp; The python version being used is looking outside
+        the virtual environment for the xmltodict module.<br>
+        <b>&nbsp;&nbsp; <br>
+          &nbsp;&nbsp; Solution 1:<br>
+          &nbsp;&nbsp; </b>Check if the module is installed, it should
+        be found in the virtual environment python_env<b><br>
+          &nbsp;&nbsp;</b> $ pip show xmltodict<b><br>
+          &nbsp;&nbsp;&nbsp; ---<br>
+          &nbsp;&nbsp;&nbsp;</b> Name: xmltodict<br>
+        &nbsp; &nbsp; Version: 0.9.2<br>
+        &nbsp;&nbsp;&nbsp; Location:
+        /home/me/ansible_vca/python_env/lib/python2.7/site-packages<br>
+        <br>
+        &nbsp;&nbsp;&nbsp; If the module is not found, install it<br>
+        &nbsp; &nbsp; $ pip install xmltodict<b><br>
+          &nbsp;&nbsp;&nbsp; </b><b><br>
+          &nbsp;&nbsp; Solution 2:<br>
+          &nbsp;</b>&nbsp; Check that Ansible is using the correct
+        python interpreter.<br>
+        &nbsp;&nbsp; This is set in the hosts file and can optionally be
+        set as an environment variable in the shell<br>
+        &nbsp;&nbsp; $ export
+        ANSIBLE_PYTHON_INTERPRETER='/Users/bwebster/python/ansible_<b><br>
+          <br>
+          Issue 2-&gt; msg: Failed to login to org, Please check the
+          orgname</b><br>
+        &nbsp;&nbsp; <br>
+        &nbsp;&nbsp; This is typically a one time error. Try running the
+        playbook again.<br>
+        <br>
+        <br>
+        <b>Issue 3-&gt;&nbsp; A true SSLContext object is not
+          available... InsecurePlatformWarning</b><br>
+        <br>
+        &nbsp; Earlier versions of the pyvcloud module used a vCloud Air
+        url that now has invalid certificates.<br>
+        <br>
+        &nbsp;<b> Solution:</b><br>
+        <br>
+        &nbsp; Check the version of pyvcloud<br>
+        &nbsp; $ pip show pyvcloud<br>
+        <br>
+        &nbsp; Uninstall and Update to pyvcloud 13rc7 if needed<br>
+        &nbsp; $ pip uninstall pyvcloud<br>
+        <meta http-equiv="content-type" content="text/html;
+          charset=UTF-8">
+        <br>
+        &nbsp; $ pip install&nbsp; pyvcloud==13rc7<br>
+        <br>
+        <br>
+        <b>Issue 4-&gt; GATHERING FACTS ****** fatal: [localhost] =&gt;
+          module is missing interpreter line</b><b><br>
+          <br>
+          Issue 5-&gt; TASK: [vca_vapp ] *******failed: [localhost]
+          =&gt; {"catalogs":<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          msg: Error in Creating VM, Please check catalog or template, <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          Available catalogs and templates are as above<br>
+        </b><b><br>
+        </b></div>
+      <b> </b></div>
+  </body>
+</html>
