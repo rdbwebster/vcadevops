@@ -23,32 +23,32 @@
 <div id="header"></div>
 
 <div class="container">
-        <h2>Spring Boot CI Scenario</h2>
+        <h2>Jenkins Nodejs Scenario</h2>
 
 <div class="col-lg-8">
 
 <p>
 <br>
 <h4>
-This scenario demonstrates an continuous integration build pipeline using GitHub, Jenkins, Chef and testing with Selenium. 
+This scenario demonstrates an continuous integration build pipeline using GitHub, Jenkins, vca-cli, Ansible and testing with Selenium. 
 
 </h4>
 <br>
-A Spring Boot Form Submission Application is built and deployed whenever a developer modifies the code in the GitHub Project.<br>
+A Nodejs App named Word Finder is built and deployed and tested whenever a developer modifies the code in the GitHub Project.<br>
 <br>
 <br>
-<b> Learn more about VMWare & Chef   </b>  <br>
-<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
+<b> Learn more about vca-cli   </b>  <br>
+<a href="https://github.com/vmware/vca-cli" target="_blank">https://github.com/vmware/vca-cli</a>
 <br>
 <br>
 <br>
 <h3>Prerequisites</h3>
 <ul>
-<li> To run the knife command the client workstation must have both the Chef SDK and the knife vcair plugin installed.</li>
+<li> Jenkins, vca-cli, Selenium and Ansible must be installed on vCloud Air.</li>
 </ul>
 <br>
 <br>
- <img src="/static/img/SB2.png"/>
+ <img src="/static/img/wf.png"/>
 
 
 <br>
@@ -60,10 +60,10 @@ A Spring Boot Form Submission Application is built and deployed whenever a devel
 
 <ol type="1">
 <li> The developer checks in a modification to GitHub</li>
-<li> GitHub notifies Jenkins of the change</li>
-<li> Jenkins retrieves the code from Github</li>
-<li> Jenkins instructs Gradle to build the project</li>
-<li> Jenkins instructs Chef to provision the VM for the application</li>
+<li> GitHub notifies Jenkins of the change and Jenkins Checks out the code</li>
+<li> Jenkins calls vca-cli to create a new VM running Ubuntu</li>
+<li> Jenkins calls vca-cli to configure the Gateway so the VM is accessible from outside vCloud Air</li>
+<li> Jenkins call Ansible to install Nodejs and other application dependencies on the Ubuntu Server</li>
 <li> Jenkins deploys the new version of the Application</li>
 <li> Jenkins instructs Selenium to perform a test of the App</li>
 <li> The developer accesses the new version of the App</li>
@@ -74,7 +74,7 @@ A Spring Boot Form Submission Application is built and deployed whenever a devel
 <br>
 <br>
 Click on
-<a href="http://devops.vcair.us:8100/job/Chef_Knife/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
+<a href="http://devops.vcair.us:8100/job/word_finder/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
 <i>to try it. (Login required)</i>
 </p>
 
