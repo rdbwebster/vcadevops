@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link
+href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
+      rel="stylesheet" type="text/css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script> 
+      $(function(){
+         $("#header").load("../base.html"); 
+      });
+    </script>
+    <title></title>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Creating an Ubuntu VM on vCloud Air using the Chef vcair
+        plugin<br>
+      </h3>
+      <br>
+      <img alt="vcair environment"
+        src="../static/img/knife_vcair_vm_creation.png" height="412"
+        width="800"><br>
+      <br>
+      <p><big><br>
+        </big></p>
+      <ol>
+        <li><big>The knife-vcair command connects to the vCloud Air API
+            endpoint and creates a VM using the specified template.</big></li>
+        <li><big>The knife-vcair command uses ssh to connect to the new
+            VM and installs the chef client, <br>
+            the new VM is not exposed outside vCloud Air so the
+            connection must be made through a ssh proxy server that is
+            exposed.<br>
+            The connections through the proxy and into the VM can both
+            be made using certificates so password entry is not
+            required.<br>
+          </big></li>
+        <li><big>The knife-vcair command connects again to the VM and
+            copies the validator.pem to the client so that it can
+            contact the Chef Server<br>
+            and be registered, it then runs the first client sync to the
+            chef server.<br>
+            In this case the connection is made using ssh username and
+            ssh password, which must be configured in the 'knife vcair
+            server create'<br>
+            command using the --ssh-user and --ssh-password
+            parameters.&nbsp; For this to succeed the password for the
+            ubuntu user in the new VM must <br>
+            be known in advance, so the customization file
+            add_ssh_keys.sh includes a command to set the password to a
+            known value of welcome1</big>.&nbsp; <br>
+        </li>
+      </ol>
+      <p><big>&nbsp;</big><br>
+      </p>
+      <p><br>
+      </p>
+      <p><br>
+      </p>
+      <h4>Install Chef knife-vcair</h4>
+      <br>
+      Install the knife-vcair gem, optionally with the Chef DK. <br>
+      You must copy the private certificates for a Chef Server User you
+      have created and the Chef Validator user into your environment as
+      shown below.<br>
+      <br>
+      <pre class="pre-scrollable">$ mkdir ~/chef-knife<br>
+$ cd chef-knife<br>
+$ gem install knife-vcair<br>
+$ gem list | grep knife-vcair
+  knife-vcair (0.7.0, 0.6.1)<br><br>// Copy the Chef user pem to our local folder<br>// The pem file was created when the Chef server was installed<br><br>$ cp /tmp/chef-ubuntu.pem .<br><br>// Copy the Chef user pem to our local folder<br>// The pem file was created when the Chef server was installed<br><br>$ cp /tmp/chef-validator.pem .<br><br>// Copy the chef-validator.pem to /etc/chef/validation.pem<br>$ cp /tmp/chef-validator.pem  /etc/chef/validator.pem<br><br></pre>
+      <p><br>
+        <br>
+      </p>
+      <h4>Create a knife.rb config file</h4>
+      <br>
+      The example below uses a vchs environment.&nbsp; <br>
+      The vcloud Air username and password must be set as shell
+      environment variables.<br>
+      <br>
+      <pre class="pre-scrollable">node_name                "ubuntu"<br>user =                   "ubuntu"<br>client_key               "/Users/bwebster/ruby/chef_knife/chef-ubuntu.pem"<br>validation_client_name   "chef-validator"<br>validation_key           "/Users/bwebster/ruby/chef_knife/chef-validator.pem"<br>chef_server_url          "https://chef.vcair.us/organizations/chef"<br><br>#OnDemand<br>#knife[:vcair_api_host] = 'us-california-1-3.vchs.vmware.com'<br>#knife[:vcair_org] = 'ec7274ed-5dfc-43fa-9961-b3611e78aa99'<br>#knife[:vcair_api_path] = '/api/compute/api'<br><br>#vchs<br>knife[:vcair_api_host] = 'p3v10-vcd.vchs.vmware.com'<br>knife[:vcair_org] = 'M933009684-4424'<br><br>#Both<br>knife[:vcair_username] = ENV['VCA_USER']<br>knife[:vcair_password] = ENV['VCA_PASS']<br></pre>
+      <p><br>
+      </p>
+      <p><br>
+        At this point you should be able to run the knife client list
+        command shown below.<br>
+        A 'chef-validator' client should be shown in the results.<br>
+      </p>
+      <p>This confirms the mac chef client can talk to the chef server
+        using the private key for the chef user named ubuntu<br>
+      </p>
+      <pre class="pre-scrollable">$ knife client list<br> chef-validator<br></pre>
+      <br>
+      <br>
+      Next set your user and password as shell env<br>
+      <br>
+      <pre class="pre-scrollable">export VCA_USER=‘foo’<br>
+export VCA_PASS=‘secret’</pre>
+      <br>
+      <br>
+      Now the command shown below&nbsp; should work.<br>
+      This confirms knife can connect to vCloud Air using your account
+      info.<br>
+      Your list of vAPPs will be different or possible empty.<br>
+      <br>
+      <br>
+      <pre class="pre-scrollable">$ knife vcair vm list<br>
+[fog][WARNING] Unrecognized arguments: path<br>
+vAPP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CPU&nbsp; Memory&nbsp; OS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Owner&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Status<br>
+chefServerApp&nbsp; chefServer&nbsp; 192.168.109.2&nbsp; 1&nbsp;&nbsp;&nbsp; 1024&nbsp;&nbsp;&nbsp; Ubuntu Linux (64-bit)&nbsp; appstech@websterx.com&nbsp; off&nbsp;&nbsp; 
+devopsApp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; devops&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 192.168.109.3&nbsp; 1&nbsp;&nbsp;&nbsp; 1024&nbsp;&nbsp;&nbsp; Ubuntu Linux (64-bit)&nbsp; appstech@websterx.com&nbsp; off&nbsp;&nbsp; </pre>
+      <br>
+      <br>
+      <br>
+      <br>
+      <h3>Configure your ssh_config to set keys and the ssh gateway<br>
+      </h3>
+      <p><br>
+      </p>
+      <p>Edit your ~/.ssh/ssh_config file and add the following lines.</p>
+      <pre class="pre-scrollable">Host gateway
+&nbsp; Hostname 23.92.225.177
+&nbsp; User ubuntu
+&nbsp; IdentityFile ~/.ssh/ubuntu_rsa<br>
+# For any host on private network behind vca gateway 23.92.225.177
+Host 192.168.109.*
+&nbsp; User ubuntu
+&nbsp; IdentityFile ~/.ssh/ubuntu_rsa
+&nbsp; StrictHostKeyChecking no
+&nbsp; ProxyCommand ssh&nbsp; -l ubuntu -i ~/.ssh/ubuntu_rsa -q gateway nc -q0 %h %p</pre>
+      <br>
+      The first line defines a host known as gateway.<br>
+      This is a VM running on vCloud Air that is running the sshd
+      service.<br>
+      You must install the public key for the ubuntu unix user in the
+      servers&nbsp; /home/ubuntu/.ssh/authorized_keys file.<br>
+      This might have been done when the VM was created if a
+      add_pulblic_ssh_key.sh file like the one below was used to
+      customize the VM.<br>
+      <br>
+      Note the wildcard mapping for ssh connections to new VM's
+      192.168.109.*&nbsp; shown above.<br>
+      The ssh User is configured to user ubuntu.<br>
+      For this reason the same value must be supplied in the
+      'knife-vcair server create' &nbsp; --ssh-user parameter<br>
+      And the Unix User Ubuntu on the SSH Server must have a password
+      that matches the --ssh-user-password&nbsp; parameter<br>
+      <p><br>
+      </p>
+      <h3>Add a&nbsp; add_public_ssh_key.sh customization file<br>
+      </h3>
+      <p>Here is a example add_public_ssh_key.sh file.<br>
+        This same file can be used as a customization file when creating
+        the SSH Proxy and when creating new VMs using the knife vcair
+        command.<br>
+        You must modify the value of the&nbsp;&nbsp; echo
+        'ssh-rsa&nbsp;&nbsp;&nbsp; line to set the public key value for
+        the ubuntu user of the VM to be created.<br>
+        <br>
+      </p>
+      <pre class="pre-scrollable"><br>echo performing customization tasks with param $1 at `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"` &gt;&gt; /root/customization.log<br>  if [ x$1=x"precustomization" ];<br>  then<br>    echo performing precustomization tasks on `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"`<br>    echo performing precustomization tasks on `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"` &gt;&gt; /root/customization.log<br>  fi<br>  if [ x$1=x"postcustomization" ];<br>  then<br>    echo performing postcustomization tasks at `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"`<br>    mkdir -p /home/ubuntu/.ssh<br><br>    echo "nameserver 8.8.8.8" &gt;&gt; /etc/resolvconf/resolv.conf.d/base<br><br>    echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDnD0tFDxOGD9O9gcaXD/2g1btxqjww8g6aPoc4RumbqwAvR4EYDQXkPrL08xGcLZttieSf+c3q6ZL4Vu7cDg+79/lbtZFk4f552+syhz27NUzPUMcSIdTL4PjDJv523WV6C+Jen9BadwhkyxwcQhU3nmwjkv+euHrxk03PtSiEBJTNMgQdsxw4fndA/9Pqh2TSShRUtEIbY35wQt0mxpvomANLTtR2nxuzWS1GQY69um0mR26++x33E5ylQOr2eiJO++73V+IZxgjRY06vQSUKZGc64H3BJlX2BKmABbV3sVji82mmkDyFK3yX538WRwUbvmuGSbVfiyKTIs7UK21f bwebster@bwebster-mbpro.local' &gt;&gt; /home/ubuntu/.ssh/authorized_keys<br><br>    chown ubuntu.ubuntu /home/ubuntu/.ssh<br>    chown ubuntu.ubuntu /home/ubuntu/.ssh/authorized_keys<br>    chmod go-rwx /home/ubuntu/.ssh<br>    chmod go-rwx /home/ubuntu/.ssh/authorized_keys<br><br>    #useradd  -m -s /bin/bash -G admin  -p  `openssl passwd -1 welcome1` vcadevops<br>    usermod --password  `openssl passwd -1 welcome1` ubuntu<br><br>    echo performing postcustomization tasks at `date "+DATE: %Y-%m-%d - TIME: %H:%M:%S"` &gt;&gt; /root/customization.log<br>  fi<br><br></pre>
+      <p>
+      </p>
+      <p><br>
+      </p>
+      <h3>Configure a SSH Proxy&nbsp;</h3>
+      <p><br>
+      </p>
+      <p>When the new VM is created by knife vcair it assumes an IP
+        address (192.168.109.7 picture above) which is not configured in
+        the vCloud Air Edge Gateway.<br>
+        As a result the knife vcair plugin must connect through an SSH
+        proxy (shown above).&nbsp; <br>
+        The SSH Proxy is at a well know address (like 192.168.109.3
+        picture above) and NAT rules exist on the gateway to allow SSH
+        access from outside vcloud air.<br>
+      </p>
+      <p>To configure a proxy you need to create an additional VM on
+        vCloud Air that runs sshd, such as Ubuntu.</p>
+      <p>Create a key pair for the server or reuse the same ubuntu keys
+        that were used on the chef server.<br>
+        This example took that approach, so the same add_public_keys.sh
+        file was used as a customizatoin file for both the Chef Server
+        and the SSH Server.<br>
+      </p>
+      <p>If you choose to generate a new key pair, ensure that the
+        public key is installed in the&nbsp;&nbsp;
+        /home/ubuntu/.ssh/authorized_keys file<br>
+        Add the public key contents to a copy of the
+        add_public_keys.sh&nbsp; file and create a new VM supplying that
+        customization file.<br>
+        <br>
+      </p>
+      <p><br>
+      </p>
+      <p><br>
+      </p>
+      <p><br>
+        <br>
+      </p>
+      <h4><big>Configuring the vCloud Air Gateway</big></h4>
+      <p><br>
+        The vCloud Air Gateway must be configured to allow access to the
+        Chef Server and the SSH Gateway from outside vCloud Air<br>
+      </p>
+      <p>You need to add at minimum Two DNAT rules and and Two SNAT
+        rules for the Chef Server.<br>
+        Use the vCloud Air Portal to add rules for your Chef Server.<br>
+      </p>
+      <p>For example Assuming you have created an Ubuntu Server on
+        192.168.109.2<br>
+        And you have an available public IP on the Gateway&nbsp;
+        23.92.225.177<br>
+        Add The following NAT Rules<br>
+      </p>
+      <p><br>
+      </p>
+      <p>d2p3-ext&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SNAT&nbsp;&nbsp;&nbsp;
+        192.168.109.0/24 &nbsp;&nbsp; Any &nbsp;&nbsp;
+        23.92.225.177&nbsp; Any &nbsp; ANY<br>
+        M9330009684-4424&nbsp;&nbsp;&nbsp; SNAT&nbsp;&nbsp;&nbsp;
+        192.168.109.0/24 &nbsp;&nbsp; Any &nbsp;&nbsp;
+        23.92.225.177&nbsp; Any &nbsp; ANY<br>
+      </p>
+      <p>// Chef Server<br>
+        d2p3-ext&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DNAT&nbsp;&nbsp;&nbsp;&nbsp;
+        23.92.225.177 &nbsp; &nbsp; &nbsp;&nbsp; Any &nbsp;&nbsp;
+        192.168.109.2&nbsp; Any&nbsp; TCP<br>
+        M9330009684-4424&nbsp;&nbsp;&nbsp; DNAT&nbsp;&nbsp;&nbsp;&nbsp;
+        23.92.225.177 &nbsp; &nbsp; &nbsp;&nbsp; Any &nbsp;&nbsp;
+        192.168.109.2&nbsp; Any&nbsp; TCP</p>
+      // SSH Server<br>
+      d2p3-ext&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DNAT&nbsp;&nbsp;&nbsp;&nbsp;
+      23.92.225.177 &nbsp; &nbsp; &nbsp;&nbsp; Any &nbsp;&nbsp;
+      192.168.109.3&nbsp; Any&nbsp; TCP<br>
+      M9330009684-4424&nbsp;&nbsp;&nbsp; DNAT&nbsp;&nbsp;&nbsp;&nbsp;
+      23.92.225.177 &nbsp; &nbsp; &nbsp;&nbsp; Any &nbsp;&nbsp;
+      192.168.109.3&nbsp; Any&nbsp; TCP
+      <p><b></b><b><br>
+        </b></p>
+      <p><b>HAIRPIN NAT CONFIGURATION</b></p>
+      <p>Note that a rule must be applied to both the internal and
+        external networks.</p>
+      <p>If rules are not applied to both networks, then VMs running the
+        Chef Client in the Virtual Data Center will not<br>
+        be able to connect to the Chef Server, requests will fail with a
+        "Connection Refused" Error.<br>
+      </p>
+      <p>For a thorough explanation refer to this article&nbsp; <a
+          href="http://www.websterx.com/bwb/vcair/vcloud-air-hairpin-nat/">http://www.websterx.com/bwb/vcair/vcloud-air-hairpin-nat/</a><br>
+      </p>
+      <p><br>
+      </p>
+      <p> </p>
+      <p><br>
+      </p>
+      <p><br>
+      </p>
+      <p><br>
+        <br>
+      </p>
+      <h3>Create a new VM using knife vcair<br>
+      </h3>
+      <p><br>
+      </p>
+      <p>Edit your ~/.ssh/ssh_config file and add the following lines.</p>
+      <pre class="pre-scrollable">
+&nbsp; knife vcair server create -V -V \<br>  --image "Ubuntu Server 12.04 LTS (amd64 20150127)" \<br>  --customization-script ./add_public_ssh_key.sh \<br>  --cpus 2 \<br>  --memory 4096 \<br>  --node-name knifevcair \<br>  --vcair-net "M933009684-4424-default-routed" \<br>  --ssh-gateway gateway \<br>  --ssh-gateway-identity /Users/bwebster/.ssh/ubuntu_rsa \<br>  --ssh-user ubuntu \<br>  --ssh-password welcome1 \<br>  --server-url "https://chef.vcair.us/organizations/chef"</pre>
+      <p><br>
+        The 'knife vcair server create' command allows the user to set
+        an ssh-gateway and ssh-gateway-idenity.<br>
+        This means that ssh requests sent by knife through the ssh
+        gateway will be done without prompting for passwords only<br>
+        if the public key is installed in the gateway known hosts file.<br>
+        and the private key is available on the client at the location
+        specified by the --ssh-gateway-identity.<br>
+      </p>
+      <p><br>
+      </p>
+      <p><br>
+      </p>
+      <br>
+      <h3>Successful execution console output <br>
+      </h3>
+      <pre class="pre-scrollable"><br>INFO: Using configuration from /Users/bwebster/ruby/chef_knife/knife.rb<br>DEBUG: vcair_username org1@websterx.com<br>DEBUG: vcair_org M933009684-4424<br>DEBUG: vcair_api_host p3v10-vcd.vchs.vmware.com<br>DEBUG: vcair_api_path <br>DEBUG: vcair_api_version <br>DEBUG: vcair_show_progress <br>DEBUG: Using fog version: 1.27.0<br>[fog][WARNING] Unrecognized arguments: path<br>DEBUG: Bootstrap IP Address: 192.168.109.7<br>DEBUG: Bootstrapping the server...<br>Bootstrapping the server by using bootstrap_protocol: ssh and image_os_type: linux<br><br>Waiting for sshd to host (192.168.109.7)DEBUG: Using ssh gateway gateway from knife config<br>........DEBUG: ssh accepting connections on localhost, banner is <br>done<br>Connecting to 192.168.109.7<br>DEBUG: Looking for bootstrap template in /opt/chefdk/embedded/apps/chef/lib/chef/knife/bootstrap<br>DEBUG: Found bootstrap template in /opt/chefdk/embedded/apps/chef/lib/chef/knife/bootstrap<br>DEBUG: Adding 192.168.109.7<br>DEBUG: establishing connection to 127.0.0.1:65535<br>DEBUG: connection established<br>INFO: negotiating protocol version<br>DEBUG: remote is `SSH-2.0-OpenSSH_5.9p1 Debian-5ubuntu1.4'<br>DEBUG: local is `SSH-2.0-Ruby/Net::SSH_2.9.2 x86_64-darwin12.0'<br>DEBUG: read 984 bytes<br>DEBUG: received packet nr 0 type 20 len 980<br>INFO: got KEXINIT from server<br>INFO: sending KEXINIT<br>DEBUG: queueing packet nr 0 type 20 len 1684<br>DEBUG: sent 1688 bytes<br>INFO: negotiating algorithms<br>DEBUG: negotiated:<br>* kex: diffie-hellman-group-exchange-sha1<br>* host_key: ssh-rsa<br>* encryption_server: aes128-cbc<br>* encryption_client: aes128-cbc<br>* hmac_client: hmac-sha1<br>* hmac_server: hmac-sha1<br>* compression_client: none<br>* compression_server: none<br>* language_client: <br>* language_server: <br>DEBUG: exchanging keys<br>DEBUG: queueing packet nr 1 type 34 len 20<br>DEBUG: sent 24 bytes<br>DEBUG: read 152 bytes<br>DEBUG: received packet nr 1 type 31 len 148<br>DEBUG: queueing packet nr 2 type 32 len 140<br>DEBUG: sent 144 bytes<br>DEBUG: read 720 bytes<br>DEBUG: received packet nr 2 type 33 len 700<br>DEBUG: queueing packet nr 3 type 21 len 20<br>DEBUG: sent 24 bytes<br>DEBUG: received packet nr 3 type 21 len 12<br>DEBUG: beginning authentication of `ubuntu'<br>DEBUG: queueing packet nr 4 type 5 len 28<br>DEBUG: sent 52 bytes<br>DEBUG: read 52 bytes<br>DEBUG: received packet nr 4 type 6 len 28<br>DEBUG: trying none<br>DEBUG: queueing packet nr 5 type 50 len 44<br>DEBUG: sent 68 bytes<br>DEBUG: read 68 bytes<br>DEBUG: received packet nr 5 type 51 len 44<br>DEBUG: allowed methods: publickey,password<br>DEBUG: none failed<br>DEBUG: trying publickey<br>DEBUG: connecting to ssh-agent<br>DEBUG: sending agent request 1 len 49<br>DEBUG: received agent packet 2 len 5<br>DEBUG: sending agent request 11 len 0<br>DEBUG: received agent packet 12 len 5<br>DEBUG: trying publickey (04:06:1a:43:c4:28:03:96:ab:37:77:69:ef:64:f4:ca)<br>DEBUG: queueing packet nr 6 type 50 len 348<br>DEBUG: sent 372 bytes<br>DEBUG: read 68 bytes<br>DEBUG: received packet nr 6 type 51 len 44<br>DEBUG: allowed methods: publickey,password<br>DEBUG: trying password<br>DEBUG: queueing packet nr 7 type 50 len 60<br>DEBUG: sent 84 bytes<br>DEBUG: read 36 bytes<br>DEBUG: received packet nr 7 type 52 len 12<br>DEBUG: password succeeded<br>DEBUG: queueing packet nr 8 type 90 len 44<br>DEBUG: sent 68 bytes<br>DEBUG: read 52 bytes<br>DEBUG: received packet nr 8 type 91 len 28<br>INFO: channel_open_confirmation: 0 0 0 32768<br>INFO: sending channel request "env"<br>DEBUG: queueing packet nr 9 type 98 len 44<br>INFO: sending channel request "pty-req"<br>DEBUG: queueing packet nr 10 type 98 len 60<br>INFO: sending channel request "exec"<br>DEBUG: queueing packet nr 11 type 98 len 4268<br>DEBUG: sent 4444 bytes<br>DEBUG: read 88 bytes<br>DEBUG: received packet nr 9 type 93 len 28<br>INFO: channel_window_adjust: 0 +2097152<br>DEBUG: received packet nr 10 type 99 len 12<br>INFO: channel_success: 0<br>DEBUG: read 68 bytes<br>DEBUG: received packet nr 11 type 94 len 44<br>INFO: channel_data: 0 27b<br>192.168.109.7 Installing Chef Client...<br>DEBUG: read 488 bytes<br>DEBUG: received packet nr 12 type 94 len 92<br>INFO: channel_data: 0 64b<br>DEBUG: received packet nr 13 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 --2015-08-26 17:58:53--  https://www.opscode.com/chef/install.sh<br>DEBUG: received packet nr 14 type 94 len 76<br>INFO: channel_data: 0 47b<br>DEBUG: received packet nr 15 type 94 len 28<br>INFO: channel_data: 0 13b<br>DEBUG: received packet nr 16 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Resolving www.opscode.com (www.opscode.com)... 184.106.28.91<br>DEBUG: received packet nr 17 type 94 len 92<br>INFO: channel_data: 0 70b<br>DEBUG: read 104 bytes<br>DEBUG: received packet nr 18 type 94 len 28<br>INFO: channel_data: 0 10b<br>DEBUG: received packet nr 19 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Connecting to www.opscode.com (www.opscode.com)|184.106.28.91|:443... connected.<br>DEBUG: read 84 bytes<br>DEBUG: received packet nr 20 type 94 len 60<br>INFO: channel_data: 0 40b<br>DEBUG: read 104 bytes<br>DEBUG: received packet nr 21 type 94 len 28<br>INFO: channel_data: 0 6b<br>DEBUG: received packet nr 22 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 HTTP request sent, awaiting response... 200 OK<br>DEBUG: read 632 bytes<br>DEBUG: received packet nr 23 type 94 len 28<br>INFO: channel_data: 0 8b<br>DEBUG: received packet nr 24 type 94 len 28<br>INFO: channel_data: 0 5b<br>DEBUG: received packet nr 25 type 94 len 28<br>INFO: channel_data: 0 6b<br>DEBUG: received packet nr 26 type 94 len 44<br>INFO: channel_data: 0 19b<br>DEBUG: received packet nr 27 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Length: 18736 (18K) [application/x-sh]<br>DEBUG: received packet nr 28 type 94 len 44<br>INFO: channel_data: 0 19b<br>DEBUG: received packet nr 29 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Saving to: `STDOUT'<br>DEBUG: received packet nr 30 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 <br>DEBUG: received packet nr 31 type 94 len 28<br>INFO: channel_data: 0 1b<br>DEBUG: received packet nr 32 type 94 len 108<br>INFO: channel_data: 0 79b<br>DEBUG: read 1100 bytes<br>DEBUG: received packet nr 33 type 94 len 28<br>INFO: channel_data: 0 1b<br>DEBUG: received packet nr 34 type 94 len 108<br>INFO: channel_data: 0 79b<br>DEBUG: received packet nr 35 type 94 len 28<br>INFO: channel_data: 0 2b<br>100%[======================================&gt;] 18,736      --.-K/s   in 0.001s  <br>DEBUG: received packet nr 36 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 <br>DEBUG: received packet nr 37 type 94 len 92<br>INFO: channel_data: 0 65b<br>DEBUG: received packet nr 38 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 2015-08-26 17:58:53 (16.8 MB/s) - written to stdout [18736/18736]<br>DEBUG: received packet nr 39 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 <br>DEBUG: received packet nr 40 type 94 len 60<br>INFO: channel_data: 0 33b<br>DEBUG: received packet nr 41 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Downloading Chef 12 for ubuntu...<br>DEBUG: received packet nr 42 type 94 len 140<br>INFO: channel_data: 0 114b<br>DEBUG: received packet nr 43 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 downloading https://www.opscode.com/chef/metadata?v=12&amp;prerelease=false&amp;nightlies=false&amp;p=ubuntu&amp;pv=12.04&amp;m=x86_64<br>DEBUG: received packet nr 44 type 94 len 60<br>INFO: channel_data: 0 43b<br>DEBUG: received packet nr 45 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7   to file /tmp/install.sh.1228/metadata.txt<br>DEBUG: received packet nr 46 type 94 len 28<br>INFO: channel_data: 0 14b<br>DEBUG: received packet nr 47 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 trying wget...<br>DEBUG: read 104 bytes<br>DEBUG: received packet nr 48 type 94 len 28<br>INFO: channel_data: 0 3b<br>DEBUG: received packet nr 49 type 94 len 28<br>INFO: channel_data: 0 1b<br>DEBUG: read 832 bytes<br>DEBUG: received packet nr 50 type 94 len 108<br>INFO: channel_data: 0 93b<br>DEBUG: received packet nr 51 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 url	https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/10.04/x86_64/chef_12.4.1-1_amd64.deb<br>DEBUG: received packet nr 52 type 94 len 28<br>INFO: channel_data: 0 3b<br>DEBUG: received packet nr 53 type 94 len 28<br>INFO: channel_data: 0 1b<br>DEBUG: received packet nr 54 type 94 len 60<br>INFO: channel_data: 0 32b<br>DEBUG: received packet nr 55 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 md5	6229586196a433b0ddf8f72cd4e85533<br>DEBUG: received packet nr 56 type 94 len 28<br>INFO: channel_data: 0 6b<br>DEBUG: received packet nr 57 type 94 len 28<br>INFO: channel_data: 0 1b<br>DEBUG: received packet nr 58 type 94 len 92<br>INFO: channel_data: 0 64b<br>DEBUG: received packet nr 59 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 sha256	bb2bdaa0c551fff21ccdf37dab75fc71374b521c419f1af51d1eab3ea2c791ba<br>DEBUG: received packet nr 60 type 94 len 60<br>INFO: channel_data: 0 39b<br>DEBUG: received packet nr 61 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 downloaded metadata file looks valid...<br>DEBUG: read 316 bytes<br>DEBUG: received packet nr 62 type 94 len 124<br>INFO: channel_data: 0 107b<br>192.168.109.7 downloading https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/10.04/x86_64/chef_12.4.1-1_amd64.deb<br>DEBUG: received packet nr 63 type 94 len 76<br>INFO: channel_data: 0 56b<br>192.168.109.7   to file /tmp/install.sh.1228/chef_12.4.1-1_amd64.deb<br>DEBUG: received packet nr 64 type 94 len 44<br>INFO: channel_data: 0 16b<br>192.168.109.7 trying wget...<br>DEBUG: read 84 bytes<br>DEBUG: received packet nr 65 type 94 len 60<br>INFO: channel_data: 0 38b<br>192.168.109.7 Comparing checksum with sha256sum...<br>DEBUG: read 188 bytes<br>DEBUG: received packet nr 66 type 94 len 44<br>INFO: channel_data: 0 18b<br>DEBUG: received packet nr 67 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Installing Chef 12<br>DEBUG: received packet nr 68 type 94 len 44<br>INFO: channel_data: 0 23b<br>DEBUG: read 52 bytes<br>DEBUG: received packet nr 69 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 installing with dpkg...<br>DEBUG: read 204 bytes<br>DEBUG: received packet nr 70 type 94 len 60<br>INFO: channel_data: 0 45b<br>DEBUG: received packet nr 71 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Selecting previously unselected package chef.<br>DEBUG: received packet nr 72 type 94 len 44<br>INFO: channel_data: 0 22b<br>DEBUG: read 952 bytes<br>DEBUG: received packet nr 73 type 94 len 44<br>INFO: channel_data: 0 25b<br>DEBUG: received packet nr 74 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 75 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 76 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 77 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 78 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 79 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 80 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 81 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 82 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 83 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 84 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 85 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 86 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: read 68 bytes<br>DEBUG: received packet nr 87 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: read 204 bytes<br>DEBUG: received packet nr 88 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 89 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 90 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: read 508 bytes<br>DEBUG: received packet nr 91 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 92 type 94 len 44<br>INFO: channel_data: 0 27b<br>DEBUG: received packet nr 93 type 94 len 44<br>INFO: channel_data: 0 23b<br>DEBUG: received packet nr 94 type 94 len 76<br>INFO: channel_data: 0 49b<br>DEBUG: received packet nr 95 type 94 len 28<br>INFO: channel_data: 0 2b<br>(Reading database ... 52292 files and directories currently installed.)<br>DEBUG: received packet nr 96 type 94 len 76<br>INFO: channel_data: 0 53b<br>DEBUG: received packet nr 97 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Unpacking chef (from .../chef_12.4.1-1_amd64.deb) ...<br>DEBUG: read 120 bytes<br>DEBUG: received packet nr 98 type 94 len 44<br>INFO: channel_data: 0 30b<br>DEBUG: received packet nr 99 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Setting up chef (12.4.1-1) ...<br>DEBUG: read 120 bytes<br>DEBUG: received packet nr 100 type 94 len 44<br>INFO: channel_data: 0 30b<br>DEBUG: received packet nr 101 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Thank you for installing Chef!<br>DEBUG: read 136 bytes<br>DEBUG: received packet nr 102 type 94 len 60<br>INFO: channel_data: 0 33b<br>DEBUG: received packet nr 103 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Starting first Chef Client run...<br>DEBUG: read 136 bytes<br>DEBUG: received packet nr 104 type 94 len 60<br>INFO: channel_data: 0 40b<br>DEBUG: received packet nr 105 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Starting Chef Client, version 12.4.1<br>DEBUG: read 168 bytes<br>DEBUG: received packet nr 106 type 94 len 92<br>INFO: channel_data: 0 74b<br>DEBUG: received packet nr 107 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Creating a new client identity for knifevcair using the validator key.<br>DEBUG: read 136 bytes<br>DEBUG: received packet nr 108 type 94 len 60<br>INFO: channel_data: 0 40b<br>DEBUG: received packet nr 109 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 resolving cookbooks for run list: []<br>DEBUG: read 528 bytes<br>DEBUG: received packet nr 110 type 94 len 44<br>INFO: channel_data: 0 28b<br>DEBUG: received packet nr 111 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Synchronizing Cookbooks:<br>DEBUG: received packet nr 112 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 113 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Compiling Cookbooks...<br>DEBUG: received packet nr 114 type 94 len 92<br>INFO: channel_data: 0 72b<br>DEBUG: received packet nr 115 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 [2015-08-26T17:59:05+00:00] WARN: Node knifevcair has an empty run list.<br>DEBUG: received packet nr 116 type 94 len 44<br>INFO: channel_data: 0 26b<br>DEBUG: received packet nr 117 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Converging 0 resources<br>DEBUG: read 564 bytes<br>DEBUG: received packet nr 118 type 94 len 28<br>INFO: channel_data: 0 4b<br>DEBUG: received packet nr 119 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 <br>DEBUG: received packet nr 120 type 94 len 44<br>INFO: channel_data: 0 21b<br>DEBUG: received packet nr 121 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Running handlers:<br>DEBUG: received packet nr 122 type 94 len 44<br>INFO: channel_data: 0 25b<br>DEBUG: received packet nr 123 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Running handlers complete<br>DEBUG: received packet nr 124 type 94 len 28<br>INFO: channel_data: 0 4b<br>DEBUG: received packet nr 125 type 94 len 92<br>INFO: channel_data: 0 70b<br>DEBUG: received packet nr 126 type 94 len 28<br>INFO: channel_data: 0 2b<br>192.168.109.7 Chef Client finished, 0/0 resources updated in 1.880440394 seconds<br>DEBUG: read 140 bytes<br>DEBUG: received packet nr 127 type 96 len 12<br>INFO: channel_eof: 0<br>DEBUG: received packet nr 128 type 98 len 44<br>INFO: channel_request: 0 exit-status false<br>DEBUG: received packet nr 129 type 97 len 12<br>INFO: channel_close: 0<br>DEBUG: queueing packet nr 12 type 97 len 28<br>INFO: closing remaining channels (0 open)<br>bwebster-mbpro:chef_knife bwebster$ </pre>
+      <p><br>
+      </p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link
+href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
+      rel="stylesheet" type="text/css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script> 
+      $(function(){
+         $("#header").load("../base.html"); 
+      });
+    </script>
+    <title></title>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Installing the Chef Client<br>
+      </h3>
+      <br>
+      <p> <br>
+      </p>
+      <h4>Ubuntu Package Install Instructinos<br>
+      </h4>
+      <p><br>
+        <br>
+      </p>
+      <pre class="pre-scrollable">cd /tmp<br>wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.4.0-1_amd64.deb<br><br>dpkg -i /tmp/chefdk_0.1.0-1_amd64.deb<br><br>// verify package install<br>dpkg -l | grep chef<br><br>// installed in /opt/chefdk/embedded<br>dpkg -L chef<br><br>// Set path in ubuntu user env using script<br><br>su - ubuntu<br><br>echo 'eval "$(chef shell-init bash)"' &gt;&gt; ~/.bash_profile<br><br>// Confirm 12.0.3 is installed <br><br>$ ls /opt/chefdk/bin<br>$ chef-client --version <br></pre>
+      <p><br>
+        <br>
+      </p>
+      <h4>Mac OSX Package Install Instructions</h4>
+      <p><br>
+        <br>
+      </p>
+      <pre class="pre-scrollable">cd ~/Downloads<br>wget https://opscode-omnibus-packages.s3.amazonaws.com/mac_os_x/10.8/x86_64/chefdk-0.7.0-1.dmg<br><br></pre>
+      <p><br>
+      </p>
+      <p> View the Downloads folder in the Mac finder app</p>
+      <p>// Double click on the chefdk-0.7.0-1.dmg<br>
+        // Double click on the chefdk-0.7.0-1.pkg and follow the
+        installer prompts. </p>
+      <br>
+      <h3>Configure the Client to talk to your Chef Server <br>
+      </h3>
+      <p><br>
+      </p>
+      <h4>Download the starter kit&nbsp; (Ubuntu or OSX)<br>
+      </h4>
+      <p><br>
+        We will download some of the necessary config files from the
+        Chef Server.<br>
+        Using a browser navigate to your chef UI</p>
+      <p>For example<br>
+        https://devops.vcloudair.io:8200</p>
+      <p>Login using the user you created when you installed the server
+        above.</p>
+      <p>login as ubuntu / welcome1<br>
+        <br>
+        Click Administration&nbsp; in top menu<br>
+        In the left nav select Organizations if its not already
+        selected.<br>
+        Select the 'chef' organization from the list in the middle<br>
+        In the left nav select 'Starter Kit'<br>
+        <br>
+        Click the 'Download Starter Kit' button and accept the warning.<br>
+        Save the file to your client workstation.<br>
+        <br>
+      </p>
+      <h4>Create a chef-repo and install the starter kit<br>
+      </h4>
+      <p>On your client workstation create a folder for the client and
+        add a chef-repo folder.<br>
+        Then unzip the chef-starter.zip archive into the folder<br>
+      </p>
+      <pre class="pre-scrollable"><br>mkdir -p chef_client/chef-repo<br><br>cd chef_client/chef-repo<br><br>jar -xvf chef-starter.zip<br><br>// At this point Run the chef verify command <br>// It should complete without issues<br><br>chef verify<br><br>cd chef-repo/.chef<br><br>// Review contents of knife.rb<br>vi knife.rb<br><br>// Confirm 12.0.3 is installed <br><br>$ ls /opt/chefdk/bin<br>$ chef-client --version <br></pre>
+      <p><br>
+      </p>
+      <h4>Customize the knife.rb file <br>
+      </h4>
+      The chef knife command utilizes a knife.rb configuration file.<br>
+      A default version of the file was installed as part of the starter
+      pack.<br>
+      <br>
+      Edit the file and change it to match the file contents below <br>
+      <br>
+      <pre class="pre-scrollable">current_dir = File.dirname(__FILE__)<br>log_level                :info<br>log_location             STDOUT<br>node_name                "ubuntu"<br>client_key               "#{current_dir}/chef-ubuntu.pem"<br>validation_client_name   "chef-validator"<br>validation_key           "#{current_dir}/chef-validator.pem"<br>chef_server_url          "https://chef.localdomain/organizations/chef"<br>cookbook_path            ["#{current_dir}/../cookbooks"]<br></pre>
+      <p><br>
+      </p>
+      <br>
+      <h4>Run some basic knife commands<br>
+      </h4>
+      <br>
+      Note: Knife commands MUST be run the from chef-repo folder.<br>
+      The client list command should display <br>
+      <br>
+      <pre class="pre-scrollable">cd chef-repo<br><br>knife ssl fetch<br><br>knife ssl check<br><br>// The next command should return a single client named chef-validator<br>knife client list -V<br><br><br><br></pre>
+      <p><br>
+      </p>
+      <br>
+      <br>
+    </div>
+  </body>
+</html>
