@@ -25,6 +25,8 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
     <div class="container"> <img
         src="../../static/img/VMWorld_Banner.png">
       <h2>Jenkins Lab (DevOps Track) </h2>
+      <p><br>
+      </p>
       <div class="col-lg-8">
         <p> <br>
           In this lab you will create a Continuous Integration process
@@ -33,7 +35,13 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
           repository on your laptop <br>
           and configure your local Jenkins server to automatically build
           and deploy the application <br>
-          to a remote server whenever the source code is modified. </p>
+          to a remote server whenever the source code is modified.<br>
+        </p>
+        <p>Note: When completing the lab highlight the commands in the
+          gray boxes and use cut and paste<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to reduce
+          typing.<br>
+        </p>
         <br>
         <h3>Prerequisites</h3>
         <ul>
@@ -47,19 +55,67 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
         <div>
           <h3> Lab Overview Steps </h3>
           <ol type="1">
-            <li> Add the Git and SCP Plugins to Jenkins </li>
-            <li> Configure a remote server endpoint in Jenkins </li>
-            <li> Create a new Jenkins Project to do the build / deploy </li>
             <li> Clone (create) a source code repository on your laptop
             </li>
             <li> Setup a post-commit hook so Git will call Jenkins </li>
+            <li>Add the Git and SCP Plugins to Jenkins </li>
+            <li> Configure a remote server endpoint in Jenkins </li>
+            <li> Create a new Jenkins Project to do the build / deploy </li>
             <li> Modify the code and commit the change </li>
             <li> Watch Jenkins checkout and deploy the new code </li>
             <li> View the application with a browser </li>
           </ol>
         </div>
         <br>
-        <h3>Step 1: &nbsp; Add the Git and SCP Plugins to Jenkins</h3>
+        <br>
+        <br>
+        <h3>Step 1: &nbsp; Clone (create) a source code repository on
+          your laptop</h3>
+        <br>
+        <ol type="a">
+          <li> Open a terminal window on your laptop </li>
+          <li> Enter the following commands to create a local git
+            repository containing the sample application. </li>
+        </ol>
+        <br>
+        <br>
+        <h5>OSX</h5>
+        <pre class="pre-scrollable">$ mkdir /tmp<br>$ cd /tmp
+$ git clone https://github.com/Dissimulate/Tearable-Cloth.git
+
+</pre>
+        <h5>Windows</h5>
+        <pre class="pre-scrollable">C:&gt; mkdir C:\tmp<br>C:&gt; cd \tmp
+C:&gt; git clone https://github.com/Dissimulate/Tearable-Cloth.git
+
+</pre>
+        <br>
+        <br>
+        <h3>Step 2: &nbsp; Setup a post-commit hook so Git will call
+          Jenkins</h3>
+        <br>
+        <ol type="a">
+          <li> Enter the following commands in the terminal window to
+            create a post-commit hook. <br>
+            With this command in place, Git will call Jenkins whenever
+            code changes are comitted to the repository.</li>
+        </ol>
+        <br>
+        <br>
+        <h5>OSX</h5>
+        <pre class="pre-scrollable">$ cd Tearable-Cloth
+$ echo '#!/bin/sh' &gt; .git/hooks/post-commit
+$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" &gt;&gt; .git/hooks/post-commit
+
+</pre>
+        <h5>Windows</h5>
+        <pre class="pre-scrollable">$ cd Tearable-Cloth
+$ echo '#!/bin/sh' &gt; .git\hooks\post-commit
+$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" &gt;&gt; .git\hooks\post-commit
+</pre>
+        <br>
+        <br>
+        <h3>Step 3: &nbsp; Add the Git and SCP Plugins to Jenkins</h3>
         <br>
         <ol type="a">
           <li> Open the Jenkins console in a browser <a
@@ -91,7 +147,7 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
         </ol>
         <br>
         <br>
-        <h3>Step 2: &nbsp; Configure a remote server endpoint in Jenkins
+        <h3>Step 4: &nbsp; Configure a remote server endpoint in Jenkins
         </h3>
         <br>
         <ol type="a">
@@ -116,7 +172,7 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
           src="../../static/img/jenkins_scp_site.png" height="256"
           width="800"> <br>
         <br>
-        <h3>Step 3: &nbsp; Create a new Jenkins Project to do the build
+        <h3>Step 5: &nbsp; Create a new Jenkins Project to do the build
           / deploy</h3>
         <br>
         <ol type="a">
@@ -136,91 +192,49 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
             Section (shown below) </li>
           <li> Check the '<b>Git</b>' radio button </li>
           <li> Enter the following repository url </li>
-          <br>
-          <pre class="pre-scrollable">file:////tmp/Tearable-Cloth
-</pre>
-          <a href="/static/img/jenkins_git_config.png" target="_blank">
-            <img alt="enter file url" style="border:1px solid black"
-              src="../../static/img/jenkins_git_config.png" height="270"
-              border="0" width="360"> </a> <br>
-          <br>
-          <br>
-          <li> Scroll down in the project to the '<b>Post-build Actions</b>'
-            section. </li>
-          <br>
-          <img alt="post build actions" style="border:1px solid black"
-            src="../../static/img/jenkins_post_build_dropdown.png"
-            height="108" width="320"> <br>
-          <br>
-          <li> Click on the dropdown field and select the '<b>Publish
-              artifacts to SCP Repository</b>' entry. </li>
-          <br>
-          <img alt="Publish to scp repository" style="border:1px solid
-            black"
-            src="../../static/img/jenkins_publish_artifact_menu.png"
-            height="240" width="316"> <br>
-          <br>
-          <li> In the <b>Publish artifacts to SCP Repository</b>
-            section,<br>
-            click on the <b>SCP site</b> dropdown box select the remote
-            site from the <b>SCP site</b> dropdown</li>
-          <li> Enter two asterisks in the Source input field '<b>**</b>'</li>
-          <li> Enter <b>your student name provided by the instructor </b>
-            in the '<b>Destination</b>' field</li>
-          <li> Click the '<b>Save</b>' button at the bottom of the page
-            to save your project</li>
-          <br>
-          <a href="/static/img/jenkins_scp_step.png" target="_blank"> <img
-              alt="Click Save" style="border:1px solid black"
-              src="../../static/img/jenkins_scp_step.png" height="467"
-              border="0" width="640"> </a> <br>
-          <br>
         </ol>
-        <br>
-        <br>
-        <h3>Step 4: &nbsp; Clone (create) a source code repository on
-          your laptop</h3>
-        <br>
-        <ol type="a">
-          <li> Open a terminal window on your laptop </li>
-          <li> Enter the following commands to create a local git
-            repository containing the sample application. </li>
-        </ol>
-        <br>
-        <br>
-        <h5>OSX</h5>
-        <pre class="pre-scrollable">$ cd /tmp
-$ git clone https://github.com/Dissimulate/Tearable-Cloth.git
-
+        <h5>&nbsp;OSX</h5>
+        <pre class="pre-scrollable">file:////tmp/Tearable-Cloth
 </pre>
-        <h5>Windows</h5>
-        <pre class="pre-scrollable">C:&gt; cd \temp
-C:&gt; git clone https://github.com/Dissimulate/Tearable-Cloth.git
-
+        <h5>&nbsp;Windows</h5>
+        <pre class="pre-scrollable">file:///c:/tmp/Tearable-Cloth/
 </pre>
         <br>
-        <h3>Step 5: &nbsp; Setup a post-commit hook so Git will call
-          Jenkins</h3>
-        <br>
-        <ol type="a">
-          <li> Enter the following commands in the terminal window to
-            create a post-commit hook. <br>
-            With this command in place, Git will call Jenkins whenever
-            code changes are comitted to the repository.</li>
-        </ol>
+        <a href="/static/img/jenkins_git_config.png" target="_blank"> <img
+            alt="enter file url" style="border:1px solid black"
+            src="../../static/img/jenkins_git_config.png" height="270"
+            border="0" width="360"> </a> <br>
         <br>
         <br>
-        <h5>OSX</h5>
-        <pre class="pre-scrollable">$ cd /tmp/Tearable-Cloth
-$ echo '#!/bin/sh' &gt; .git/hooks/post-commit
-$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" &gt;&gt; .git/hooks/post-commit
-
-</pre>
-        <h5>Windows</h5>
-        <pre class="pre-scrollable">$ cd \temp\Tearable-Cloth
-$ echo '#!/bin/sh' &gt; .git\hooks\post-commit
-$ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" &gt;&gt; .git\hooks\post-commit
-</pre>
+        <li> Scroll down in the project to the '<b>Post-build Actions</b>'
+          section. </li>
+        <br>
+        <img alt="post build actions" style="border:1px solid black"
+          src="../../static/img/jenkins_post_build_dropdown.png"
+          height="108" width="320"> <br>
+        <br>
+        <li> Click on the dropdown field and select the '<b>Publish
+            artifacts to SCP Repository</b>' entry. </li>
+        <br>
+        <img alt="Publish to scp repository" style="border:1px solid
+          black"
+          src="../../static/img/jenkins_publish_artifact_menu.png"
+          height="240" width="316"> <br>
+        <br>
+        <li> In the <b>Publish artifacts to SCP Repository</b> section,<br>
+          click on the <b>SCP site</b> dropdown box select the remote
+          site from the <b>SCP site</b> dropdown</li>
+        <li> Enter two asterisks in the Source input field '<b>**</b>'</li>
+        <li> Enter <b>your student name provided by the instructor </b>
+          in the '<b>Destination</b>' field</li>
+        <li> Click the '<b>Save</b>' button at the bottom of the page to
+          save your project</li>
+        <br>
+        <a href="/static/img/jenkins_scp_step.png" target="_blank"> <img
+            alt="Click Save" style="border:1px solid black"
+            src="../../static/img/jenkins_scp_step.png" height="467"
+            border="0" width="640"> </a> <br>
+        <br>
         <br>
         <br>
         <h3>Step 6: &nbsp; Modify the code and commit the change</h3>
