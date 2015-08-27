@@ -11,7 +11,6 @@
 href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <link href="/static/css/custom.css" rel="stylesheet">
     <link
 href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
       rel="stylesheet" type="text/css">
@@ -22,6 +21,12 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
         });
     });
     </script>
+    <style>
+html { font-size: 62.5%; } /* font-size: 62.5% now means that 1.0 rem = 10px */
+*{font-size: 1.5rem;line-height: 2.0rem; }
+body { background: #fff; font-family: arial;  }
+
+    </style>
     <div class="container"> <img
         src="../../static/img/VMWorld_Banner.png">
       <h2>Jenkins Lab (DevOps Track) </h2>
@@ -30,18 +35,12 @@ href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+N
       <div class="col-lg-8">
         <p> <br>
           In this lab you will create a Continuous Integration process
-          using Jenkins.<br>
-          You will install the source code for an application into a git
-          repository on your laptop <br>
-          and configure your local Jenkins server to automatically build
-          and deploy the application <br>
-          to a remote server whenever the source code is modified.<br>
-        </p>
-        <p>Note: When completing the lab highlight the commands in the
-          gray boxes and use cut and paste<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to reduce
-          typing.<br>
-        </p>
+          using Jenkins. </p><p>You will install the source code for an
+          application into a git repository on your laptop and configure
+          your local Jenkins server to automatically build and deploy
+          the application to a remote server whenever the source code is
+          modified. </p>
+        <p>Note: When completing the lab, cut and paste text in the gray boxes to reduce typing. </p>
         <br>
         <h3>Prerequisites</h3>
         <ul>
@@ -157,8 +156,8 @@ $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" 
             of the page.</li>
           <li> Scroll down to the <b>SCP repository hosts</b> section.
             (Shown below)</li>
-          <li> In the <b>Hostname</b> field enter the server name or IP
-            provided by your instructor.</li>
+          <li> In the <b>Hostname</b> field enter the server name <b>http://labs.vcair.us</b>
+          </li>
           <li> In the <b>Port</b> field enter the value '<b>22</b>'</li>
           <li> In the <b>User Name</b> field enter your student
             username provided by the instructor.</li>
@@ -187,23 +186,21 @@ $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" 
           <img alt="Click the ok button" style="border:1px solid black"
             src="../../static/img/jenkins_new_project.png" height="424"
             width="640"> <br>
-          <br>
           <li> Scroll down to the '<b>Source Code Management</b>'
             Section (shown below) </li>
           <li> Check the '<b>Git</b>' radio button </li>
-          <li> Enter the following repository url </li>
-        </ol>
+          <li> Enter the following repository url <br>
+            <br>
+          </li>
+       
         <h5>&nbsp;OSX</h5>
-        <pre class="pre-scrollable">file:////tmp/Tearable-Cloth
-</pre>
+        <pre class="pre-scrollable">file:////tmp/Tearable-Cloth</pre>
         <h5>&nbsp;Windows</h5>
-        <pre class="pre-scrollable">file:///c:/tmp/Tearable-Cloth/
-</pre>
+        <pre class="pre-scrollable">file:///c:/tmp/Tearable-Cloth/</pre>
         <br>
-        <a href="/static/img/jenkins_git_config.png" target="_blank"> <img
-            alt="enter file url" style="border:1px solid black"
-            src="../../static/img/jenkins_git_config.png" height="270"
-            border="0" width="360"> </a> <br>
+        <img alt="enter file url" style="border:1px solid black"
+          src="../../static/img/jenkins_git_config.png" height="270"
+          border="0" width="360"> <br>
         <br>
         <br>
         <li> Scroll down in the project to the '<b>Post-build Actions</b>'
@@ -211,16 +208,15 @@ $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" 
         <br>
         <img alt="post build actions" style="border:1px solid black"
           src="../../static/img/jenkins_post_build_dropdown.png"
-          height="108" width="320"> <br>
-        <br>
+          height="108" width="320"> <br><br>
         <li> Click on the dropdown field and select the '<b>Publish
             artifacts to SCP Repository</b>' entry. </li>
         <br>
         <img alt="Publish to scp repository" style="border:1px solid
           black"
           src="../../static/img/jenkins_publish_artifact_menu.png"
-          height="240" width="316"> <br>
-        <br>
+          <br>
+          height="240" width="316"> <br><br>
         <li> In the <b>Publish artifacts to SCP Repository</b> section,<br>
           click on the <b>SCP site</b> dropdown box select the remote
           site from the <b>SCP site</b> dropdown</li>
@@ -229,11 +225,11 @@ $ echo "curl -X POST http://localhost:8080/job/Tearable_Cloth/build?delay=5sec" 
           in the '<b>Destination</b>' field</li>
         <li> Click the '<b>Save</b>' button at the bottom of the page to
           save your project</li>
+        </ol>
         <br>
-        <a href="/static/img/jenkins_scp_step.png" target="_blank"> <img
-            alt="Click Save" style="border:1px solid black"
+        <img alt="Click Save" style="border:1px solid black"
             src="../../static/img/jenkins_scp_step.png" height="467"
-            border="0" width="640"> </a> <br>
+            border="0" width="640">  <br>
         <br>
         <br>
         <br>
@@ -284,10 +280,13 @@ $ git commit -m "new change"
         <h3>Step 8: &nbsp; View the application with a browser</h3>
         <br>
         <ol type="a">
-          <li> Open your browser to http://<b>serverIdFromInstructor:90/yourStudentID</b>/index.html<br>
-          </li>
-          For example http://vcair.us:90/student0/index.html
-        </ol>
+          <li> Open your browser to http://labs.vcair.us/student<b>X</b>/index.html
+          <br>
+          Changing X to your student number.<br>
+          For example http://labs.vcair.us/student0/index.html</li>
+       
+        <li>Enjoy!</li>
+         </ol>
         <br>
         <img alt="Tearable Cloth App" style="border:1px solid black"
           src="../../static/img/tearable_cloth.png" height="250"
