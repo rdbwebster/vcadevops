@@ -1,0 +1,35 @@
+---
+
+- name: Check if artifactory is already installed
+  stat: path=/var/opt/jfrog
+  register: download_dir_exists
+
+- name: install artifactory
+  shell: mkdir /var/opt/jfrog; cd /var/opt/jfrog; wget http://bit.ly/Hqv9aj; jar -xvf Hqv9aj 
+  when:  download_dir_exists.stat.exists == False
+
+- name: get version home directory
+  shell:  find  /var/opt/jfrog -name artifactory-os*
+  register: shell_output
+
+- name: Check if link exists
+  stat: path=/var/opt/jfrog/artifactory
+  register: link_exists
+
+- name: create link
+  shell: ln -s {{shell_output.stdout}}  /var/opt/jfrog/artifactory
+  when:  link_exists.stat.exists == False
+
+
+- name: modify default config
+  lineinfile: dest="/var/opt/jfrog/artifactory/bin/artifactory.default" regexp='^#export ARTIFACTORY_HOME=/var/opt/jfrog/artifactory' line='export ARTIFACTORY_HOME=/var/opt/jfrog/artifactory'
+
+- name: modify default config
+  lineinfile: dest="/var/opt/jfrog/artifactory/bin/artifactory.default" regexp='^#export ARTIFACTORY_USER=artifactory' line='export ARTIFACTORY_USER=artifactory'
+
+- name: install artifactory as a service
+  shell: chmod +x /var/opt/jfrog/artifactory/bin/installService.sh; /var/opt/jfrog/artifactory/bin/installService.sh
+
+- name: Start Artifactory Service
+  service: name=artifactory  state=started
+
