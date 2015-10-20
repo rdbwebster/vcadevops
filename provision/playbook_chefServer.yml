@@ -7,6 +7,7 @@
     #fqdn: chef.vcloudair.io
     fqdn: chef.vcair.us
     host_name: chef
+    vca_public_ip: "{{ lookup('env','VCA_PUBLIC_IP') }}"
   tasks:
     - include: roles/common/tasks/hostname.yml
     - include: roles/common/tasks/ssh.yml

@@ -3,6 +3,6 @@
 "VCA_VDC":"DevOps-VDC",
 "VCA_INSTANCE":"97453e02-e83c-4cae-bbe9-3f7ee6dd8401",
 "VCA_PUBLIC_IP":"107.189.120.86",
-"UBUNTU_PRIVATE_KEY":"~/.ssh./ubuntu_rsa"
+"UBUNTU_PRIVATE_KEY":"~/.ssh/ubuntu_rsa"
 }
 

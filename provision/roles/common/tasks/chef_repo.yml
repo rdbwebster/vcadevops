@@ -11,11 +11,11 @@
   sudo_user: ubuntu
 
 
-#- name: Copy chef server certifiates
+- name: Copy chef server certifiates to devops server
 
-   shell: scp -P 22 ubuntu@{{ chef_ip }}:/home/ubuntu/.ssh/chef-validator.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-validator.pem
-   shell: scp -P 22 ubuntu@{{ chef_ip }}:/home/ubuntu/.ssh/chef-ubuntu.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-ubuntu.pem
-   shell: "cd ~/vcadevops/chef-repo; knife ssl fetch"
+  shell: 'scp -P 33 ubuntu@chef:/home/ubuntu/.ssh/chef-validator.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-validator.pem'
+  shell: 'scp -P 33 ubuntu@chef:/home/ubuntu/.ssh/chef-ubuntu.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-ubuntu.pem'
+  shell: "cd /home/ubuntu/vcadevops/chef-repo; knife ssl fetch"
 
 
 

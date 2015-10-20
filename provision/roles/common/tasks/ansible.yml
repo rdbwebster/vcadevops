@@ -3,6 +3,7 @@
 - name: Check if nodejs is installed
   command: dpkg-query -W nodejs
   register: pkg_check
+  failed_when: pkg_check.rc > 1
 
 - name:  add apt source for nodejs
   shell: curl -sL https://deb.nodesource.com/setup | sudo bash -

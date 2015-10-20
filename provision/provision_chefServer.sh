@@ -15,23 +15,23 @@ export ANSIBLE_HOSTS=./hosts
 
 #ssh-keyscan -t rsa1,rsa,dsa 23.92.225.229 >> ~/.ssh/known_hosts
 
-ssh-keygen -R 23.92.225.229
-ssh-keygen -R [23.92.225.229]:33
+ssh-keygen -R ${VCA_PUBLIC_IP}
+ssh-keygen -R [${VCA_PUBLIC_IP}]:33
 
 ### Login to vCloud Air
 
-echo "Logging into vCloud Air"
-vca login --password ${VCA_PASSWORD:?must be set in env} --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424 vcadevops@gmail.com
+#echo "Logging into vCloud Air"
+#vca login --password ${VCA_PASSWORD:?must be set in env} --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424 vcadevops@gmail.com
 
-vca org use --org M933009684-4424 --service M933009684-4424
+#vca org use --org M933009684-4424 --service M933009684-4424
 
 ###
 ### Chef Server
 ###
 
 # Get and Save ip
-export chef_server_ip=$(./wait_boot_ip.sh chefServerApp chefServer)
-echo chef_server_ip=${chef_server_ip} 
+#export chef_server_ip=$(./wait_boot_ip.sh chefServerApp chefServer)
+#echo chef_server_ip=${chef_server_ip} 
 
 # Provision Chef Server
 echo Provision chef server

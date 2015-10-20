@@ -4,10 +4,17 @@
   shell: wget http://localhost:8100/jnlpJars/jenkins-cli.jar
 
 - name: install required jenkins plugins
-  shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} install-plugin envinject github gradle
+  shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} install-plugin http://updates.jenkins-ci.org/download/plugins/envinject http://updates.jenkins-ci.org/download/plugins/github http://updates.jenkins-ci.org/download/plugins/gradle
 
 - name: safe restart jenkins
   shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} safe-restart
 
+#  command: cat /var/log/jenkins/jenkins.log
+#  register: log_output
+#  until: log_output.stdout.find("HTTP Listener started") > -1
+#  retries: 10
+#  delay: 30
 
+- name: Wait for Jenkins on 8100 
+  wait_for: host=devops port=8100 delay=45
 

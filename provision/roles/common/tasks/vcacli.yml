@@ -21,7 +21,10 @@
 #- name: python-pip 
 #  apt: name=python-pip update_cache=yes
 
-- name: Install pip with easy-install to avoid 'cannot import name IncompleteRead'
+- name: Install python-tools
+  apt:  name=python-setuptools
+
+- name: Install pip with easy-install to avoid 'cannot import name IncompleteRead' Error
   shell: easy_install -U pip 
 
 - name: Install vca-cli

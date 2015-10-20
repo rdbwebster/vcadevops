@@ -4,8 +4,9 @@
   sudo: yes
   vars:
     host_name: devops
-    fqdn: devops.vcloudair.io
-    devops_ip: 192.168.109.3
+    # fqdn: devops.vcloudair.io
+    fqdn: devops.vcair.us
+    #devops_ip: 192.168.109.3
 
     # use local network address for chef workstation setup
     chef_ip: "{{ lookup('env','chef_server_ip') }}"
@@ -16,17 +17,24 @@
     # cannot call out through gateway and back in on devops.vcloudair.io
     jenkins_url: http://{{ devops_ip }}:8100
   tasks:
-    - include: roles/common/tasks/hostname.yml
-    - include: roles/common/tasks/ssh.yml
-    - include: roles/common/tasks/java7.yml
-    - include: roles/common/tasks/jenkins.yml
-    - include: roles/common/tasks/chef_dk.yml
-    - include: roles/common/tasks/chef_repo.yml
-    - include: roles/common/tasks/vcacli.yml
-    - include: roles/common/tasks/devopsui.yml
-    - include: roles/common/tasks/ansible.yml
-    - include: roles/common/tasks/jenkins_plugins.yml
-    - include: roles/common/tasks/jenkins_load_jobs.yml
-    - include: roles/common/tasks/config_user_ubuntu.yml
-    - include: roles/common/tasks/config_user_jenkins.yml
-    - include: roles/common/tasks/iptables.yml
+    #- include: roles/common/tasks/hostname.yml
+    #- include: roles/common/tasks/ssh.yml
+    #- include: roles/common/tasks/java7.yml
+    #- include: roles/common/tasks/jenkins.yml
+    #- include: roles/common/tasks/chef_dk.yml
+    #- include: roles/common/tasks/chef_repo.yml
+    #- include: roles/common/tasks/vcacli.yml
+
+    # Not using flask anymore, using nginx
+    # #- include: roles/common/tasks/devopsui.yml
+    #- include: roles/common/tasks/nginx.yml
+
+#    - include: roles/common/tasks/ansible.yml
+#    - include: roles/common/tasks/jenkins_plugins.yml
+#    - include: roles/common/tasks/jenkins_load_jobs.yml
+#    - include: roles/common/tasks/config_user_ubuntu.yml
+#    - include: roles/common/tasks/config_user_jenkins.yml
+#    - include: roles/common/tasks/iptables.yml
+
+    - include: roles/common/tasks/gitlab.yml
+

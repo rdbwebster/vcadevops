@@ -1,9 +1,9 @@
 ---
 
 - name: install Java 7 openjdk
-  apt: name=openjdk-7-jdk update_cache=no
+  apt: name=openjdk-7-jdk update_cache=yes
 
-- name: Set JAVA HOME and PATHh values
+- name: Set JAVA HOME and PATH values
   lineinfile:
     dest: /etc/profile
     regexp: "{{ item.regexp }}"

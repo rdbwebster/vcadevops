@@ -1,0 +1,95 @@
+# This module requires the following variables settings at the shell level:
+# export VCA_PASS='vca login user password'
+# export ANSIBLE_HOST_KEY_CHECKING=False
+
+# variables in vars section in  {} are passed in using --extra-vars "@config.json"
+
+ 
+- hosts: localhost
+  connection: local
+  vars:
+    instanceid: '{{VCA_INSTANCE}}'
+    admin_pass: 'Vmware123!'
+    public_ip: '{{VCA_PUBLIC_IP}}'
+    vdc: "{{VCA_VDC}}"
+    template: "Ubuntu Server 12.04 LTS (amd64 20150127)"
+    catalog: "Public Catalog"
+    network: "default-routed-network"
+    vmname: "VMJenkinsDemo"
+    networkmode: "pool"
+
+  tasks:
+   - vca_vapp:
+       state: present
+       operation: poweron
+       instance_id: "{{ instanceid }}"
+       vdc_name: "{{ vdc }}"
+       catalog_name: "{{ catalog }}"
+       template_name: "{{ template }}"
+       vm_name: "{{ vmname }}"
+       vm_cpus: 4
+       vm_memory: 4096
+       network_mode: "{{ networkmode }}"
+       admin_password: '{{ admin_pass }}'
+       network_name: "{{ network }}"
+
+     register: myvm
+
+   - debug: var=myvm
+
+   # d2p3v29-ext  SNAT 192.168.109.0/24 any 107.189.113.86 any  ANY
+   # d2p3v29-ext  DNAT 107.189.113.86   22  107.189.113.86 22   TCP
+   # d2p3v29-ext  DNAT 107.189.113.86   80  107.189.113.86 80   TCP
+   - vca_nat:
+       instance_id: "{{ instanceid }}"
+       vdc_name: '{{vdc}}'
+       state: present
+       nat_rules: 
+          - rule_type: DNAT
+            original_ip: "{{ public_ip }}"
+            translated_ip: "{{ myvm.vm_details.network_info.ip }}"
+          
+          # Note: adding original_ip and original_port causes Failure without protocol_type
+          - rule_type: DNAT
+            original_ip: "{{ public_ip }}"
+            original_port: "22"
+            translated_ip: "{{ myvm.vm_details.network_info.ip }}"
+            translated_port: "22"
+            protocol_type: TCP 
+
+          - rule_type: DNAT
+            original_ip: "{{ public_ip }}"
+            original_port: "80"
+            translated_ip: "{{ myvm.vm_details.network_info.ip }}"
+            translated_port: "80"
+            protocol_type: TCP 
+          
+          # Issue SNAT gets applied to routed nextwork instead of gateway network
+          - rule_type: SNAT
+            original_ip: "192.168.109.0/24"
+            translated_ip: "{{ public_ip }}"
+         
+   #  Any:Any            107.189.113.86:Any   ANY    Allow
+   #  192.168.109.7:Any  Any:Any              ANY    Allow  
+   - vca_fw:
+       instance_id: '{{ instanceid }}'
+       vdc_name: '{{vdc}}'
+       state: present
+       fw_rules:
+         - description: "Allow all traffic to the public ip"
+           source_ip: "{{myvm.vm_details.network_info.ip}}"
+           dest_ip: "{{ public_ip }}"
+         - description: "Allow all traffic from new ip"
+           source_ip: "{{ public_ip }}"
+           dest_ip: "{{myvm.vm_details.network_info.ip}}"
+ 
+   - name: Reset ssh authorized client keys locally
+     shell: ssh-keygen -R {{ public_ip }}
+
+   - wait_for: host="{{ public_ip }}" port=22 state=started delay=5
+ 
+   - add_host: name="{{ public_ip }}" groups=nginx ansible_ssh_pass="{{ admin_pass }}"
+   
+  post_tasks:
+
+
