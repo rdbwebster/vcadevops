@@ -1,14 +1,20 @@
-
-ns/>
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
   <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>http://devops:8300/root/word-finder.git</url>
-        <credentialsId>058a9d12-b397-4e5b-a470-e25bf78fcfe0</credentialsId>
+        <url>https://github.com/vcadevops/word-finder.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -17,10 +23,6 @@ ns/>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <browser class="hudson.plugins.git.browser.GitLab">
-      <url>http://devops.vcair.us:8300/root/word-finder</url>
-      <version>7.11</version>
-    </browser>
     <submoduleCfg class="list"/>
     <extensions/>
   </scm>
@@ -29,7 +31,11 @@ ns/>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <jdk>(Default)</jdk>
-  <triggers/>
+  <triggers>
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.11.3">
+      <spec></spec>
+    </com.cloudbees.jenkins.GitHubPushTrigger>
+  </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.26">
@@ -37,8 +43,9 @@ ns/>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
             <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-              <properties>VAPP_NAME=${VAPP_NAME}
-VM_NAME=${VM_NAME}</properties>
+              <properties>VAPP_NAME=vApp2
+VM_NAME=s2ubu
+</properties>
             </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
           </configs>
           <projects>create_ubuntu</projects>
@@ -69,43 +76,28 @@ VM_NAME=${VM_NAME}</properties>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
     <hudson.tasks.Shell>
-      <command># Lookup the ip of the target node, login completed on create_ubuntu step
+      <command>ssh-keygen -R s2ubu
 
-#export SERVER_IP=`vca vm -a ${VAPP_NAME} | grep ${VM_NAME} | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
 
-# Get the app source from GitLab
-#sudo rm -rf  word-finder
-#git clone http://devops:8300/root/word-finder.git
-#sudo rm -rf /home/ubuntu/word-finder/.git
+# Provision target server with Ansible, install nodejs and setup app as service
+export ANSIBLE_HOST_KEY_CHECKING=False
 
-# Build / Syntax check the app
+pushd ~ubuntu/vcadevops/scenarios/wordFinder/ansible
+      ansible-playbook -i inventory.py playbook.yml
+popd
 
-#cd word-finder
-sudo npm -g install
-
-# Provision targer server with Ansible, install nodejs and setup app as service
-
-#export ANSIBLE_HOST_KEY_CHECKING=False
-
-#pushd ~ubuntu/vcadevops/scenarios/wordFinder/ansible
-#      ansible-playbook -i inventory.py playbook.yml
-#popd
-
-#pwd 
 
 # Move the executable
-#scp -o StrictHostKeyChecking=no -r /var/lib/jenkins/jobs/word_finder/workspace/word-finder ubuntu@${VM_NAME}:~
-
+rsync -avzhe &quot;ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null&quot; --exclude=&quot;.*&quot; /var/lib/jenkins/jobs/word_finder/workspace/ ubuntu@s2ubu:/home/ubuntu/workspace
 
 # Stop the App if a previous version is running
-#ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} export JPID=`netstat -plnt | grep 3000 | awk &apos;{print $7}&apos; | cut -d/ -f1`; if [[ -n $JPID ]]; then kill $JPID; fi
-sudo service word-finder restart
+ssh -o StrictHostKeyChecking=no ubuntu@s2ubu &quot;cd workspace &amp;&amp; sudo npm -g install&quot;
 
-# Start the App
-#ssh -o &apos;StrictHostKeyChecking=no&apos;  ubuntu@${VM_NAME} &quot;cd word-finder; nohup nodejs /home/ubuntu/word-finder/server.js &gt; /tmp/word-finder.out 2&gt;&amp;1 &lt; /dev/null &amp;&quot;
 
-# create a port mapping to the app 
-#sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 3000 ${SERVER_IP} 3000
+
+# Restart the app
+ssh-keygen -R s2ubu
+ssh -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no  ubuntu@s2ubu sudo service word-finder restart
 
 # Run Selenium test
 echo &quot;&lt;= Run Selenium Test&quot;
@@ -117,7 +109,6 @@ then
 else
   echo &quot;TEST FAILED&quot;
 fi
-
 
 echo &quot;Test with http://devops.vcair.us:3000/&quot;
 
@@ -133,12 +124,6 @@ echo &quot;Test with http://devops.vcair.us:3000/&quot;
   <buildWrappers>
     <EnvInjectBuildWrapper plugin="envinject@1.91.2">
       <info>
-        <propertiesContent>VAPP_NAME=linuxa_vapp
-VM_NAME=linuxa
-
-
-
-</propertiesContent>
         <loadFilesFromMaster>false</loadFilesFromMaster>
       </info>
     </EnvInjectBuildWrapper>
@@ -148,7 +133,7 @@ VM_NAME=linuxa
       <passwordEntries>
         <EnvInjectPasswordEntry>
           <name>VCA_PASSWORD</name>
-          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+          <value>9F+bQqVw0XLTlVB/+Dt0MN26xISUc9yUv0gDXaq2Z0M=</value>
         </EnvInjectPasswordEntry>
       </passwordEntries>
     </EnvInjectPasswordWrapper>
