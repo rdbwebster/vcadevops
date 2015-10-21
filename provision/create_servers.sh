@@ -75,6 +75,12 @@ else
 
   echo adding NAT rule for nginx  http to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 80 --translated-ip ${devops_server_ip} --translated-port 80 --protocol tcp
+
+  echo adding NAT rule for Artifactory http to gateway
+  vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 8081 --translated-ip ${devops_server_ip} --translated-port 8081 --protocol tcp
+
+  echo adding NAT rule for Selenium  http to gateway
+  vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 4444 --translated-ip ${devops_server_ip} --translated-port 4444 --protocol tcp
 fi
 
 ###

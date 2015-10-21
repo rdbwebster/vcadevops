@@ -1,0 +1,33 @@
+---
+
+
+- name: Add apt repo for Java 8
+  apt_repository: repo='ppa:webupd8team/java' state=present
+
+- name: Autoaccept license for Java
+  action: shell echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+
+- name: Autoaccept license for Java
+  action: shell echo oracle-java8-installer shared/accepted-oracle-license-v1-1 seen true | sudo /usr/bin/debconf-set-selections
+
+- name: Install Java8 
+  apt: name=oracle-java8-installer update_cache=yes state=present
+
+#  command: "{{ item }} chdir=/tmp"
+#  with_items:
+  #- debconf-set-selections <<< "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true"
+  #- debconf-set-selections <<< "oracle-java8-installer shared/accepted-oracle-license-v1-1 seen true"
+#  - apt-get update
+#  - apt-get -y install oracle-java8-installer
+
+- name: set path 
+  apt:  name=oracle-java8-set-default update_cache=no state=present
+
+- name: Set JAVA HOME and PATH values
+  lineinfile:
+    dest: /etc/profile
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^JAVA_HOME', line: 'JAVA_HOME=/usr/lib/jvm/java-8-oracle' }
+    - { regexp: "^export PATH=$JAVA_HOME", line: "export PATH=$JAVA_HOME/bin:$PATH" }

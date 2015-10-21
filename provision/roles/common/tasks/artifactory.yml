@@ -27,6 +27,9 @@
 - name: modify default config
   lineinfile: dest="/var/opt/jfrog/artifactory/bin/artifactory.default" regexp='^#export ARTIFACTORY_USER=artifactory' line='export ARTIFACTORY_USER=artifactory'
 
+- name: modify default config
+  lineinfile: dest="/var/opt/jfrog/artifactory/bin/artifactory.default" regexp='^#export JAVA_HOME' line='export JAVA_HOME=/usr/lib/jvm/java-8-oracle'
+
 - name: install artifactory as a service
   shell: chmod +x /var/opt/jfrog/artifactory/bin/installService.sh; /var/opt/jfrog/artifactory/bin/installService.sh
 
