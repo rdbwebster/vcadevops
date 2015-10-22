@@ -115,6 +115,10 @@ else
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP --original-port 33 --translated-ip ${chef_server_ip} --translated-port 22 --protocol tcp
   echo adding http NAT rule for chef http to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP --original-port 8200 --translated-ip ${chef_server_ip} --translated-port 8200 --protocol tcp
+
+  echo adding ssh NAT rule to gateway for chef redirect
+  vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP --original-port 8200 --translated-ip  ${chef_server_ip} --translated-port 8200 --protocol tcp -n d2p3v40-ext
+
   echo adding http NAT rule for chef https to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP --original-port 443 --translated-ip ${chef_server_ip} --translated-port 443 --protocol tcp
 fi

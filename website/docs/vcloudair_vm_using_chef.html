@@ -290,6 +290,27 @@ Host 192.168.109.*
       <p><br>
       </p>
       <p><br>
+        <h3>Troubleshooting</h3>
+
+          <p>
+            ERROR: Connection refused - Connection refused connecting to https://chef.vcair.us/organizations/chef/clients, giving up <br><br>
+
+Connections by knife bootstrap to the url and register the client with the server use the validator.pem key generated during the chef server install.
+Ensure the private key stored as /etc/chef/validator.pem is correct.
+If the key is lost regenerate new keys from the chef Server UI.
+
+          </p>
+
+           <p>
+            ssh password prompt for @yourpublicgatewayip <br><br>
+            ERROR: Connection refused - Connection refused connecting to https://chef.vcair.us/organizations/chef/clients, giving up <br><br>
+
+Connections by knife bootstrap to the url use the client.pem key generated during the chef server install.
+Ensure the private key stored as /etc/chef/client.pem or /etc/chef/validator.pem is correct.
+If the key is lost regenerate new keys from the chef Server UI.
+
+          </p>
+
       </p>
       <br>
       <h3>Successful execution console output <br>

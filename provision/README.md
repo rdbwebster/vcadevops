@@ -1,5 +1,5 @@
 
-This folder contains ansible scripts to provision the vca devops demo
+This folder contains ansible and vca-cli scripts to provision the vca devops demo
 
 
 

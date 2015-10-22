@@ -53,6 +53,10 @@ This scenario shows how to use the vCloud Air CLI to create a VM running Photon 
 <li>For OnDemand Service Accounts: A Photon image is available in the vCloud Air public catalog  </li>
 <li>For Subsription Service Accounts: A Photon .iso must be uploaded to a VM and stored in a VDC custom catalog  </li>
 <li>The Edge Gateway should be configured to support DNS forwarding.</li>
+<li>Note that the new VM created in this example is accessed from outside vcloud Air through an existing ssh proxy running in the VDC.  
+This approach removes the need for a new public ip on the gateway for every new VM..
+Refer to the 'Setting up ssh for vCloud Air' section in under the Docs link for details on how to configure a proxy node.
+</li>
 </ul>
 <br>
 <br>
@@ -79,7 +83,8 @@ This scenario shows how to use the vCloud Air CLI to create a VM running Photon 
 <h3>Commands</h3>
 
 Here are the vca-cli commands necessary to run the scenario.<br>
-The same commands can be executed from Jenkins as part of a build / test automation.
+.
+If executed from within vCloud Air (for example from Jenkins) then the public IP and NAT configuration steps can be omitted.
 <br>
 <br>
 Click on
@@ -91,15 +96,17 @@ Click on
 
 
 <pre class="pre-scrollable">
-vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+# Login
+vca login appstech@websterx.com --password "$VCA_PASS" --instance 97453e02-e83c-4cae-bbe9-3f7ee6dd8401 --vdc VDC1
 
-vca org use --org M933009684-4424 --service M933009684-4424
+export VAPP_NAME=vcaPhoton
+export VM_NAME=vcaPhoton
 
-vca vdc use --vdc M933009684-4424
+# Create a vApp
+vca vapp create -a $VAPP_NAME -V photonNode -c 'Public Catalog' -t 'VMware Photon OS - Tech Preview 2' -n default-routed-network  -m pool
 
-vca vapp create -a $VAPP_NAME -V $VM_NAME -c 'cf-catalog' -t 'Photon'  -n M933009684-4424-default-routed  -m DHCP
-
-vca vapp power.on --vapp $VAPP_NAME
+# power on the vApp
+vca vapp power-on --vapp $VAPP_NAME 
 
 sleep 5
 
@@ -107,9 +114,11 @@ sleep 5
 
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 |  tr -d '[[:space:]]'`
   
+# Get the initial admin password for root
+export ADMIN_PASS=$(vca vapp info --vapp $VAPP_NAME | grep admin_password | cut -d\| -f4)
 
 # ssh into Photon and enable and start Docker
-sshpass -e ssh -t -v root@${IP} "systemctl enable docker && systemctl start docker && systemctl status docker"
+sshpass -p $ADMIN_PASS -e ssh -t -v root@${IP} "systemctl enable docker && systemctl start docker && systemctl status docker"
 
 
 </pre>

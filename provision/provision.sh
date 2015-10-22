@@ -1,29 +1,58 @@
 #!/bin/bash
 
-### Provision devops demo on vCloud Air using vca-cli and ansible
+### Provision devops demo on vCloud Air using ansible
 
-### Must set VCA_PASSWORD env variable before running script
-### Must set UBUNTU_PRIVATE_KEY env variable to point to location of ubuntu private key file
+### Must set VCA_PASS env variable before running script
 
-if [ -z ${VCA_PASSWORD+x} ]; then echo "VCA_PASSWORD env variable must be set"; fi
-if [ -z ${UBUNTU_PRIVATE_KEY+x} ]; then echo "UBUNTU_PRIVATE_KEY env variable must be set"; exit 1; fi
-if [ ! -f ${UBUNTU_PRIVATE_KEY} ]; then echo "The specified private key file does not exist"; fi
+### Abort if shell command returns error
+set -e
+
+### Set no host checking 
+export ANSIBLE_HOST_KEY_CHECKING=False
+
+export VCA_USER=($(jq -r  '.VCA_USER' config.json)); echo $VCA_USER
+export VCA_VDC=($(jq  -r '.VCA_VDC' config.json)); echo $VCA_VDC
+export VCA_INSTANCE=($(jq  -r '.VCA_INSTANCE' config.json)); echo $VCA_INSTANCE
+export UBUNTU_PRIVATE_KEY=($(jq  -r '.UBUNTU_PRIVATE_KEY' config.json)); echo $UBUNTU_PRIVATE_KEY
+export VCA_PUBLIC_IP=($(jq  -r '.VCA_PUBLIC_IP' config.json)); echo $VCA_PUBLIC_IP
+
+if [ -z ${VCA_PASS+x} ]; then
+    echo "VCA_PASS must be set as environment variable"
+    exit;
+fi
+
+if [ ! -f ${UBUNTU_PRIVATE_KEY} ]; then echo "The specified private key file ${UBUNTU_PRIVATE_KEY} does not exist"; fi
 
 export ANSIBLE_HOSTS=./hosts
 
-// get new host keys to avoid possible host validation error when doing ssh
+# get new host keys to avoid possible host validation error when doing ssh
+#ssh-keyscan -t rsa1,rsa,dsa 23.92.225.229 >> ~/.ssh/known_hosts
 
-ssh-keyscan -t rsa1,rsa,dsa 23.92.225.229 >> ~/.ssh/known_hosts
+ssh-keygen -R $VCA_PUBLIC_IP
+ssh-keygen -R [${VCA_PUBLIC_IP}]:33
 
-### Login to vCloud Air
+### Login to onDemand vCloud Air
 
 echo "Logging into vCloud Air"
-vca login --password ${VCA_PASSWORD:?must be set in env} --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424 vcadevops@gmail.com
+vca login $VCA_USER --password "$VCA_PASS" --instance $VCA_INSTANCE --vdc $VCA_VDC
 
-vca org use --org M933009684-4424 --service M933009684-4424
+### Create the Servers
+
+./create_servers.sh
+
+# Get and Save devops Server ip
+export devops_server_ip=$(./wait_boot_ip.sh devopsApp devopsApp)
+echo devops_server_ip=${devops_server_ip}
 
 ###
-### Chef Server
+### Generate Ansible hosts file 
+###
+
+echo devops ansible_ssh_port=22 ansible_ssh_host=${VCA_PUBLIC_IP} > hosts
+echo chef   ansible_ssh_port=33 ansible_ssh_host=${VCA_PUBLIC_IP} >> hosts
+
+###
+### Provision Chef Server
 ###
 
 # Get and Save ip
@@ -34,17 +63,12 @@ echo chef_server_ip=${chef_server_ip}
 echo Provision chef server
 ansible-playbook  playbook_chefServer.yml -u ubuntu --private-key   ${UBUNTU_PRIVATE_KEY}  --sudo
 
+
 ###
-### devops Server
+### Provision DevOps Server
 ###
 
-# Get and Save ip
-export devops_server_ip=$(./wait_boot_ip.sh devopsApp devopsApp)
-echo devops_server_ip=${devops_server_ip}
-
-
-# Provision Devops Server
+# Provision Devops Server after Chef Server so connection to chef can be configured
 echo Provision devops server
 ansible-playbook  playbook_devopsServer.yml -i ./hosts -u ubuntu --private-key  ${UBUNTU_PRIVATE_KEY} --sudo
-
 

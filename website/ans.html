@@ -1,47 +1,54 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet"
-href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <link href="/static/css/custom.css" rel="stylesheet">
-    <link
-href="http://fonts.googleapis.com/css?family=Open+Sans:600italic,600%7CPT+Sans+Narrow%7COswald%7CPT+Sans"
-      rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script> 
+
+    <script>
       $(function(){
-         $("#header").load("./base.html"); 
+         $("#header").load("base.html");
       });
     </script>
-    <title></title>
-  </head>
-  <body>
-    <div class="container">
+    <title>Provision VMs on vCloud Air using Ansible</title>
+
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<div class="container">
       <h2>Ansible Scenario</h2>
       <div class="col-lg-8">
         <p> <br>
         </p>
         <h4> This scenario demonstrates how a developer can
-          create/provision an application on an nginx web server on CentOS server on vCloud Air. <br>
+          create/provision an application on an nginx web server on
+          CentOS server on vCloud Air. <br>
         </h4>
         <br>
         <br>
         <span class="learn-more"> Learn more about VMWare &amp; Ansible
         </span> <br>
         <a
-href="http://docs.ansible.com/ansible/list_of_cloud_modules.html"
-          target="_blank">http://docs.ansible.com/ansible/list_of_cloud_modules.html</a> <br>
+          href="http://docs.ansible.com/ansible/list_of_cloud_modules.html"
+          target="_blank">http://docs.ansible.com/ansible/list_of_cloud_modules.html</a>
+        <br>
         <br>
         <br>
         <h3>Prerequisites</h3>
         <ul>
           <li>The client workstation has Ansible installed with the
             vCloud Air addon. <br>
+            See how to setup a Mac with Ansible and the plugin <a
+              href="http://vcair.us/docs/install_ansible.html">Ansible
+              setup</a><br>
           </li>
           <li>You have a vCloud Air account for an onDemand environment.<br>
           </li>
@@ -53,10 +60,13 @@ href="http://docs.ansible.com/ansible/list_of_cloud_modules.html"
           <br>
           <ol type="1">
             <li>Connect to vCloud Air using your account credentials.</li>
-            <li>Create a new VApp/VM from a template stored in the vCloud Air Catalog
-            <li>Configure the gateway to enable outside access to the VM </li>
+            <li>Create a new VApp/VM from a template stored in the
+              vCloud Air Catalog </li>
+            <li>Configure the gateway to enable outside access to the VM
+            </li>
             <li>Download and Install nginx. </li>
-            <li>Checkout an application from GitHub and copy it to the nginx web server. </li>
+            <li>Checkout an application from GitHub and copy it to the
+              nginx web server. </li>
           </ol>
         </div>
         Once the playbook has completed, you can login to the VM using
@@ -65,8 +75,10 @@ href="http://docs.ansible.com/ansible/list_of_cloud_modules.html"
         <br>
         Here is the sample playbook<br>
         ansible-playbook new_vapp_test.yml<br>
-<a href="https://github.com/rdbwebster/ansible_vca/blob/master/ansible_deploy.xml" target="_blank">Ansible Playbook</a>
-        <br><br>
+        <a
+href="https://github.com/rdbwebster/ansible_vca/blob/master/ansible_deploy.xml"
+          target="_blank">Ansible Playbook</a> <br>
+        <br>
         Here are the ansible commands necessary to run the scenario.<br>
         The same commands can be executed from Jenkins as part of a
         build / test automation. <br>
@@ -77,12 +89,12 @@ http://devops.vcloudair.io:8900/
 </pre>
         <br>
         <br>
-          <p>Watch a video of the client execution. </p>
-<video width="400" controls>
-  <source src="static/video/Ansible_vca_app_deploy.mp4" type="video/mp4">
-  Your browser does not support HTML5 video.
-</video>
-      </div>
+        <p>Watch a video of the client execution. </p>
+        <video controls="controls" height="288" width="512">
+          <source
+src="https://www.dropbox.com/s/inmyncqwudv66tc/Ansible_vca_app_deploy_l.mp4?dl=1"
+            type="video/mp4"> Your browser does not support HTML5 video.
+        </video> </div>
     </div>
   </body>
 </html>
