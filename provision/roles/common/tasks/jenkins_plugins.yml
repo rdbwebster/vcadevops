@@ -1,13 +1,32 @@
 ---
 
-- name: get jenkins cli
-  shell: wget http://localhost:8100/jnlpJars/jenkins-cli.jar
 
-- name: install required jenkins plugins
-  shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} install-plugin http://updates.jenkins-ci.org/download/plugins/envinject http://updates.jenkins-ci.org/download/plugins/github http://updates.jenkins-ci.org/download/plugins/gradle
+# Use curl as load through cli does not actually install plugins
+
+- name: get Jenkins envinject plugin
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/envinject.hpi
+
+- name: get Jenkins plugin github
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/github.hpi
+
+- name: get Jenkins plugin git
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/git.hpi
+
+- name: get Jenkins plugin gitlab
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/gitlab-plugin.hpi
+
+- name: get Jenkins plugin gradle
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/gradle.hpi
+
+- name: get Jenkins plugin scps
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/scp.hpi
+
+- name: get Jenkins parameterized trigger
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/parameterized-trigger.hpi
 
 - name: safe restart jenkins
-  shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} safe-restart
+  shell: curl http://localhost:8100/reload
+  #shell: java -jar jenkins-cli.jar -s {{ jenkins_url }} safe-restart
 
 #  command: cat /var/log/jenkins/jenkins.log
 #  register: log_output

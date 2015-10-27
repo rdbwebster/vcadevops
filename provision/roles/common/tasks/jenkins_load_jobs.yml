@@ -21,11 +21,14 @@
   ignore_errors: yes
 
 - name: Load Jenkins Chef_Knife
-  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job Chef_Knife  < /home/ubuntu/vcadevops/scenarios/chefKnife/jenkins/chef_knife_config.xml
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job Chef_Knife  < /home/ubuntu/vcadevops/scenarios/chefKnife/jenkins/config.xml
   ignore_errors: yes
 
 - name: Load Jenkins job reset_demo
   shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job reset_demo  < /home/ubuntu/vcadevops/scenarios/resetDemo/jenkins/config.xml
   ignore_errors: yes
 
+- name: Load Jenkins job word_finder
+  shell: java -jar ~ubuntu/jenkins-cli.jar -s {{ jenkins_url }}/ create-job word_finder  < /home/ubuntu/vcadevops/scenarios/wordFinder/jenkins/config.xml
+  ignore_errors: yes
 

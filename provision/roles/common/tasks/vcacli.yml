@@ -21,12 +21,19 @@
 #- name: python-pip 
 #  apt: name=python-pip update_cache=yes
 
-- name: Install python-tools
-  apt:  name=python-setuptools
+#- name: Install python-tools
+#  apt:  name=python-setuptools
+
+- name: python-setuptools
+  shell: pip install --upgrade setuptools
+
+- name: upgrade python request module to avoid insecureplatform warnings
+  shell: pip install requests[security]
+
 
 - name: Install pip with easy-install to avoid 'cannot import name IncompleteRead' Error
   shell: easy_install -U pip 
 
 - name: Install vca-cli
-  shell: pip install vca-cli==10rc8
+  shell: pip install vca-cli
 

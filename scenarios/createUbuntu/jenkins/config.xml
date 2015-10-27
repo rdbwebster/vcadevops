@@ -30,7 +30,6 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <jdk>(Default)</jdk>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
@@ -55,9 +54,13 @@ if [[ $(ping -c 1 ${VM_NAME}) &amp;&amp; $? -eq 0 ]]; then
 fi
 
 
-# Login using vca-cli
-vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
-vca vdc use --vdc M933009684-4424
+# Login using vca-cli r13 subscription
+# vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+# vca vdc use --vdc M933009684-4424
+
+# Login using vca-cli r13 onDemand
+vca login  appstech@websterx.com --password ${VCA_PASSWORD} --instance &apos;97453e02-e83c-4cae-bbe9-3f7ee6dd8401&apos; 
+vca vdc use --vdc DevOps-VDC
 
 export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
@@ -68,7 +71,7 @@ if [ ${#IP} -lt 1 ]
   then
 
   echo &quot;Create VApp&quot;
-  vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;Ubuntu Server 12.04 LTS (amd64 20150127)&apos; -n M933009684-4424-default-routed -m DHCP 
+  vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;Ubuntu Server 12.04 LTS (amd64 20150127)&apos; -n default-routed-network -m pool
  
   echo &quot;Customize Vapp&quot;
   vca vapp customize --vapp $VAPP_NAME --vm $VM_NAME --file ~/add_public_ssh_key.sh
@@ -95,13 +98,13 @@ echo &quot;=&gt; New Server ${VM_NAME} created at ${IP}&quot;
   </builders>
   <publishers/>
   <buildWrappers>
-    <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
+    <EnvInjectPasswordWrapper plugin="envinject@1.92.1">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>
       <passwordEntries>
         <EnvInjectPasswordEntry>
           <name>VCA_PASSWORD</name>
-          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+          <value>EKvLs32P7c4qvfTpgrv8mxcTFP3XIRlUtDxD/WKvR6M=</value>
         </EnvInjectPasswordEntry>
       </passwordEntries>
     </EnvInjectPasswordWrapper>

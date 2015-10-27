@@ -1,12 +1,21 @@
 ---
 
-- name: Add Jenkins to apt source list
-  shell: wget  -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key > /tmp/key
-  shell: apt-key add  /tmp/key
-  shell: echo "deb http://pkg.jenkins-ci.org/debian binary/" >> /etc/apt/sources.list
+- name: Check if Jenkins is already downloaded
+  stat: path=/tmp/jenkins_1.634_all.deb
+  register: download_exists
+
+- name: Get specific Jenkins Version
+  shell: cd /tmp/; wget http://pkg.jenkins-ci.org/debian/binary/jenkins_1.634_all.deb
+  when:  download_exists.stat.exists == False
+
+#- name: Add Jenkins to apt source list
+#  shell: wget  -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key > /tmp/key
+#  shell: apt-key add  /tmp/key
+#  shell: echo "deb http://pkg.jenkins-ci.org/debian binary/" >> /etc/apt/sources.list
 
 - name: install Jenkins CI Server
-  apt: name=jenkins update_cache=no force=yes
+#  apt: name=jenkins update_cache=yes force=yes
+  apt: deb=/tmp/jenkins_1.634_all.deb state=present
 
 - name: config
   lineinfile:
@@ -16,9 +25,19 @@
   with_items:
     - { regexp: '^HTTP_PORT', line: 'HTTP_PORT=8100' }
     - { regexp: '^#JAVA_ARGS="-Xmx256m"', line: 'JAVA_ARGS="-Xmx256m"' }
+    - { regexp: '^JAVA', line: 'JAVA="$JAVA_HOME/bin/java"' }
+
+- name: add before the match
+  lineinfile: dest=/etc/default/jenkins 
+                regexp='^JAVA'
+                insertbefore='^Java'
+                line='JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64'
 
 - name: restart jenkins service
   service: name=jenkins state=restarted
 
+- name: add required project support files
+  shell: cp /home/ubuntu/vcadevops/chef-repo/add_public_ssh_key.sh /var/lib/jenkins/add_public_ssh_key.sh
 
-
+- name: add .ssh to jenkins home
+  shell: mkdir /var/lib/jenkins/.ssh; chown jenkins /var/lib/jenkins/.ssh;  chmod 700 /var/lib/jenkins/.ssh

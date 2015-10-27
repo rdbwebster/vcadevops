@@ -47,3 +47,74 @@ $ pip install vca-cli==10rc8
 
 // for partial processing of just one server use the run_playbook_chefServer.sh
 // and the run_playbook_devopsServer.sh
+
+
+// POST PROVISION STEPS
+
+
+
+Jenkins
+------
+
+> Secure Jenkins
+
+Goto jenkins url http://devops.vcloudair.io:8100
+Click on - Manage Jenkins  (on left side of page)
+Click on - Configure System
+
+Check - Enable Security
+      - Jenkins Own User Database  + allow users to sign up
+      - Anyone can do anything
+Save this page
+
+Then on main page click - Sign up - and add a new user admin / whateveryouwant
+
+Then go back into Manage Jenkins / Configure Jenkins and check
+      - UNCHECK Allow users to sign up
+      - CHECK Logged in users can do anything
+
+> Set bash as default shell 
+In console -> Manage Jenkins -> Configure System
+In Shell Section 
+Set Shell executable field to 
+/bin/bash
+
+
+GitLab
+------
+> Login to Gitlab and change password
+
+Username: root
+Password: 5iveL!fe
+
+Default Username: root
+Default Password: 5iveL!fe
+change to your choice of password
+
+>Checkin wordfinder project
+- helpful notes here https://git-scm.com/book/en/v2/Git-on-the-Server-GitLab
+
+First login to gitlab console, click create new Project
+Add a project named word-finder, check the public radio button.
+
+Next, Login to devops server as ubuntu using terminal
+
+cd /Users/bwebster/apps/vcadevopsenv/vcadevops/scenarios/wordFinder/word-finder
+
+git remote add gitlab http://vcair.us:8300/root/word-finder.git
+
+git remote -v
+
+git push gitlab  master
+
+supply  root/ password you set above for root as creds
+
+
+Setup Jenkins Hook from Github
+
+    Go to https://github.com/vcadevops/word-finder > Settings > Webhooks & Services > Services > Add a Service > Jenkins (Github plugin)
+
+    Jenkins hook url: http://devops.vcair.us:8100/github-webhook/
+
+    Be sure Active is checked and click Add Service
+

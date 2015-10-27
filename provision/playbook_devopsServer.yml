@@ -18,26 +18,32 @@
     # cannot call out through gateway and back in on devops.vcloudair.io
     jenkins_url: http://{{ devops_ip }}:8100
   tasks:
-     - include: roles/common/tasks/hostname.yml
-     - include: roles/common/tasks/ssh.yml
-     - include: roles/common/tasks/java8.yml
-     - include: roles/common/tasks/jenkins.yml
-     - include: roles/common/tasks/chef_dk.yml
-     - include: roles/common/tasks/chef_repo.yml
-     - include: roles/common/tasks/vcacli.yml
+     #- include: roles/common/tasks/hostname.yml
+     #- include: roles/common/tasks/ssh.yml
+
+     # Java 7 for Jenkins
+     #- include: roles/common/tasks/java7.yml
+
+     # Java 8 for Artifactory
+     #- include: roles/common/tasks/java8.yml
+
+     #- include: roles/common/tasks/jenkins.yml
+     #- include: roles/common/tasks/chef_dk.yml
+     #- include: roles/common/tasks/chef_repo.yml
+     #- include: roles/common/tasks/vcacli.yml
 
      # Not using flask anymore, using nginx
      # #- include: roles/common/tasks/devopsui.yml
-     - include: roles/common/tasks/nginx.yml
+     #- include: roles/common/tasks/nginx.yml
 
-     - include: roles/common/tasks/ansible.yml
-     - include: roles/common/tasks/jenkins_plugins.yml
-     - include: roles/common/tasks/jenkins_load_jobs.yml
-     - include: roles/common/tasks/config_user_ubuntu.yml
-     - include: roles/common/tasks/config_user_jenkins.yml
-     - include: roles/common/tasks/iptables.yml
+     #- include: roles/common/tasks/ansible.yml
+     #- include: roles/common/tasks/jenkins_plugins.yml
+     #- include: roles/common/tasks/jenkins_load_jobs.yml
+     #- include: roles/common/tasks/config_user_ubuntu.yml
+     #- include: roles/common/tasks/config_user_jenkins.yml
+     #- include: roles/common/tasks/iptables.yml
 
-     - include: roles/common/tasks/gitlab.yml
-     - include: roles/common/tasks/artifactory.yml
-     - include: roles/common/tasks/selenium.yml
+     #- include: roles/common/tasks/gitlab.yml
+     #- include: roles/common/tasks/artifactory.yml
+     #- include: roles/common/tasks/selenium.yml
 

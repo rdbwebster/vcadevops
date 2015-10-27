@@ -81,7 +81,15 @@ else
 
   echo adding NAT rule for Selenium  http to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 4444 --translated-ip ${devops_server_ip} --translated-port 4444 --protocol tcp
+
+  echo adding NAT rule for redirect to iptables for routing through devops server
+  vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port ANY --translated-ip ${devops_server_ip} --translated-port ANY --protocol tcp
 fi
+
+# Add the private key to the ubuntu server so it can ssh to other servers created by jenkins
+scp -i ${UBUNTU_PRIVATE_KEY} ${UBUNTU_PRIVATE_KEY} ubuntu@$VCA_PUBLIC_IP:~/.ssh/id_rsa
+ssh -o 'StrictHostKeyChecking=no' -i ${UBUNTU_PRIVATE_KEY}  ubuntu@$VCA_PUBLIC_IP "chmod 700 ~ubuntu/.ssh/ubuntu_rsa > log.out 2> log.err < /dev/null &"
+
 
 ###
 ### Chef Server
@@ -123,4 +131,12 @@ else
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP --original-port 443 --translated-ip ${chef_server_ip} --translated-port 443 --protocol tcp
 fi
 
+
+# Add an entry to devops server hosts file that points to chef server
+# use tee for sudo append
+ssh -o 'StrictHostKeyChecking=no' -i ${UBUNTU_PRIVATE_KEY}  ubuntu@$VCA_PUBLIC_IP "echo "${chef_server_ip} chef.vcair.us chef" | sudo tee -a /etc/hosts"
+
+# Add an entry to chef server hosts file that points to devops server
+# use tee for sudo append
+ssh -o 'StrictHostKeyChecking=no' -i ${UBUNTU_PRIVATE_KEY} -p33  ubuntu@$VCA_PUBLIC_IP "echo "${devops_server_ip} devops.vcair.us devops" | sudo tee -a /etc/hosts"
 
