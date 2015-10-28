@@ -9,37 +9,51 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <jdk>(Default)</jdk>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+      <command># Login using vca-cli r13 onDemand
+vca login  appstech@websterx.com --password ${VCA_PASSWORD} --instance &apos;97453e02-e83c-4cae-bbe9-3f7ee6dd8401&apos; 
+vca vdc use --vdc DevOps-VDC
 
-vca vdc use --vdc M933009684-4424
+if [[ $(vca vapp list | cut -d&apos;|&apos; -f2 | grep vApp1) ]]
+then
+  vca vapp delete -a vApp1
+fi
 
-vca vapp delete -a vApp1
+if [[ $(vca vapp list | cut -d&apos;|&apos; -f2 | grep vApp2) ]]
+then
+  vca vapp delete -a vApp2
+fi
 
-vca vapp delete -a vApp2
+if [[ $(vca vapp list | cut -d&apos;|&apos; -f2 | grep vApp3) ]]
+then
+  vca vapp delete -a vApp3
+fi
 
-vca vapp delete -a vApp3
+if [[ $(vca vapp list | cut -d&apos;|&apos; -f2 | grep vApp4) ]]
+then
+  vca vapp delete -a vApp4
+fi
 
-vca vapp delete -a vApp4
-
-vca vapp delete -a vApp5
+if [[ $(vca vapp list | cut -d&apos;|&apos; -f2 | grep vApp5) ]]
+then
+  vca vapp delete -a vApp5
+fi
 
 echo &quot;=&gt; Removed demo Test Servers&quot;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers>
-    <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
+    <EnvInjectPasswordWrapper plugin="envinject@1.92.1">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>
       <passwordEntries>
         <EnvInjectPasswordEntry>
           <name>VCA_PASSWORD</name>
-          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
+          <value>EKvLs32P7c4qvfTpgrv8mxcTFP3XIRlUtDxD/WKvR6M=</value>
         </EnvInjectPasswordEntry>
       </passwordEntries>
     </EnvInjectPasswordWrapper>
