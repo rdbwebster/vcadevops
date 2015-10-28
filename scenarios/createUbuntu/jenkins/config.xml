@@ -1,7 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>Creates an ubuntu 12 vApp/VM on vCloud Air&#xd;
+Expects input parameters&#xd;
+VAPP_NAME&#xd;
+VM_NAME&#xd;
+&#xd;
+Note: ubuntu vm names are used has hostnames and cannot contain underscore characters.&#xd;
+      vca-cli will fail with message &apos;unable to set hostname&apos; if the vm name contains any _ characters.</description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>-1</daysToKeep>
     <numToKeep>5</numToKeep>
@@ -46,7 +52,7 @@ fi
 
 echo VAPP_NAME=${VAPP_NAME} VM_NAME=${VM_NAME}
 
-# Check for existing server
+# Quick Check for existing server, indeterminate
 
 if [[ $(ping -c 1 ${VM_NAME}) &amp;&amp; $? -eq 0 ]]; then
   echo &quot;Found Existing Server ${VM_NAME}!&quot;
