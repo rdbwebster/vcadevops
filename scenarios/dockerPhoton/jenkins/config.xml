@@ -2,7 +2,8 @@
 <project>
   <actions/>
   <description>The job demonstrates the deployment of a NGINX web server container to a Photon Server.&#xd;
-The photon server will be created if it does not exist (using create_photon)</description>
+The photon server will be created if it does not exist.&#xd;
+This job has a dependency on the Jenkins EnvInject Plugin</description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>-1</daysToKeep>
     <numToKeep>5</numToKeep>
@@ -16,51 +17,53 @@ The photon server will be created if it does not exist (using create_photon)</de
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <jdk>(Default)</jdk>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.26">
-      <configs>
-        <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
-          <configs>
-            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-              <properties>VAPP_NAME=${VAPP_NAME}
-VM_NAME=${VM_NAME}
-</properties>
-            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-          </configs>
-          <projects>create_photon</projects>
-          <condition>ALWAYS</condition>
-          <triggerWithNoParameters>false</triggerWithNoParameters>
-          <block>
-            <buildStepFailureThreshold>
-              <name>FAILURE</name>
-              <ordinal>2</ordinal>
-              <color>RED</color>
-              <completeBuild>true</completeBuild>
-            </buildStepFailureThreshold>
-            <unstableThreshold>
-              <name>UNSTABLE</name>
-              <ordinal>1</ordinal>
-              <color>YELLOW</color>
-              <completeBuild>true</completeBuild>
-            </unstableThreshold>
-            <failureThreshold>
-              <name>FAILURE</name>
-              <ordinal>2</ordinal>
-              <color>RED</color>
-              <completeBuild>true</completeBuild>
-            </failureThreshold>
-          </block>
-          <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
-        </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
-      </configs>
-    </hudson.plugins.parameterizedtrigger.TriggerBuilder>
     <hudson.tasks.Shell>
-      <command>echo &quot;=&gt; Login to vCloud Air previously done by &apos;Check for existing server&apos; job&quot;
-echo &quot;=&gt; Get Server IP&quot;
-export SERVER_IP=$(vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | sed -e &apos;s/^[[:space:]]*//&apos;)
+      <command># Remove &quot;&quot; from input variables if present
+VAPP_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VAPP_NAME`
+VM_NAME=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $VM_NAME`
+
+# Login to vCloud Air vchs
+
+#vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+#vca vdc use --vdc M933009684-4424
+
+# Login to vCloud Air onDemand
+vca login  appstech@websterx.com --password ${VCA_PASSWORD} --instance &apos;97453e02-e83c-4cae-bbe9-3f7ee6dd8401&apos; 
+vca vdc use --vdc DevOps-VDC
+
+export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $SERVER_IP
+
+# Create new Photon Server and start docker, skip if Server already exists 
+if [ ${#SERVER_IP} -lt 1 ]
+  then
+    vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;VMware Photon OS - Tech Preview 2&apos;  -n default-routed-network  -m pool
+    vca vapp power-on --vapp $VAPP_NAME
+
+  # get the new vm ip 
+  SERVER_IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
+  
+  # Add host entry 
+  sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${SERVER_IP} ${VM_NAME}
+
+  # Get the initial root password
+  export SSHPASS=$(vca vapp info --vapp $VAPP_NAME | grep admin_password | cut -d&apos;|&apos; -f4)
+  # Remove leading and trailing spaces
+  SSHPASS=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $SSHPASS`
+  
+  # ssh to Proton Server and enable and start Docker
+  sshpass  -e ssh -o StrictHostKeyChecking=no -t -v root@${IP} &quot;systemctl enable docker &amp;&amp; systemctl start docker &amp;&amp; systemctl status docker&quot; 
+
+else  
+
+  # Get the initial root password
+  export SSHPASS=$(vca vapp info --vapp $VAPP_NAME | grep admin_password | cut -d&apos;|&apos; -f4)
+  # Remove leading and trailing spaces
+  SSHPASS=`sed -e &apos;s/^&quot;//&apos; -e &apos;s/&quot;$//&apos; &lt;&lt;&lt; $SSHPASS`
+
+fi
 
 # check for existing container deployment
 echo &quot;=&gt; Check for existing container deployment&quot;
@@ -72,15 +75,15 @@ if [ ${#name} -gt 1 ]
   then
   echo &quot;=&gt; Removing existing container named ${name} &quot;
   
-  sshpass -e ssh -t root@${SERVER_IP} docker stop ${name} 
-  sshpass -e ssh -t root@${SERVER_IP} docker rm ${name}
+  sshpass -e ssh  -o StrictHostKeyChecking=no -t root@${SERVER_IP} docker stop ${name} 
+  sshpass -e ssh  -o StrictHostKeyChecking=no -t root@${SERVER_IP} docker rm ${name}
 fi
 
 # install nginx container and start
 echo &quot;=&gt; Deploy Container vmwarecna/nginx&quot;
 sshpass -e ssh -t root@${SERVER_IP} &quot;docker run -d -p 80:80 vmwarecna/nginx &amp;&amp; docker ps&quot;
 
-# create a port mapping to the app 
+# create a port mapping to the app using iptables
 sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 9999 ${SERVER_IP} 80
 
 # Test with browser using url 
@@ -90,24 +93,20 @@ echo &quot;=&gt; Test with browser http://devops.vcair.us:9999&quot;
   </builders>
   <publishers/>
   <buildWrappers>
-    <EnvInjectBuildWrapper plugin="envinject@1.91.2">
+    <EnvInjectBuildWrapper plugin="envinject@1.92.1">
       <info>
         <propertiesContent>VAPP_NAME=vApp1
 VM_NAME=s1pho</propertiesContent>
         <loadFilesFromMaster>false</loadFilesFromMaster>
       </info>
     </EnvInjectBuildWrapper>
-    <EnvInjectPasswordWrapper plugin="envinject@1.91.2">
+    <EnvInjectPasswordWrapper plugin="envinject@1.92.1">
       <injectGlobalPasswords>false</injectGlobalPasswords>
       <maskPasswordParameters>true</maskPasswordParameters>
       <passwordEntries>
         <EnvInjectPasswordEntry>
           <name>VCA_PASSWORD</name>
-          <value>Hy4LyJbLh2Jf8PqDgO4IrDVg4sXK08WaIv33ATuxqho=</value>
-        </EnvInjectPasswordEntry>
-        <EnvInjectPasswordEntry>
-          <name>SSHPASS</name>
-          <value>9F+bQqVw0XLTlVB/+Dt0MN26xISUc9yUv0gDXaq2Z0M=</value>
+          <value>EKvLs32P7c4qvfTpgrv8mxcTFP3XIRlUtDxD/WKvR6M=</value>
         </EnvInjectPasswordEntry>
       </passwordEntries>
     </EnvInjectPasswordWrapper>

@@ -13,7 +13,7 @@
     echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/base
 
     # No Hairpin NAT, Chef Client must stay on internal network
-    echo "192.168.109.3  devops.vcloudair.io" >> /etc/hosts
+ #   echo "192.168.109.3  devops.vcloudair.io" >> /etc/hosts
 
     echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDnD0tFDxOGD9O9gcaXD/2g1btxqjww8g6aPoc4RumbqwAvR4EYDQXkPrL08xGcLZttieSf+c3q6ZL4Vu7cDg+79/lbtZFk4f552+syhz27NUzPUMcSIdTL4PjDJv523WV6C+Jen9BadwhkyxwcQhU3nmwjkv+euHrxk03PtSiEBJTNMgQdsxw4fndA/9Pqh2TSShRUtEIbY35wQt0mxpvomANLTtR2nxuzWS1GQY69um0mR26++x33E5ylQOr2eiJO++73V+IZxgjRY06vQSUKZGc64H3BJlX2BKmABbV3sVji82mmkDyFK3yX538WRwUbvmuGSbVfiyKTIs7UK21f bwebster@bwebster-mbpro.local' >> /home/ubuntu/.ssh/authorized_keys
 

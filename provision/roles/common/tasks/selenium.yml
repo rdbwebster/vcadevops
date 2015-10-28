@@ -2,12 +2,24 @@
   stat: path=/var/opt/selenium
   register: download_dir_exists
 
-- name: download selenium
+- name: download and "install" selenium server
   shell: mkdir /var/opt/selenium; cd /var/opt/selenium; wget http://goo.gl/PJUZfa
   when:  download_dir_exists.stat.exists == False
 
+- name: install selenium and pyvirtualdisplay python modules
+  shell: pip install selenium pyvirtualdisplay
+
+- name: install selenium-webdriver and rspec
+  shell: cd /home/ubuntu/vcadevops/chef-repo; /usr/bin/gem install selenium-webdriver; /usr/bin/gem install rspec
+
 - name: Copy across upstart service config for selenium
   template: src=selenium.conf.j2 dest=/etc/init/selenium.conf owner=root group=root  mode=0644
+
+- name: install firefox 
+  apt: name=firefox update_cache=no
+
+- name: install firefox and xvfb
+  apt: name=xvfb update_cache=no
 
 - name: Start Service
   service: name=selenium state=restarted

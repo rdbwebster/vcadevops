@@ -11,7 +11,7 @@ to avoid conflicts it is probably best to just edit the html on the desktop and 
 
 If the vcair site for some reason needs to sync with github a git pull can be performed to sync the site with the repo.
 
-The original website used flask with its internal web server, but the embedded template macros for service side includes  made it difficult 
+The original website used flask with its internal web server, but the embedded template macros for service side includes made it difficult 
 to edit html content remotely as server side commands would not run and would appear as non html markup.
 
 An nginx server to host the site can be installed on ubuntu using this command:
@@ -74,4 +74,6 @@ sudo service nginx resart
 // access site at
 
 http://vcair.us
+
+Can also install NGINX on mac and run site on workstation for html pages.
 

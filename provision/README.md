@@ -60,18 +60,40 @@ Jenkins
 
 Goto jenkins url http://devops.vcloudair.io:8100
 Click on - Manage Jenkins  (on left side of page)
-Click on - Configure System
+Click on - Configure System or watch for Setup Security button on right 
 
 Check - Enable Security
       - Jenkins Own User Database  + allow users to sign up
       - Anyone can do anything
 Save this page
 
-Then on main page click - Sign up - and add a new user admin / whateveryouwant
+Then on main page click - Sign up - and add a new user admin or jenkins/ passwd_as_whateveryouwant
+
 
 Then go back into Manage Jenkins / Configure Jenkins and check
       - UNCHECK Allow users to sign up
-      - CHECK Logged in users can do anything
+
+Login using browser with jenkins / devops123
+
+Then check matrix based security
+Add a jenkins or admin user
+check all boxes for jenkins/admin
+For anonymous user check
+Overall Read
+Job Discover
+Job Extended Read (requires Hudson Extended Read plugin)
+Discover
+Note:// if this does not work, and you are locked out, shut off security in the jenkins config file
+vi /var/lib/jenkins/config.xml  
+// change useSecurity to false
+service jenkins restart
+
+Confirm all plugins are installed.
+API plugin installation is not reliable.
+You must confirm all plugins loaded and manually load any if missing.
+The reload all jobs since sections in jobs that reference missing plugins will have been dropped.
+
+
 
 > Set bash as default shell 
 In console -> Manage Jenkins -> Configure System

@@ -4,9 +4,6 @@ cd -
 
 #java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ help --username admin --password $PASSWORD
 
-# create_photon
-java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job create_photon --username admin --password $PASSWORD  > ./createPhoton/jenkins/config.xml
-
 # create_ubuntu
 java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job create_ubuntu --username admin --password $PASSWORD > ./createUbuntu/jenkins/config.xml
 

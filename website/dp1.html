@@ -32,7 +32,7 @@
 <p>
 <br>
 <h4>
-This scenario shows how to deploy a NGINX container onto Photon.
+This scenario shows how to create a Photon Server on vCloud Air and deploy a NGINX Web Server packaged in a container.
 
 </h4>
 <br>
@@ -44,7 +44,7 @@ This scenario shows how to deploy a NGINX container onto Photon.
 <br>
 <h3>Prerequisites</h3>
 <ul>
-<li> This scenario assumes a Photon Server has been deployed to the devops demo environment. <br>(See the other scenarios if needed)</li>
+<li> Login credentials for a vCloud Air onDemand Account.</li>
 
 </ul>
 <br>
@@ -61,9 +61,10 @@ This scenario shows how to deploy a NGINX container onto Photon.
 <br>
  <ol type="1">
 
-<li> Connect to vCloud Air and lookup the IP for the Photon Server. (optional step)</li>
-<li> SSH into the Photon Server and issue a docker run command </li>
-<li> Add an iptables http port mapping so the app can be accessed through devops.vcloudair.io</li>
+<li> Connect to vCloud Air and create a new Photon Server, if one does not exist.
+<li> SSH into the Photon Server and Start the docker service </li>
+<li> SSH into docker and install the NGINX container
+<li> Add an iptables http port mapping so the app can be accessed with a browser at http://vcair.us:9999</li>
 </ol>
 
 </div>

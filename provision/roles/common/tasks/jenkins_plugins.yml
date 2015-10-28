@@ -6,11 +6,11 @@
 - name: get Jenkins envinject plugin
   shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/envinject.hpi
 
-- name: get Jenkins plugin github
-  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/github.hpi
-
 - name: get Jenkins plugin git
   shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/git.hpi
+
+- name: get Jenkins plugin github
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/github.hpi
 
 - name: get Jenkins plugin gitlab
   shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/gitlab-plugin.hpi
@@ -23,6 +23,9 @@
 
 - name: get Jenkins parameterized trigger
   shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/parameterized-trigger.hpi
+
+ - name: get Jenkins Extended Read Permission so Anonymous users can view job configuration
+  shell: cd /var/lib/jenkins/plugins/download/plugins; curl -O http://updates.jenkins-ci.org/latest/extended-read-permission.hpi
 
 - name: safe restart jenkins
   shell: curl http://localhost:8100/reload

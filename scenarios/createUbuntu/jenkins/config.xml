@@ -46,7 +46,7 @@ fi
 
 echo VAPP_NAME=${VAPP_NAME} VM_NAME=${VM_NAME}
 
-# Try Quick check for existing server
+# Check for existing server
 
 if [[ $(ping -c 1 ${VM_NAME}) &amp;&amp; $? -eq 0 ]]; then
   echo &quot;Found Existing Server ${VM_NAME}!&quot;
@@ -72,7 +72,7 @@ if [ ${#IP} -lt 1 ]
 
   echo &quot;Create VApp&quot;
   vca vapp create -a $VAPP_NAME -V $VM_NAME -c &apos;Public Catalog&apos; -t &apos;Ubuntu Server 12.04 LTS (amd64 20150127)&apos; -n default-routed-network -m pool
- 
+  
   echo &quot;Customize Vapp&quot;
   vca vapp customize --vapp $VAPP_NAME --vm $VM_NAME --file ~/add_public_ssh_key.sh
   
@@ -83,12 +83,18 @@ if [ ${#IP} -lt 1 ]
   
 fi
 
+if [ ${#IP} -lt 1 ]
+then
+  echo &quot;Failed to retrieve Server IP&quot;
+  return -1
+fi
+
 # Set Host Name
-echo &quot;=&gt; Set Host Name&quot;
-/home/ubuntu/vcadevops/scenarios/jenkins/set_host_name.sh $IP precise-amd64 $VM_NAME
+#echo &quot;=&gt; Set Host Name&quot;
+#/home/ubuntu/vcadevops/scenarios/jenkins/set_host_name.sh $IP precise-amd64 $VM_NAME
   
   
-# Add host entry 
+# Add entry to /etc/host so Jenkins jobs can access server by hostname 
 echo &quot;=&gt; Register hostname&quot;
 sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${IP} ${VM_NAME}
 

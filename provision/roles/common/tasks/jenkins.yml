@@ -39,5 +39,8 @@
 - name: add required project support files
   shell: cp /home/ubuntu/vcadevops/chef-repo/add_public_ssh_key.sh /var/lib/jenkins/add_public_ssh_key.sh
 
-- name: add .ssh to jenkins home
+- name: add .ssh to jenkins home 
   shell: mkdir /var/lib/jenkins/.ssh; chown jenkins /var/lib/jenkins/.ssh;  chmod 700 /var/lib/jenkins/.ssh
+
+- name: place ubuntu key in jenkins home for jenkins use to login to created servers
+  shell: cp ~ubuntu/.ssh/id_rsa ~jenkins/.ssh/ubuntu_rsa; chown jenkins ~jenkins/.ssh/ubuntu_rsa;  chmod 700 ~jenkins/.ssh/ubuntu_rsa
