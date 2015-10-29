@@ -10,12 +10,11 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
 
-    <script>
+    <script> 
       $(function(){
-         $("#header").load("base.html");
+         $("#header").load("base.html"); 
       });
-    </script>
-    <title>Provision VMs on vCloud Air using a Chef Client running on a Mac</title>
+    </script> 
 
 </head>
 
@@ -23,82 +22,88 @@
 
 <div id="header"></div>
 
+
 <div class="container">
-      <h2>Chef Remote Client Scenario</h2>
-      <div class="col-lg-8">
-        <p> <br>
-        </p>
-        <h4> Create a VM on vCloud Air from an Chef client
-          running on a Mac outside vCloud Air.  <br>
- </h4>
-        <br>
-        <br>
-        <span class="learn-more"> Learn more about VMWare &amp; Chef
-        </span> <br>
+        <h2>Web Server Scenario</h2>
+
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+This scenario demonstrates how a developer can configure an existing Server
+to be a corporate standard web server running nginx. 
+</h4>
+<br>
+<br>
+<span class="learn-more"> Learn more about VMWare & Chef </span> <br>
 <a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
-
-        <br>
-        <br>
-        <br>
-        <h3>Prerequisites</h3>
-        <ul>
-          <li>The client workstation has the Chef Client installed with the
-            vCloud Air addon. <br>
-            See how to setup a Mac with the Chef Client and vCloud Air add on  <a
-              href="http://vcair.us/docs/install_chef_client.html">Chef Knife setup</a><br>
-          </li>
-          <li>You have a vCloud Air account for an onDemand environment.<br>
-          </li>
-        </ul>
-        <br>
-        <br>
-        <img src="/static/img/ans1.png"> <br>
-        <div class="center-block"> Chef  will ... <br>
-          <br>
-          <ol type="1">
-            <li>Connect to vCloud Air using your account credentials.</li>
-            <li>Create a new VApp/VM from a template stored in the
-              vCloud Air Catalog </li>
-            <li>Install the chef client on the new VM. </li>
-            <li>Run an initial sync with the chef server to load the server configuration. </li>
-          </ol>
-        </div>
-        <h3>Commands</h3>
-        <br>
-        Here is the chef command<br>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li>The client workstation is configured with the Chef SDK.</li>
+<li>The Corporate Chef Server has a web-server role definition. </li>
+</ul>
+<br>
+<br>
+ <img src="/static/img/sp1.png"/>
 
 
+<br>
 
-        See how to install this scenario<br>
-        <a "http://vcair.us/docs/vcloudair_vm_using_chef.html"
-          target="_blank">Install and Config</a> <br>
-        <br>
-        Here are the Chef command necessary to run the scenario.<br>
-        The same command can be executed from Jenkins as part of a
-        build / test automation. <br>
-        <pre class="pre-scrollable">
 
-  knife vcair server create -V -V \
-  --image "Ubuntu Server 12.04 LTS (amd64 20150127)" \
-  --customization-script ./add_public_ssh_key.sh \
-  --cpus 2 \
-  --memory 4096 \
-  --node-name knifevcair \
-  --vcair-net "M933009684-4424-default-routed" \
-  --ssh-gateway gateway \
-  --ssh-gateway-identity /Users/bwebster/.ssh/ubuntu_rsa \
-  --ssh-user ubuntu \
-  --ssh-password welcome1 \
-  --server-url "https://chef.vcair.us/organizations/chef"
+<div class="center-block">
+ The plugin will... 
+<br>
+<br>
+ <ol type="1">
+
+<li> SSH into the VM and install the Chef Client </li>
+<li> Assign a run list to the node 
+<li> Run the chef client to register the new vm with the Chef Server and configure the vm based on the assigned runlist </li>
+</ol>
+
+</div>
+
+<br>
+<h3>Commands</h3>
+
+Here are the knife commands necessary to run the scenario.<br>
+The same commands can be executed from Jenkins as part of a build / test automation.
+<br>
+<br>
+Click on
+<a href="http://devops.vcair.us:8100/job/web_server/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
+<i>to try it. (Login required)</i>
+</p>
+
+
+
+
+<pre class="pre-scrollable">
+
+// Bootstrap node with chef client and set node role
+
+$ knife bootstrap 192.168.109.8 -x ubuntu --sudo --run-list  'role[web_server]'
+
+// Get the ip for the chef node
+export NIP=`knife node show klinuxchef | grep IP: | cut -d: -f2 | sed -e 's/^[[:space:]]*//'`
+
+// create a port mapping to the app
+$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${NIP}:80"
+
+// access the webserver with a browser
+http://devops.vcloudair.io:8900/
+
 </pre>
-        <br>
-        <br>
-        <p>Watch a video of the client execution. </p>
-        <video controls="controls" height="288" width="512">
-          <source
-src="https://www.dropbox.com/s/inmyncqwudv66tc/Ansible_vca_app_deploy_l.mp4?dl=1"
-            type="video/mp4"> Your browser does not support HTML5 video.
-        </video> </div>
-    </div>
-  </body>
+
+</br>
+</div>
+</div>
+
+</body>
 </html>
