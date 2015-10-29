@@ -73,7 +73,7 @@ Then on main page click - Sign up - and add a new user admin or jenkins/ passwd_
 Then go back into Manage Jenkins / Configure Jenkins and check
       - UNCHECK Allow users to sign up
 
-Login using browser with jenkins / devops123
+Login using browser with jenkins / YourPswd
 
 Then check matrix based security
 Add a jenkins or admin user

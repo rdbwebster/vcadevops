@@ -24,7 +24,7 @@
 
 
 <div class="container">
-        <h2>Web Server Scenario</h2>
+        <h2>Chef Client Scenario</h2>
 
 
 <div class="col-lg-8">
@@ -33,28 +33,28 @@
 <p>
 <br>
 <h4>
-This scenario demonstrates how a developer can configure an existing Server
-to be a corporate standard web server running nginx. 
+This scenario demonstrates how a jenkins can utilize the Chef Knife client
+to create and provision a web server running nginx. 
 </h4>
 <br>
 <br>
 <span class="learn-more"> Learn more about VMWare & Chef </span> <br>
-<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a>
+<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a> <br>
+<a href="https://github.com/chef-partners/knife-vcair" target="_blank">https://github.com/chef-partners/knife-vcair</a>
 <br>
 <br>
 <br>
 <h3>Prerequisites</h3>
 <ul>
-<li>The client workstation is configured with the Chef SDK.</li>
-<li>The Corporate Chef Server has a web-server role definition. </li>
+<li> To run the knife command the Chef SDK must be installed on the server running Jenkins..</li>
+<li> A running Chef Server is required, see the Docs section for instructions on how to install Chef Server 12 on vCloud Air.</li>
+<li> The Corporate Chef Server has a web-server role definition. </li>
 </ul>
 <br>
 <br>
  <img src="/static/img/sp1.png"/>
 
-
 <br>
-
 
 <div class="center-block">
  The plugin will... 
@@ -62,9 +62,9 @@ to be a corporate standard web server running nginx.
 <br>
  <ol type="1">
 
+<li> Connect to vCloud Air and Create the VM </li>
 <li> SSH into the VM and install the Chef Client </li>
-<li> Assign a run list to the node 
-<li> Run the chef client to register the new vm with the Chef Server and configure the vm based on the assigned runlist </li>
+<li> Run the chef client to register the new vm with the Chef Server as a new node </li>
 </ol>
 
 </div>
@@ -86,20 +86,39 @@ Click on
 
 <pre class="pre-scrollable">
 
-// Bootstrap node with chef client and set node role
 
-$ knife bootstrap 192.168.109.8 -x ubuntu --sudo --run-list  'role[web_server]'
+loud Air vchs Environment login
+# vca login vcadevops@gmail.com --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424 --save-password
 
-// Get the ip for the chef node
-export NIP=`knife node show klinuxchef | grep IP: | cut -d: -f2 | sed -e 's/^[[:space:]]*//'`
+# Login to vCloud Air onDemand
+vca login  appstech@websterx.com --password ${VCA_PASSWORD} --instance '97453e02-e83c-4cae-bbe9-3f7ee6dd8401' 
+vca vdc use --vdc DevOps-VDC
 
-// create a port mapping to the app
-$ ssh ubuntu@devops "sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8900 -m conntrack --ctstate NEW -j DNAT --to ${NIP}:80"
+# Lookup the ip of the target node
+# (if necessary the server has been created by an earlier jenkins job)
+# The earlier job connected to vcloud air cli
 
-// access the webserver with a browser
-http://devops.vcloudair.io:8900/
+export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d '|' -f5 | tr -d '[[:space:]]'`
 
-</pre>
+cd /home/ubuntu/vcadevops/chef-repo
+
+# Remove the old node from the chef-server if present
+if [ $(knife node list | grep precise-amd64 | wc -l) -eq 1 ]
+then
+  knife node delete precise-amd64  --yes
+  echo Deleted old server registration on Chef Server
+fi
+
+# Bootstrap node with chef client and set node role
+# Uses settings from knife.rb file in chef-repo
+#knife bootstrap ${VM_NAME} -x ubuntu --sudo --run-list  'role[web_server]'
+knife bootstrap s3ubuc --ssh-user ubuntu  -i ~jenkins/.ssh/ubuntu_rsa --sudo --run-list 'role[web-server]'
+
+# create a port mapping to the app 
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8900 ${SERVER_IP} 80
+
+# Test web server at url
+echo "http://devops.vcair.us:8900"
 
 </br>
 </div>

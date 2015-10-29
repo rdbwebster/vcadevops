@@ -26,7 +26,7 @@
 # chef-server-ctl user-list | grep ubuntu
 
 - name: Create user
-  shell: chef-server-ctl user-create ubuntu Devops Developer vcadevops@gmail.com devops123 --filename /home/ubuntu/.ssh/chef-ubuntu.pem
+  shell: chef-server-ctl user-create ubuntu Devops Developer vcadevops@gmail.com yourPswd --filename /home/ubuntu/.ssh/chef-ubuntu.pem
   ignore_errors: yes
 
 - name: Create org

@@ -16,9 +16,6 @@ java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job spring_boot_form
 # web_server
 java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job web_server   --username admin --password $PASSWORD > ./webServer/jenkins/config.xml
 
-# Chef_Knife
-java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job Chef_Knife   --username admin --password $PASSWORD > ./chefKnife/jenkins/config.xml
-
 # reset_demo
 java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job reset_demo  --username admin --password $PASSWORD > ./resetDemo/jenkins/config.xml
 

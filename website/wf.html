@@ -79,6 +79,71 @@ Click on
 </p>
 
 
+<p><b>Jenkins Job</b></p>
+<pre class="pre-scrollable">
+
+# get the project from git
+
+rm -rf word-finder
+
+git clone https://github.com/vcadevops/word-finder.git
+
+ssh-keygen -R s2ubu
+
+# Provision target server with Ansible, install nodejs and setup app as service
+
+# Note: Instruct Ansible to not prompt for unknown certs, set ANSIBLE_HOST_KEY_CHECKING=False above using envinject
+
+ 
+pushd ~ubuntu/vcadevops/scenarios/wordFinder/ansible
+
+      ansible-playbook -i inventory.py playbook.yml
+
+popd
+ 
+
+# Move the executable
+
+rsync -avzhe "ssh -i /var/lib/jenkins/.ssh/ubuntu_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --exclude=".*" /var/lib/jenkins/jobs/word_finder/workspace ubuntu@s2ubu:/home/ubuntu/workspace
+
+
+# Stop the App if a previous version is running
+
+ssh  -i /var/lib/jenkins/.ssh/ubuntu_rsa -o StrictHostKeyChecking=no ubuntu@s2ubu "cd workspace && sudo npm -g install word-finder"
+
+
+# Restart the app
+
+ssh-keygen -R s2ubu
+
+ssh  -i /var/lib/jenkins/.ssh/ubuntu_rsa  -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no  ubuntu@s2ubu sudo service word-finder restart
+
+
+# Run Selenium test
+
+echo "<= Run Selenium Test"
+
+python /home/ubuntu/vcadevops/scenarios/wordFinder/selenium/formtest.py
+
+
+if [  $? -eq 0 ] 
+then
+  echo "TEST PASSED"
+else
+  echo "TEST FAILED"
+fi
+
+echo "Test with http://devops.vcair.us:3000/"
+
+</pre>
+
+ <br>
+        <br><b>Ansible playbook on GitHub</b><br>
+        <a
+href="https://github.com/rdbwebster/vcadevops/blob/master/scenarios/wordFinder/ansible/playbook.yml"
+          target="_blank">Ansible Playbook</a> <br>
+        <br>
+
 </div>
 </div>
 

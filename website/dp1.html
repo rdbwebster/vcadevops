@@ -32,7 +32,7 @@
 <p>
 <br>
 <h4>
-This scenario shows how to create a Photon Server on vCloud Air and deploy a NGINX Web Server packaged in a container.
+This scenario shows how to use vca-cli to create a Photon Server on vCloud Air and deploy a NGINX Web Server packaged in a container.
 
 </h4>
 <br>
@@ -78,7 +78,7 @@ The same commands can be executed from Jenkins as part of a build / test automat
 <br>
 Click on
 <a href="http://devops.vcair.us:8100/job/docker_photon/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
-<i>to try it. (Login required)</i>
+<i>to try it. (Login required)</i> <br>Even without a login, You can view the job configuration and the console output from previous job executions.
 </p>
 
 
@@ -86,30 +86,73 @@ Click on
 
 <pre class="pre-scrollable">
 
-vca login --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+# Remove "" from input variables if present
+VAPP_NAME=`sed -e 's/^"//' -e 's/"$//' <<< $VAPP_NAME`
+VM_NAME=`sed -e 's/^"//' -e 's/"$//' <<< $VM_NAME`
 
-vca org use --org M933009684-4424 --service M933009684-4424
+# Login to vCloud Air vchs
 
-vca vdc use --vdc M933009684-4424
+#vca login --password $VCA_PASSWORD --save-password --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424  vcadevops@gmail.com
+#vca vdc use --vdc M933009684-4424
 
-export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 | sed -e 's/^[[:space:]]*//'`
+# Login to vCloud Air onDemand
+vca login  appstech@websterx.com --password ${VCA_PASSWORD} --instance '97453e02-e83c-4cae-bbe9-3f7ee6dd8401' 
+vca vdc use --vdc DevOps-VDC
 
+export SERVER_IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d '|' -f5 | tr -d '[[:space:]]'` && echo $SERVER_IP
 
-# Trim potential spaces from input parameters
-export HTTP_PORT="$(echo -e "${HTTP_PORT}" | tr -d '[[:space:]]')"
+# Create new Photon Server and start docker, skip if Server already exists 
+if [ ${#SERVER_IP} -lt 1 ]
+  then
+    vca vapp create -a $VAPP_NAME -V $VM_NAME -c 'Public Catalog' -t 'VMware Photon OS - Tech Preview 2'  -n default-routed-network  -m pool
+    vca vapp power-on --vapp $VAPP_NAME
 
-# install an sample nginx container and start
-sshpass -e ssh -t -v root@${SERVER_IP} "docker run -d -p 80:80 vmwarecna/nginx && docker ps"
+  # get the new vm ip 
+  SERVER_IP=`/home/ubuntu/vcadevops/scenarios/jenkins/wait_boot_ip.sh $VAPP_NAME $VM_NAME`
+  
+  # Add host entry 
+  sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_host_entry.sh ${SERVER_IP} ${VM_NAME}
 
+  # Get the initial root password
+  export SSHPASS=$(vca vapp info --vapp $VAPP_NAME | grep admin_password | cut -d'|' -f4)
+  # Remove leading and trailing spaces
+  SSHPASS=`sed -e 's/^"//' -e 's/"$//' <<< $SSHPASS`
+  
+  # ssh to Proton Server and enable and start Docker
+  sshpass  -e ssh -o StrictHostKeyChecking=no -t -v root@${IP} "systemctl enable docker && systemctl start docker && systemctl status docker" 
 
-# add route through devops server
-sudo /sbin/iptables -t nat -A PREROUTING -i eth0 -p tcp --dport ${HTTP_PORT} -m conntrack --ctstate NEW -j DNAT --to ${IP}:80
+else  
 
+  # Get the initial root password
+  export SSHPASS=$(vca vapp info --vapp $VAPP_NAME | grep admin_password | cut -d'|' -f4)
+  # Remove leading and trailing spaces
+  SSHPASS=`sed -e 's/^"//' -e 's/"$//' <<< $SSHPASS`
+
+fi
+
+# check for existing container deployment
+echo "=> Check for existing container deployment"
+export name=`sshpass -e ssh -t -v root@${SERVER_IP} "docker ps | grep nginx" `
+export name=$(echo $name | awk '{ print $NF }')
+
+# stop container and remove if present
+if [ ${#name} -gt 1 ]
+  then
+  echo "=> Removing existing container named ${name} "
+  
+  sshpass -e ssh  -o StrictHostKeyChecking=no -t root@${SERVER_IP} docker stop ${name} 
+  sshpass -e ssh  -o StrictHostKeyChecking=no -t root@${SERVER_IP} docker rm ${name}
+fi
+
+# install nginx container and start
+echo "=> Deploy Container vmwarecna/nginx"
+sshpass -e ssh -t root@${SERVER_IP} "docker run -d -p 80:80 vmwarecna/nginx && docker ps"
+
+# create a port mapping to the app using iptables
+sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 9999 ${SERVER_IP} 80
 
 # Test with browser using url 
-echo "Test with browser http://devops.vcloudair.io:${HTTP_PORT}"
-
-
+echo "=> Test with browser http://devops.vcair.us:9999"
 </pre>
 
 </div>
