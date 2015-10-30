@@ -3,10 +3,7 @@
   <actions/>
   <description>Demonstrates the creation and  provisioning of a web_server based on a chef role named &apos;web_server&apos;.&#xd;
 The web_server role represents an enterprise configuration of a web server using corporate standards.&#xd;
-&#xd;
-This job calls &apos;create_ubuntu&apos; which will connect to vCloud Air using the CLI and create an ubuntu Server to host the web Server.&#xd;
-The server name is &apos;klinuxw&apos;&#xd;
-The chef bootstrap command is used to install the chef client and run the initial configuration.</description>
+</description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>-1</daysToKeep>
     <numToKeep>5</numToKeep>
@@ -23,79 +20,43 @@ The chef bootstrap command is used to install the chef client and run the initia
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <EnvInjectBuilder plugin="envinject@1.92.1">
-      <info>
-        <propertiesContent>#Inject so available to shell later
-VAPP_NAME=vApp3
-VM_NAME=s3ubuc</propertiesContent>
-      </info>
-    </EnvInjectBuilder>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.29">
-      <configs>
-        <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
-          <configs>
-            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-              <properties>VAPP_NAME=$VAPP_NAME
-VM_NAME=$VM_NAME
-</properties>
-            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
-          </configs>
-          <projects>create_ubuntu</projects>
-          <condition>ALWAYS</condition>
-          <triggerWithNoParameters>false</triggerWithNoParameters>
-          <block>
-            <buildStepFailureThreshold>
-              <name>FAILURE</name>
-              <ordinal>2</ordinal>
-              <color>RED</color>
-              <completeBuild>true</completeBuild>
-            </buildStepFailureThreshold>
-            <unstableThreshold>
-              <name>UNSTABLE</name>
-              <ordinal>1</ordinal>
-              <color>YELLOW</color>
-              <completeBuild>true</completeBuild>
-            </unstableThreshold>
-            <failureThreshold>
-              <name>FAILURE</name>
-              <ordinal>2</ordinal>
-              <color>RED</color>
-              <completeBuild>true</completeBuild>
-            </failureThreshold>
-          </block>
-          <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
-        </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
-      </configs>
-    </hudson.plugins.parameterizedtrigger.TriggerBuilder>
     <hudson.tasks.Shell>
-      <command># vCloud Air vchs Environment login
-# vca login vcadevops@gmail.com --password $VCA_PASSWORD --host vchs.vmware.com --type subscription --version 5.6 --org M933009684-4424 --save-password
+      <command>// upload the role
 
-# Login to vCloud Air onDemand
+knife role from file roles/web_server.rb
+
+# Get the ip of the server if it exists
 vca login  appstech@websterx.com --password ${VCA_PASSWORD} --instance &apos;97453e02-e83c-4cae-bbe9-3f7ee6dd8401&apos; 
 vca vdc use --vdc DevOps-VDC
 
-# Lookup the ip of the target node
-# (if necessary the server has been created by an earlier jenkins job)
-# The earlier job connected to vcloud air cli
+export IP=`vca vm -a $VAPP_NAME | grep $VM_NAME | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;` &amp;&amp; echo $IP
 
-export SERVER_IP=`vca vm -a klinuxw_vapp | grep klinuxw | cut -d &apos;|&apos; -f5 | tr -d &apos;[[:space:]]&apos;`
+# If it exists run bootstrap
+knife bootstrap ${IP} -x ubuntu --sudo  --no-host-key-verify
 
-cd /home/ubuntu/vcadevops/chef-repo
+# Create a new Ubuntu VM
+knife vcair server create -V -V \
+  --image &quot;Ubuntu Server 12.04 LTS (amd64 20150127)&quot; \
+  --customization-script ./add_public_ssh_key.sh \
+  --cpus 2 \
+  --memory 4096 \
+  --node-name knifevcair \
+  --vcair-net &quot;default-routed-network&quot; \
+  --ssh-user ubuntu \
+  --ssh-password welcome1 \
+  --server-url &quot;https://192.168.109.3/organizations/chef&quot; \
+  --no-host-key-verify 
 
-# Remove the old node from the chef-server if present
-if [ $(knife node list | grep precise-amd64 | wc -l) -eq 1 ]
-then
-  knife node delete precise-amd64  --yes
-  echo Deleted old server registration on Chef Server
-fi
+# Assign the role to the Server
+knife exec -E &apos;nodes.transform(&quot;name:klinuxsp&quot;) {|n| n.run_list([&quot;role[web_server]&quot;])}&apos;
 
-# Bootstrap node with chef client and set node role
-# Uses settings from knife.rb file in chef-repo
-knife bootstrap ${VM_NAME} -x ubuntu --sudo --run-list  &apos;role[web_server]&apos;
+# Run the chef client
+knife ssh 192.168.109.8 &apos;sudo chef-client&apos; --manual-list --ssh-user ubuntu
 
 # create a port mapping to the app 
 sudo /home/ubuntu/vcadevops/scenarios/jenkins/add_iptable_nat.sh 8900 ${SERVER_IP} 80
+
+
 
 # Test web server at url
 echo &quot;http://devops.vcair.us:8900&quot;</command>

@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This project show sample knife commands &#xd;
+- Upload cookbooks to the server&#xd;
+- List VMs registered with the chef Server&#xd;
+- List VMs running on vCloud Air&#xd;
+&#xd;
+All commands must be run from a chef-repo directory that contains&#xd;
+a .chef/knife.rb with configuration knife settings.</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>sudo -u ubuntu -s
+cd ~ubuntu/vcadevops/chef-repo
+
+# Verify knife configuration
+knife client list -V
+knife ssl check
+
+# list Vapps that are registered with the Chef Server
+knife node list
+ 
+# upload all local cookbooks to the chef server
+knife cookbook upload --all
+
+# Upload a locally defined Role to the chef server (A role defines a run list of recipes)
+knife role from file roles/web_server.rb
+
+# Get the IP of a given node registered with the server
+export NIP=$(knife vcair vm list | grep chefClientApp | awk &apos;{print $3;}&apos;)
+
+# Install a Chef Agent onto an existing Server
+knife bootstrap $NIP -x ubuntu --sudo  --no-host-key-verify
+
+# list all VMs with Agents and other known command line clients (chef-validator)
+knife client list
+
+# list all VMs running on vCloud Air
+knife vcair vm list
+
+# Check the run-list of recipes for a given server
+knife node run_list add chefClient &apos;recipe[SB1]&apos;
+
+# Add a recipe to a Servers run list
+knife node run_list add chefClient &apos;recipe[SB1]&apos;
+
+# Add a Role to a Server Run List
+knife exec -E &apos;nodes.transform(&quot;name:chefClient&quot;) {|n| n.run_list([&quot;role[web_server]&quot;])}&apos;
+
+# Trigger a Chef Client run on a server
+knife ssh $NIP &apos;sudo chef-client&apos; --manual-list --ssh-user ubuntu --no-host-key-verify 
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.92.1">
+      <info>
+        <propertiesContent>VCAIR_USER=appstech@websterx.com</propertiesContent>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
+    <EnvInjectPasswordWrapper plugin="envinject@1.92.1">
+      <injectGlobalPasswords>false</injectGlobalPasswords>
+      <maskPasswordParameters>true</maskPasswordParameters>
+      <passwordEntries>
+        <EnvInjectPasswordEntry>
+          <name>VCAIR_PASS</name>
+          <value>EKvLs32P7c4qvfTpgrv8mxcTFP3XIRlUtDxD/WKvR6M=</value>
+        </EnvInjectPasswordEntry>
+      </passwordEntries>
+    </EnvInjectPasswordWrapper>
+  </buildWrappers>
+</project>

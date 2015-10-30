@@ -1,4 +1,5 @@
 # Chef
+# include .knife.rb but exclude private certs
 .chef/*.pem
 .chef/encrypted_data_bag_secret
 

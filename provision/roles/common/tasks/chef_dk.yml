@@ -1,7 +1,7 @@
 ---
 
 - name: check for chefdk download
-  stat: path=./chefdk_0.4.0-1_amd64.deb
+  stat: path=./chefdk_0.9.0-1_amd64.deb
   register: chefdk_downloaded
 
 #- name:  get chef sdk if not present
@@ -9,13 +9,25 @@
 #  creates=./chefdk_0.4.0-1_amd64.deb
  
 - name:  get chef sdk if not present
-  command: wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.4.0-1_amd64.deb
+#  command: wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.4.0-1_amd64.deb
+  command: wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.9.0-1_amd64.deb
   when: chefdk_downloaded.stat.exists == False
 
 - name: install chef dk
-  shell: dpkg -i chefdk_0.4.0-1_amd64.deb
+  shell: dpkg -i chefdk_0.9.0-1_amd64.deb
 
-- name: install knife vcair
+- name: install knife vcair for ubuntu
   shell: chef gem install knife-vcair
   when: chefdk_downloaded.stat.exists == True
 
+- name: install 'librarian' to manage online cookbooks
+  shell: chef gem install librarian-chef
+
+- name: run the librarian to fetch specified online cookbooks specified in site-cookbooks and create a local cookbooks folder in chef-repo
+  shell: librarian-chef install
+
+- name: Install chef cert, created during chef server install to location set in chef-repo/.chef/knife.rb
+  shell: scp ubuntu@chef.vcair.us:/home/ubuntu/.ssh/chef-validator.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-validator.pem
+
+- name: Install chef ubuntu client cert, created during chef server install to location set in chef-repo/.chef/knife.rb
+  shell: scp ubuntu@chef.vcair.us:/home/ubuntu/.ssh/chef-ubuntu.pem /home/ubuntu/vcadevops/chef-repo/.chef/chef-ubuntu.pem

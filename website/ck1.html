@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="/static/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600|PT+Sans+Narrow|Oswald|PT+Sans' rel='stylesheet' type='text/css'>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+
+    <script> 
+      $(function(){
+         $("#header").load("base.html"); 
+      });
+    </script> 
+
+</head>
+
+<body>
+
+<div id="header"></div>
+
+
+<div class="container">
+        <h2>Chef Client Scenario</h2>
+
+
+<div class="col-lg-8">
+
+
+<p>
+<br>
+<h4>
+This scenario demonstrates basic Chef Knife client usage from Jenkins running on vCloud Air
+</h4>
+<br>
+<br>
+<span class="learn-more"> Learn more about VMWare & Chef </span> <br>
+<a href="https://www.chef.io/solutions/vmware/" target="_blank">https://www.chef.io/solutions/vmware/</a> <br>
+<a href="https://github.com/chef-partners/knife-vcair" target="_blank">https://github.com/chef-partners/knife-vcair</a>
+<br>
+<br>
+<br>
+<h3>Prerequisites</h3>
+<ul>
+<li> To run the knife command the Chef SDK must be installed on the server running Jenkins.</li>
+<li> A running Chef Server is required, see the Docs section for instructions on how to install Chef Server 12 on vCloud Air.</li>
+</ul>
+<br>
+<br>
+ <img src="/static/img/ck1.png"/>
+
+<br>
+<br>
+
+<div class="center-block">
+ In this scenario Jenkins acts as a chef client talking to a Chef Server.<br>
+ Both Jenkins and the Chef Server are running on vCloud Air. <br>
+ The Jenkins user has the knife client installed and the knife vcair plugin installed. <br><br>
+ The jenkins client uses a set of cookbooks that are maintained in github and "checked out" to the chef-repo on the Jenkins Server.<br><br>
+ The scenario utilizes an existing Ubuntu server (named chefClient, shown as the VM icon in the above diagram)<br>
+ How the server was created is not the focus of this scenario. <br>
+ The server represents a new VM that we want to register with the Chef Server <br > and have Chef install a set of software products on the server.<br><br>
+
+ The various commands in this scenario show how chef knife can:
+ <ul>
+ <li> locate the server on vCloud Air</li>
+ <li> install the chef agent (bootstrap)</li>
+ <li> assign cookbooks and sets of cookbooks (roles) to the run list of the server</li>
+ <li> execute the client agent so the defined software is installed on the server</li>
+ </ul>
+<br>
+<br>
+
+</div>
+
+<br>
+<h3>Commands</h3>
+
+Here are the knife commands shown in the scenario.<br>
+<br>
+<br>
+Click on
+<a href="http://devops.vcair.us:8100/job/chef_knife/" target="_blank"><button type="button">Run the Demo<span class="glyphicon glyphicon-play"></button></a>
+<i>to try it. (Login required)</i>
+</p>
+
+
+<pre class="pre-scrollable">
+
+cd ~ubuntu/vcadevops/chef-repo
+
+# Verify knife configuration
+knife client list -V
+knife ssl check
+
+# list Vapps that are registered with the Chef Server
+knife node list
+ 
+# upload all local cookbooks to the chef server
+knife cookbook upload --all
+
+# Upload a locally defined Role to the chef server (A role defines a run list of recipes)
+knife role from file roles/web_server.rb
+
+# Get the IP of a given node registered with the server
+export NIP=$(knife vcair vm list | grep chefClientApp | awk '{print $3;}')
+
+# Install a Chef Agent onto an existing Server
+knife bootstrap $NIP -x ubuntu --sudo  --no-host-key-verify
+
+# list all VMs with Agents and other known command line clients (chef-validator)
+knife client list
+
+# list all VMs running on vCloud Air
+knife vcair vm list
+
+# Check the run-list of recipes for a given server
+knife node run_list add chefClient 'recipe[SB1]'
+
+# Add a recipe to a Servers run list
+knife node run_list add chefClient 'recipe[SB1]'
+
+# Add a Role to a Server Run List
+knife exec -E 'nodes.transform("name:chefClient") {|n| n.run_list(["role[web_server]"])}'
+
+# Trigger a Chef Client run on the chefClient server with the new agent
+knife ssh $NIP 'sudo chef-client' --manual-list --ssh-user ubuntu --no-host-key-verify 
+
+
+</pre>
+
+</br>
+</div>
+</div>
+
+</body>
+</html>

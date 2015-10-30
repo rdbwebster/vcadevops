@@ -24,14 +24,20 @@
     line: "{{ item.line }}"
   with_items:
     - { regexp: '^HTTP_PORT', line: 'HTTP_PORT=8100' }
+    - { regexp: '^JENKINS_USER', line: 'JENKINS_USER=ubuntu' }
     - { regexp: '^#JAVA_ARGS="-Xmx256m"', line: 'JAVA_ARGS="-Xmx256m"' }
     - { regexp: '^JAVA', line: 'JAVA="$JAVA_HOME/bin/java"' }
 
-- name: add before the match
+
+
+- name: setjava version, add before the match
   lineinfile: dest=/etc/default/jenkins 
                 regexp='^JAVA'
                 insertbefore='^Java'
                 line='JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64'
+
+- name: change ownership of jenkins workspaces, cache and logs
+  shell: chown -R ubuntu:ubuntu /var/lib/jenkins;  chown -R ubuntu:ubuntu /var/cache/jenkins; chown -R ubuntu:ubuntu /var/log/jenkins
 
 - name: restart jenkins service
   service: name=jenkins state=restarted
@@ -41,6 +47,9 @@
 
 - name: add .ssh to jenkins home 
   shell: mkdir /var/lib/jenkins/.ssh; chown jenkins /var/lib/jenkins/.ssh;  chmod 700 /var/lib/jenkins/.ssh
+
+- name: reset default jenkins user password
+  shell: usermod --password $(echo $JENKINS_PASS | openssl passwd -1 -stdin) jenkins
 
 - name: place ubuntu key in jenkins home for jenkins use to login to created servers
   shell: cp ~ubuntu/.ssh/id_rsa ~jenkins/.ssh/ubuntu_rsa; chown jenkins ~jenkins/.ssh/ubuntu_rsa;  chmod 700 ~jenkins/.ssh/ubuntu_rsa

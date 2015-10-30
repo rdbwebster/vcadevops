@@ -31,6 +31,8 @@ $ pip install vca-cli==10rc8
 
 ```
 
+==== RUN PROVISIONING
+
 // You must Set the environment variables in config.json
 
 // You mus also set VCA_PASS as an environment variable

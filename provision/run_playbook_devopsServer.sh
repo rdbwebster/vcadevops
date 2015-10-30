@@ -4,4 +4,9 @@ if [ -z ${devops_server_ip+x} ]; then
     exit;
 fi
 
+if [ -z ${JENKINS_PASS+x} ]; then
+    echo "JENKINS_PASS must be set as environment variable"
+    exit;
+fi
+
 ansible-playbook  -vvvv playbook_devopsServer.yml -i hosts -u ubuntu --private-key   ~/.ssh/ubuntu_rsa  --sudo

@@ -7,6 +7,9 @@ cd -
 # create_ubuntu
 java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job create_ubuntu --username admin --password $PASSWORD > ./createUbuntu/jenkins/config.xml
 
+# chef_knife
+java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job chef_knife --username admin --password $PASSWORD > ./chefKnife/jenkins/config.xml
+
 # docker_photon
 java -jar /tmp/jenkins-cli.jar -s http://vcair.us:8100/ get-job docker_photon --username admin --password $PASSWORD  > ./dockerPhoton/jenkins/config.xml
 

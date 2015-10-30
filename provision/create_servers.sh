@@ -129,6 +129,12 @@ else
 
   echo adding http NAT rule for chef https to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP --original-port 443 --translated-ip ${chef_server_ip} --translated-port 443 --protocol tcp
+
+  echo add Additional DNAT rule to internal network rule for chef knife bootstrap callout (hairpin nat)
+  vca nat add --type dnat  --original-ip $VCA_PUBLIC_IP --original-port ANY --translated-ip ${chef_server_ip} --translated-port ANY --protocol tcp  --network default-routed-network
+
+  echo add Additional SNAT rule to internal network rule for chef knife bootstrap callout (hairpin nat)
+  vca nat add --type snat  --original-ip 192.168.109.0/24 --original-port ANY --translated-ip $VCA_PUBLIC_IP --translated-port ANY --protocol tcp  --network default-routed-network
 fi
 
 

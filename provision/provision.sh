@@ -21,6 +21,12 @@ if [ -z ${VCA_PASS+x} ]; then
     exit;
 fi
 
+if [ -z ${JENKINS_PASS+x} ]; then
+    echo "JENKINS_PASS must be set as environment variable"
+    exit;
+fi
+
+
 if [ ! -f ${UBUNTU_PRIVATE_KEY} ]; then echo "The specified private key file ${UBUNTU_PRIVATE_KEY} does not exist"; fi
 
 export ANSIBLE_HOSTS=./hosts
@@ -52,7 +58,7 @@ echo devops ansible_ssh_port=22 ansible_ssh_host=${VCA_PUBLIC_IP} > hosts
 echo chef   ansible_ssh_port=33 ansible_ssh_host=${VCA_PUBLIC_IP} >> hosts
 
 ###
-### Provision Chef Server
+### Provision Chef Server, chef server  keys need to be created and used by DevOps
 ###
 
 # Get and Save ip

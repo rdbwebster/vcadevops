@@ -45,5 +45,5 @@
 
      #- include: roles/common/tasks/gitlab.yml
      #- include: roles/common/tasks/artifactory.yml
-     #- include: roles/common/tasks/selenium.yml
+     - include: roles/common/tasks/selenium.yml
 
