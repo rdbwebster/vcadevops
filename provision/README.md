@@ -35,7 +35,9 @@ $ pip install vca-cli==10rc8
 
 // You must Set the environment variables in config.json
 
-// You mus also set VCA_PASS as an environment variable
+// You must set VCA_PASS as an environment variable to access the target vCloud Air VDC
+
+// You must set JENKINS_PASS as an environment variable to set the default password for the Jenkins admin user.
 
 // Run the provision script to create servers and provision
 
@@ -104,36 +106,6 @@ Set Shell executable field to
 /bin/bash
 
 
-GitLab
-------
-> Login to Gitlab and change password
-
-Username: root
-Password: 5iveL!fe
-
-Default Username: root
-Default Password: 5iveL!fe
-change to your choice of password
-
->Checkin wordfinder project
-- helpful notes here https://git-scm.com/book/en/v2/Git-on-the-Server-GitLab
-
-First login to gitlab console, click create new Project
-Add a project named word-finder, check the public radio button.
-
-Next, Login to devops server as ubuntu using terminal
-
-cd /Users/bwebster/apps/vcadevopsenv/vcadevops/scenarios/wordFinder/word-finder
-
-git remote add gitlab http://vcair.us:8300/root/word-finder.git
-
-git remote -v
-
-git push gitlab  master
-
-supply  root/ password you set above for root as creds
-
-
 Setup Jenkins Hook from Github
 
     Go to https://github.com/vcadevops/word-finder > Settings > Webhooks & Services > Services > Add a Service > Jenkins (Github plugin)
@@ -142,3 +114,13 @@ Setup Jenkins Hook from Github
 
     Be sure Active is checked and click Add Service
 
+
+
+Artifactory: Post Provisioning Step
+Login to artifactory using 
+admin / password
+
+Security->Users
+to admin / yourpassword
+
+Anonymous users (not logged in) can browse by default.

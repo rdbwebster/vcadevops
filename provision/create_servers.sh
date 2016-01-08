@@ -70,8 +70,9 @@ else
   echo adding NAT rule for Jenkins http to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 8100 --translated-ip ${devops_server_ip} --translated-port 8100 --protocol tcp
 
-  echo adding NAT rule for Gitlab  http to gateway
-  vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 8300 --translated-ip ${devops_server_ip} --translated-port 8300 --protocol tcp
+# Gitlab Removed 01/2016
+#  echo adding NAT rule for Gitlab  http to gateway
+#  vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 8300 --translated-ip ${devops_server_ip} --translated-port 8300 --protocol tcp
 
   echo adding NAT rule for nginx  http to gateway
   vca nat add --type DNAT  --original-ip $VCA_PUBLIC_IP  --original-port 80 --translated-ip ${devops_server_ip} --translated-port 80 --protocol tcp

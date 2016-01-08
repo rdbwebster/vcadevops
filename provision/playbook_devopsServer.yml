@@ -43,6 +43,7 @@
      #- include: roles/common/tasks/config_user_jenkins.yml
      #- include: roles/common/tasks/iptables.yml
 
+     #- Not using gitlab anymore, too many issues
      #- include: roles/common/tasks/gitlab.yml
      #- include: roles/common/tasks/artifactory.yml
      - include: roles/common/tasks/selenium.yml
